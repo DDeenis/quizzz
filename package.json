@@ -9,12 +9,25 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@auth/core": "^0.7.1",
+    "@next-auth/supabase-adapter": "^0.2.1",
+    "@supabase/supabase-js": "^2.22.0",
+    "@tanstack/react-query": "^4.29.7",
+    "@trpc/client": "^10.27.1",
+    "@trpc/next": "^10.27.1",
+    "@trpc/react-query": "^10.27.1",
+    "@trpc/server": "^10.27.1",
     "@types/node": "20.2.3",
     "@types/react": "18.2.7",
     "@types/react-dom": "18.2.4",
     "next": "13.4.3",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "typescript": "5.0.4"
+    "typescript": "5.0.4",
+    "zod": "^3.21.4"
+  },
+  "devDependencies": {
+    "next-auth": "^4.22.1",
+    "nodemailer": "^6.9.2"
   }
 }
