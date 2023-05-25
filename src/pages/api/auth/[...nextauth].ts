@@ -3,7 +3,8 @@ import Email from "next-auth/providers/email";
 import { SupabaseAdapter } from "@next-auth/supabase-adapter";
 
 export default NextAuth({
-  // secret: process.env.NEXTAUTH_SECRET,
+  //   secret: process.env.NEXTAUTH_SECRET,
+  //   url: process.env.NEXTAUTH_URL,
   adapter: SupabaseAdapter({
     url: process.env.NEXT_PUBLIC_SUPABASE_URL!,
     secret: process.env.SUPABASE_SERVICE_ROLE_KEY!,
