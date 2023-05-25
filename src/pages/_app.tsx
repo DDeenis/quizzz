@@ -1,9 +1,20 @@
+import { type Session } from "next-auth";
+import { SessionProvider } from "next-auth/react";
+import { type AppType } from "next/app";
+import { api } from "@/utils/api";
+import CssBaseline from "@mui/material/CssBaseline";
 import "@/styles/globals.css";
-import { trpc } from "@/utils/trpc";
-import type { AppProps } from "next/app";
 
-function App({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />;
-}
+const MyApp: AppType<{ session: Session | null }> = ({
+  Component,
+  pageProps: { session, ...pageProps },
+}) => {
+  return (
+    <SessionProvider session={session}>
+      <CssBaseline />
+      <Component {...pageProps} />
+    </SessionProvider>
+  );
+};
 
-export default trpc.withTRPC(App);
+export default api.withTRPC(MyApp);
