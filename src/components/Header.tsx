@@ -11,12 +11,19 @@ import MoreIcon from "@mui/icons-material/More";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import { useSession, signIn, signOut } from "next-auth/react";
 import Button from "@mui/material/Button";
+import Modal from "@mui/material/Modal";
+import { RegisterForm, SignInForm } from "./AuthForms";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
 
 export default function Header() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
     React.useState<null | HTMLElement>(null);
+  const [open, setOpen] = React.useState(false);
+  const [currentTab, setCurrentTab] = React.useState(0);
   const session = useSession();
+  console.log(session);
 
   const isAuthenticated = session.status === "authenticated";
 
@@ -40,8 +47,12 @@ export default function Header() {
     setMobileMoreAnchorEl(event.currentTarget);
   };
 
-  const handleAuth = () =>
-    isAuthenticated ? void signOut() : void signIn("email");
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setCurrentTab(newValue);
+  };
 
   const menuId = "primary-search-account-menu";
   const renderMenu = (
@@ -62,9 +73,7 @@ export default function Header() {
     >
       <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
       <MenuItem onClick={handleMenuClose}>
-        <Button onClick={handleAuth}>
-          {isAuthenticated ? "Sign Out" : "Sign In"}
-        </Button>
+        <Button onClick={() => void signOut()}>Sign Out</Button>
       </MenuItem>
     </Menu>
   );
@@ -124,17 +133,27 @@ export default function Header() {
           </Typography>
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: "none", md: "flex" } }}>
-            <IconButton
-              size="large"
-              edge="end"
-              aria-label="account of current user"
-              aria-controls={menuId}
-              aria-haspopup="true"
-              onClick={handleProfileMenuOpen}
-              color="inherit"
-            >
-              <AccountCircle />
-            </IconButton>
+            {isAuthenticated ? (
+              <IconButton
+                size="large"
+                edge="end"
+                aria-label="account of current user"
+                aria-controls={menuId}
+                aria-haspopup="true"
+                onClick={handleProfileMenuOpen}
+                color="inherit"
+              >
+                <AccountCircle />
+              </IconButton>
+            ) : (
+              <Button
+                onClick={handleOpen}
+                variant="contained"
+                color="secondary"
+              >
+                Sign In
+              </Button>
+            )}
           </Box>
           <Box sx={{ display: { xs: "flex", md: "none" } }}>
             <IconButton
@@ -152,6 +171,65 @@ export default function Header() {
       </AppBar>
       {renderMobileMenu}
       {renderMenu}
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            maxWidth: "400px",
+            width: "100%",
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+          }}
+        >
+          <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
+            <Tabs
+              value={currentTab}
+              onChange={handleTabChange}
+              aria-label="basic tabs example"
+              centered
+            >
+              <Tab label="Sign In" />
+              <Tab label="Register" />
+            </Tabs>
+          </Box>
+          <TabPanel value={currentTab} index={0}>
+            <SignInForm />
+          </TabPanel>
+          <TabPanel value={currentTab} index={1}>
+            <RegisterForm />
+          </TabPanel>
+        </Box>
+      </Modal>
     </Box>
+  );
+}
+
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+    >
+      {value === index && children}
+    </div>
   );
 }
