@@ -82,6 +82,7 @@ export function TestForm(props: TestFormProps) {
         },
       },
     },
+    shouldUnregister: true,
   });
 
   const appendQuestion = () =>
@@ -426,6 +427,7 @@ const FormField = ({
                 )}
                 {...register(`questions.${index}.questionData.variants.${i}`, {
                   required: true,
+                  shouldUnregister: true,
                   onChange() {
                     setValue(`questions.${index}.answerData`, []);
                   },
