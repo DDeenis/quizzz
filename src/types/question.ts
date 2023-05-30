@@ -34,7 +34,7 @@ export interface QuestionCreateObject {
 }
 
 export type QuestionUpdateObject = QuestionCreateObject & {
-  id: string;
+  id?: string;
 };
 
 export enum QuestionType {

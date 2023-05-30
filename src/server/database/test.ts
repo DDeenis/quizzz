@@ -66,7 +66,8 @@ export const createTest = async (testCreateObj: TestCreateObject) => {
 
 export const updateTest = async (
   id: string,
-  testUpdateObj: TestUpdateObject
+  testUpdateObj: TestUpdateObject,
+  deletedQuestionIds?: string[] | null
 ) => {
   try {
     const { error } = await supabase
@@ -85,13 +86,27 @@ export const updateTest = async (
     if (error) throw error;
 
     testUpdateObj.questions.forEach(async (q) => {
-      const { error } = await supabase
-        .from("questions")
-        .update(q)
-        .eq("id", q.id);
-
-      if (error) throw error;
+      console.log(q);
+      if (q.id) {
+        const { error } = await supabase
+          .from("questions")
+          .update(q)
+          .eq("id", q.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from("questions")
+          .insert({ ...q, testId: id });
+        if (error) throw error;
+      }
     });
+
+    console.log(deletedQuestionIds);
+    if (deletedQuestionIds) {
+      deletedQuestionIds.forEach(async (qId) => {
+        await supabase.from("questions").delete().eq("id", qId);
+      });
+    }
   } catch (err) {
     console.log(err);
     return false;

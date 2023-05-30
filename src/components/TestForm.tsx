@@ -1,4 +1,9 @@
-import { QuestionComplexity, QuestionType } from "@/types/question";
+import {
+  QuestionComplexity,
+  QuestionCreateObject,
+  QuestionType,
+  QuestionUpdateObject,
+} from "@/types/question";
 import type { Test, TestCreateObject, TestUpdateObject } from "@/types/test";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -30,11 +35,16 @@ import IconButton from "@mui/material/IconButton";
 import { getTotalScore } from "@/utils/questions";
 import FormHelperText from "@mui/material/FormHelperText";
 
+type RemoveQuestionFn =
+  | ((question: QuestionCreateObject) => void)
+  | ((question: QuestionUpdateObject) => void);
+
 interface TestFormProps {
   test?: Test;
   onSubmit:
     | ((formData: TestCreateObject) => void)
     | ((formData: TestUpdateObject) => void);
+  onRemoveQuestion?: RemoveQuestionFn;
 }
 
 export function TestForm(props: TestFormProps) {
@@ -81,8 +91,13 @@ export function TestForm(props: TestFormProps) {
       questionData: { question: "", variants: [] },
       answerData: [],
     });
+  const removeQuestion = (i: number) => () => {
+    const question = getValues().questions[i];
+    questionFieldsArray.remove(i);
+    // @ts-expect-error
+    props.onRemoveQuestion?.(question);
+  };
 
-  // @ts-expect-error
   const onSubmit = handleSubmit(props.onSubmit);
 
   // fix weird react-hook-forms bug (answerData is not set in defaultValues)
@@ -201,6 +216,7 @@ export function TestForm(props: TestFormProps) {
             index={index}
             control={control}
             errors={errors}
+            onRemove={removeQuestion(index)}
             register={register}
             getValues={getValues}
             setValue={setValue}
@@ -225,6 +241,7 @@ const FormField = ({
   index,
   control,
   errors,
+  onRemove,
   register,
   getValues,
   setValue,
@@ -232,6 +249,7 @@ const FormField = ({
   index: number;
   control: Control<TestCreateObject, any>;
   errors: FieldErrors<TestCreateObject>;
+  onRemove: () => void;
   register: UseFormRegister<TestCreateObject>;
   getValues: UseFormGetValues<TestCreateObject>;
   setValue: UseFormSetValue<TestCreateObject>;
@@ -298,9 +316,18 @@ const FormField = ({
 
   return (
     <Card sx={{ p: 2 }}>
-      <Typography gutterBottom variant="h5" component="div">
-        Question {index + 1}
-      </Typography>
+      <Box
+        display="flex"
+        justifyContent={"space-between"}
+        alignItems={"center"}
+      >
+        <Typography gutterBottom variant="h5" component="div">
+          Question {index + 1}
+        </Typography>
+        <IconButton aria-label="delete" size="medium" onClick={onRemove}>
+          <DeleteIcon fontSize="medium" />
+        </IconButton>
+      </Box>
       <CardContent sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
         <Box
           maxWidth={300}

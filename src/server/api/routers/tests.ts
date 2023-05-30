@@ -41,7 +41,7 @@ const testUpdateScheme = z.object({
   description: z.string().optional().nullable(),
   questions: z.array(
     z.object({
-      id: z.string(),
+      id: z.string().optional().nullable(),
       questionType: z.enum([
         QuestionType.SingleVariant,
         QuestionType.MultipleVariants,
@@ -78,14 +78,19 @@ export const testsRouter = createTRPCRouter({
       z.object({
         testId: z.string(),
         testUpdateObject: testUpdateScheme,
+        deletedQuestionIds: z.array(z.string()).optional().nullable(),
       })
     )
     .mutation(async ({ input, ctx }) => {
-      // @ts-ignore
-      return await updateTest(input.testId, {
-        ...input.testUpdateObject,
-        authorId: ctx.session.user.id,
-      });
+      return await updateTest(
+        input.testId,
+        // @ts-expect-error
+        {
+          ...input.testUpdateObject,
+          authorId: ctx.session.user.id,
+        },
+        input.deletedQuestionIds
+      );
     }),
 
   deleteTest: adminProcedure
