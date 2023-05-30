@@ -23,7 +23,6 @@ export default function Header() {
   const [open, setOpen] = React.useState(false);
   const [currentTab, setCurrentTab] = React.useState(0);
   const session = useSession();
-  console.log(session);
 
   const isAuthenticated = session.status === "authenticated";
 

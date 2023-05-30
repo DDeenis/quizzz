@@ -1,4 +1,7 @@
-import { QuestionAnswer, QuestionAnswerCreateObject } from "./questionAnswer";
+import type {
+  QuestionAnswer,
+  QuestionAnswerCreateObject,
+} from "./questionAnswer";
 
 export type Question =
   | {
@@ -10,7 +13,6 @@ export type Question =
       answerData: SingleVariantAnswerData;
       createdAt?: string;
       image?: string;
-      // answers?: QuestionAnswer[];
     }
   | {
       id: string;
@@ -21,26 +23,19 @@ export type Question =
       answerData: MultipleVariantsAnswerData;
       createdAt?: string;
       image?: string;
-      // answers?: QuestionAnswer[];
     };
 
-// export type QuestionCreateObject = {
-//   questionType: QuestionType;
-//   complexity: QuestionComplexity;
-//   questionData: SingleVariantData;
-//   answerData: SingleVariantAnswerData;
-// } & {
-//   questionType: QuestionType;
-//   complexity: QuestionComplexity;
-//   questionData: MultipleVariantsData;
-//   answerData: MultipleVariantsAnswerData;
-// };
 export interface QuestionCreateObject {
   questionType: QuestionType;
   complexity: QuestionComplexity;
   questionData: SingleVariantData | MultipleVariantsData;
-  answerData: [string] | string[];
+  answerData: SingleVariantAnswerData | MultipleVariantsAnswerData;
+  image?: string;
 }
+
+export type QuestionUpdateObject = QuestionCreateObject & {
+  id: string;
+};
 
 export enum QuestionType {
   SingleVariant = "singleVariant",
@@ -66,10 +61,6 @@ export interface MultipleVariantsData extends VariantData {
   variants: string[];
 }
 
-export interface SingleVariantAnswerData {
-  answer: string;
-}
+export type SingleVariantAnswerData = [string];
 
-export interface MultipleVariantsAnswerData {
-  answers: string[];
-}
+export type MultipleVariantsAnswerData = string[];

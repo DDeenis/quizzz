@@ -1,4 +1,8 @@
-import { Question, QuestionCreateObject } from "./question";
+import {
+  Question,
+  QuestionCreateObject,
+  QuestionUpdateObject,
+} from "./question";
 
 export interface Test {
   id: string;
@@ -22,4 +26,14 @@ export interface TestCreateObject {
   minimumScore: number;
   description?: string;
   questions: QuestionCreateObject[];
+}
+
+export interface TestUpdateObject {
+  name: string;
+  authorId: string;
+  time: number;
+  questionsCount: number;
+  minimumScore: number;
+  description?: string;
+  questions: QuestionUpdateObject[];
 }

@@ -32,7 +32,6 @@ export const authRouter = createTRPCRouter({
     )
     .mutation(async ({ input }) => {
       const user = await getUserByEmail(input.email);
-      console.log(input.email, user);
 
       if (!user) {
         throw new TRPCError({

@@ -14,7 +14,6 @@ export const RegisterForm = () => {
   const { register, handleSubmit, formState } = useForm<UserCreateObject>({
     reValidateMode: "onChange",
   });
-  console.log();
 
   const onSubmit = handleSubmit((formData) => {
     mutateAsync(formData)

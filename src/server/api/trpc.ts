@@ -133,11 +133,15 @@ const enforceUserIsAdmin = t.middleware(async ({ ctx, next }) => {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
 
-  const isAdmin = await isUserAdmin(ctx.session.user.id);
-
-  if (!isAdmin) {
+  if (!ctx.session.user.isAdmin) {
     throw new TRPCError({ code: "FORBIDDEN" });
   }
+
+  // const isAdmin = await isUserAdmin(ctx.session.user.id);
+
+  // if (!isAdmin) {
+  //   throw new TRPCError({ code: "FORBIDDEN" });
+  // }
 
   return next({
     ctx: {

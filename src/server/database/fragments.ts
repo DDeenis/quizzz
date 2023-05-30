@@ -27,6 +27,8 @@ export const testFragment = `
     deletedAt,
     time,
     questionsCount,
+    minimumScore,
+    maximumScore,
     questions ( 
         ${questionFragment}
     )
