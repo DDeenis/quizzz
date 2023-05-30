@@ -7,6 +7,8 @@ import {
 } from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
 import Email from "next-auth/providers/email";
+import { getUserByEmail } from "./database/user";
+import { User } from "@/types/user";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -16,11 +18,7 @@ import Email from "next-auth/providers/email";
  */
 declare module "next-auth" {
   interface Session extends DefaultSession {
-    user: {
-      id: string;
-      // ...other properties
-      // role: UserRole;
-    } & DefaultSession["user"];
+    user: User;
   }
 
   // interface User {
@@ -36,7 +34,15 @@ declare module "next-auth" {
  */
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    session: ({ session, token }) => {
+    session: async ({ session, token }) => {
+      if (session.user.email) {
+        const user = await getUserByEmail(session.user.email);
+        return {
+          ...session,
+          user,
+        };
+      }
+
       return {
         ...session,
         user: session.user,
