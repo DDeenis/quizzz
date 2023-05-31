@@ -10,7 +10,6 @@ export interface QuestionAnswer {
 export interface QuestionAnswerCreateObject {
   questionId: string;
   userId: string;
-  answerType: AnswerType;
   answerData: AnswerData;
 }
 

@@ -51,6 +51,7 @@ export function TestForm(props: TestFormProps) {
   const {
     control,
     register,
+    unregister,
     getValues,
     setValue,
     handleSubmit,
@@ -82,7 +83,7 @@ export function TestForm(props: TestFormProps) {
         },
       },
     },
-    shouldUnregister: true,
+    // shouldUnregister: true,
   });
 
   const appendQuestion = () =>
@@ -95,6 +96,7 @@ export function TestForm(props: TestFormProps) {
   const removeQuestion = (i: number) => () => {
     const question = getValues().questions[i];
     questionFieldsArray.remove(i);
+    unregister(`questions.${i}`);
     // @ts-expect-error
     props.onRemoveQuestion?.(question);
   };
@@ -330,13 +332,7 @@ const FormField = ({
         </IconButton>
       </Box>
       <CardContent sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-        <Box
-          maxWidth={300}
-          width={"100%"}
-          display={"flex"}
-          flexDirection={"column"}
-          gap={2}
-        >
+        <Box flexGrow={1} display={"flex"} flexDirection={"column"} gap={2}>
           <TextField
             type={"text"}
             variant="filled"
@@ -414,7 +410,7 @@ const FormField = ({
           </FormControl>
         </Box>
         <Divider orientation="vertical" flexItem />
-        <Box flexGrow={1} display={"flex"} flexDirection={"column"} gap={2}>
+        <Box flexGrow={2} display={"flex"} flexDirection={"column"} gap={2}>
           {variantsFieldsArray.fields.map((field, i) => (
             <Box display={"flex"} gap={2} key={field.id}>
               <TextField

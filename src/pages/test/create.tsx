@@ -1,18 +1,13 @@
 import type { TestCreateObject } from "@/types/test";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { api } from "@/utils/api";
 import { TestForm } from "@/components/TestForm";
+import { useAdminSession } from "@/hooks/session";
 
 export default function CreateTest() {
   const { mutateAsync } = api.tests.createTest.useMutation();
   const { push } = useRouter();
-  const { data } = useSession({
-    required: true,
-    onUnauthenticated() {
-      push("/");
-    },
-  });
+  useAdminSession();
 
   const onSubmit = (formValues: TestCreateObject) => {
     mutateAsync({ testCreateObject: formValues }).then(

@@ -12,7 +12,6 @@ import { type Session } from "next-auth";
 import superjson from "superjson";
 import { ZodError } from "zod";
 import { getServerAuthSession } from "@/server/auth";
-import { isUserAdmin } from "../database/admin";
 
 /**
  * 1. CONTEXT

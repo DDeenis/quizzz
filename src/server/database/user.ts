@@ -15,7 +15,9 @@ export const getUserByEmail = async (email: string) => {
     .eq("email", email);
   const user = matches.data?.[0];
 
-  return { ...user, isAdmin: !!(user?.admins as any[])?.length } as
+  if (!user) return null;
+
+  return { ...user, isAdmin: !!(user.admins as any[])?.length } as
     | User
     | undefined;
 };

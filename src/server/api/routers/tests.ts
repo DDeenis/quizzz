@@ -4,6 +4,7 @@ import {
   createTest,
   deleteTest,
   getAllTests,
+  getAllTestsWithDeleted,
   getTestById,
   updateTest,
 } from "@/server/database/test";
@@ -103,7 +104,8 @@ export const testsRouter = createTRPCRouter({
       return await deleteTest(input.testId);
     }),
 
-  getAll: protectedProcedure.query(async () => {
+  getAll: protectedProcedure.query(async ({ ctx }) => {
+    if (ctx.session.user.isAdmin) return await getAllTestsWithDeleted();
     return await getAllTests();
   }),
 

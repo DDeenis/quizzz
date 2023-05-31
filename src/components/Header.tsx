@@ -15,6 +15,7 @@ import Modal from "@mui/material/Modal";
 import { RegisterForm, SignInForm } from "./AuthForms";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
+import Link from "next/link";
 
 export default function Header() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -110,7 +111,7 @@ export default function Header() {
   );
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
+    <Box>
       <AppBar position="static">
         <Toolbar>
           <IconButton
@@ -130,7 +131,11 @@ export default function Header() {
           >
             MUI
           </Typography>
-          <Box sx={{ flexGrow: 1 }} />
+          <Box sx={{ flexGrow: 1 }}>
+            <Link href={"/test"}>
+              <Button sx={{ color: "white" }}>Tests</Button>
+            </Link>
+          </Box>
           <Box sx={{ display: { xs: "none", md: "flex" } }}>
             {isAuthenticated ? (
               <IconButton

@@ -1,7 +1,9 @@
 import type { Test, TestCreateObject, TestUpdateObject } from "@/types/test";
 import { supabase } from "./supabase";
 import { testFragment } from "./fragments";
-import { getTotalScore } from "@/utils/questions";
+import { getTotalScore, hashFromString, shuffleArray } from "@/utils/questions";
+import { Question } from "@/types/question";
+import { getTestSessionById } from "./testSession";
 
 export const getAllTests = async () => {
   const response = await supabase.from("tests").select().is("deletedAt", null);
@@ -29,6 +31,100 @@ export const getTestById = async (id: string) => {
   const test = matches.data?.[0];
 
   return test as Test | undefined;
+};
+
+export const getTestWithSession = async (id: string, testSessionId: string) => {
+  const testSession = await getTestSessionById(testSessionId);
+
+  if (!testSession) return null;
+
+  const randomSeed = hashFromString(testSessionId);
+
+  const matches = await supabase
+    .from("tests")
+    .select(testFragment)
+    .eq("id", id);
+  const test = matches.data?.[0] as Test | undefined;
+
+  if (!test || !test.questions) return;
+
+  const { questionsCount, minimumScore, questions } = test;
+  const questionsShuffled = shuffleArray(questions, randomSeed);
+  let questionsForTest: Question[] = [];
+
+  let i = 0;
+  while (
+    getTotalScore(questionsForTest) < minimumScore ||
+    questionsForTest.length < questionsCount
+  ) {
+    const question = questionsShuffled[i++];
+    // this probably won't happen, but just in case return all questions
+    if (!question) {
+      console.error(
+        `Something went wrong while selecting questions for test ${test.id}`
+      );
+      questionsForTest = questionsShuffled;
+      break;
+    }
+    questionsForTest.push(question);
+  }
+
+  return {
+    testSession,
+    test: {
+      ...test,
+      questions: questionsForTest.map((q) => ({
+        ...q,
+        questionData: {
+          ...q.questionData,
+          variants: shuffleArray(q.questionData.variants),
+        },
+      })),
+    } as Test,
+  };
+};
+
+export const getTestForStudent = async (id: string) => {
+  const matches = await supabase
+    .from("tests")
+    .select(testFragment)
+    .eq("id", id);
+  const test = matches.data?.[0] as Test | undefined;
+
+  if (!test || !test.questions) return;
+
+  const { questionsCount, minimumScore, questions } = test;
+  const questionsShuffled = shuffleArray(questions);
+  // const questionsSorted = questions.sort((q1, q2) => q1.complexity === );
+  let questionsForTest: Question[] = [];
+
+  let i = 0;
+  while (
+    getTotalScore(questionsForTest) < minimumScore ||
+    questionsForTest.length < questionsCount
+  ) {
+    const question = questionsShuffled[i++];
+    // this probably won't happen, but just in case return all questions
+    if (!question) {
+      console.error(
+        `Something went wrong while selecting questions for test ${test.id}`
+      );
+      questionsForTest = questionsShuffled;
+      break;
+    }
+    questionsForTest.push(question);
+  }
+
+  return {
+    ...test,
+    questions: questionsForTest.map((q) => ({
+      ...q,
+      questionData: {
+        ...q.questionData,
+        variants: shuffleArray(q.questionData.variants),
+      },
+    })),
+  } as Test;
 };
 
 export const createTest = async (testCreateObj: TestCreateObject) => {
@@ -86,22 +182,22 @@ export const updateTest = async (
     if (error) throw error;
 
     testUpdateObj.questions.forEach(async (q) => {
-      console.log(q);
       if (q.id) {
         const { error } = await supabase
           .from("questions")
           .update(q)
           .eq("id", q.id);
+
         if (error) throw error;
       } else {
         const { error } = await supabase
           .from("questions")
           .insert({ ...q, testId: id });
+
         if (error) throw error;
       }
     });
 
-    console.log(deletedQuestionIds);
     if (deletedQuestionIds) {
       deletedQuestionIds.forEach(async (qId) => {
         await supabase.from("questions").delete().eq("id", qId);
@@ -121,6 +217,24 @@ export const deleteTest = async (id: string) => {
       .from("tests")
       .update({
         deletedAt: new Date().toISOString(),
+      })
+      .eq("id", id);
+
+    if (error) throw error;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+
+  return true;
+};
+
+export const restoreTest = async (id: string) => {
+  try {
+    const { error } = await supabase
+      .from("tests")
+      .update({
+        deletedAt: null,
       })
       .eq("id", id);
 

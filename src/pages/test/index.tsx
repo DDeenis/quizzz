@@ -1,22 +1,27 @@
+import { useProtectedSession } from "@/hooks/session";
 import { Test } from "@/types/test";
 import { api } from "@/utils/api";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useMemo } from "react";
 
 export default function TestsListPage() {
-  const { push } = useRouter();
-  const { data: tests, isLoading, refetch } = api.tests.getAll.useQuery();
+  const { data, isLoading, dataUpdatedAt, refetch } =
+    api.tests.getAll.useQuery();
   const { mutateAsync } = api.tests.deleteTest.useMutation();
-  const { data } = useSession({
-    required: true,
-    onUnauthenticated() {
-      push("/");
-    },
-  });
+  const { data: session } = useProtectedSession();
+
+  const tests = useMemo(() => {
+    const existing = data?.filter((t) => !t.deletedAt);
+    const deleted = data?.filter((t) => t.deletedAt);
+    return {
+      existing,
+      deleted,
+    };
+  }, [dataUpdatedAt]);
 
   const createOnDelete = (testId: string) => () => {
     mutateAsync({ testId }).then(() => refetch());
@@ -24,23 +29,44 @@ export default function TestsListPage() {
 
   return (
     <>
-      {data?.user.isAdmin && (
+      {session?.user.isAdmin && (
         <Link href={`test/create`}>
           <Button variant="contained" sx={{ mb: 3 }}>
             Create new test
           </Button>
         </Link>
       )}
+      <Typography variant="h4" my={2}>
+        Available tests
+      </Typography>
       <Box display={"flex"} flexWrap={"wrap"} gap={4}>
-        {tests?.map((test) => (
+        {tests.existing?.map((test) => (
           <TestCard
             test={test}
-            isAdmin={data?.user.isAdmin}
+            isAdmin={session?.user.isAdmin}
             onDelete={createOnDelete(test.id)}
             key={test.id}
           />
         ))}
       </Box>
+      {!!tests.deleted?.length && (
+        <>
+          <Typography variant="h4" my={2}>
+            Deleted tests
+          </Typography>
+          <Box display={"flex"} flexWrap={"wrap"} gap={4}>
+            {tests.deleted?.map((test) => (
+              <TestCard
+                test={test}
+                isAdmin={session?.user.isAdmin}
+                isDeleted={true}
+                onDelete={createOnDelete(test.id)}
+                key={test.id}
+              />
+            ))}
+          </Box>
+        </>
+      )}
     </>
   );
 }
@@ -48,10 +74,11 @@ export default function TestsListPage() {
 interface TestCardProps {
   test: Test;
   isAdmin?: boolean;
+  isDeleted?: boolean;
   onDelete: () => void;
 }
 
-const TestCard = ({ test, isAdmin, onDelete }: TestCardProps) => {
+const TestCard = ({ test, isAdmin, isDeleted, onDelete }: TestCardProps) => {
   return (
     <Box
       p={2}
@@ -71,7 +98,7 @@ const TestCard = ({ test, isAdmin, onDelete }: TestCardProps) => {
         <Typography variant="subtitle1">• {test.time} minutes</Typography>
       </Box>
       {!isAdmin && (
-        <Link href={`test/${test.id}`}>
+        <Link href={`/test/${test.id}/start`}>
           <Button variant="contained" fullWidth>
             Start test
           </Button>

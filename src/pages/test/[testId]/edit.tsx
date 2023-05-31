@@ -5,6 +5,7 @@ import { api } from "@/utils/api";
 import { TestForm } from "@/components/TestForm";
 import { useEffect, useRef } from "react";
 import { QuestionCreateObject, QuestionUpdateObject } from "@/types/question";
+import { useAdminSession } from "@/hooks/session";
 
 export default function EditTest() {
   const router = useRouter();
@@ -13,6 +14,7 @@ export default function EditTest() {
     { testId: (testId as string | undefined) ?? "" },
     { enabled: false, cacheTime: 0, staleTime: 0 }
   );
+  useAdminSession();
   const { mutateAsync } = api.tests.updateTest.useMutation();
   const deletedQuestionsRef = useRef<string[]>([]);
 
@@ -23,13 +25,6 @@ export default function EditTest() {
 
     refetch();
   }, [testId, router.isReady]);
-
-  const { data } = useSession({
-    required: true,
-    onUnauthenticated() {
-      router.push("/");
-    },
-  });
 
   const onSubmit = (formValues: TestUpdateObject) => {
     mutateAsync({

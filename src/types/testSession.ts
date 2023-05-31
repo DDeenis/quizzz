@@ -6,6 +6,15 @@ export interface TestSession {
   testId: string;
   userId: string;
   createdAt: string;
-  test: Test;
-  testResults: TestResult;
+  expires: string;
+  isFinished: boolean;
+  // test: Test;
+  // testResults: TestResult;
+}
+
+export interface TestSessionCreateObject {
+  testId: string;
+  userId: string;
+  createdAt: string;
+  expires: string;
 }
