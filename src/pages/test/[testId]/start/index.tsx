@@ -61,21 +61,17 @@ export default function StartTestPage() {
               color="warning"
               label={`You need to get ${test.minimumScore} points`}
             />
-            {/* <Chip
-              color="warning"
-              label={`You can to get: ${getTotalScore(test.questions!)} points`}
-            /> */}
           </Box>
           <Typography variant="body1" mb={2}>
             {test.description}
           </Typography>
           <Typography variant="body2">
-            Once you start the test, you will not be able to leave it before you
-            finish it
+            If you close this test before you have completed it, your answers
+            will not be saved.
           </Typography>
-          <Typography variant="caption">
+          {/* <Typography variant="caption">
             You have not passed this test before
-          </Typography>
+          </Typography> */}
         </CardContent>
         <CardActions>
           <Link href={"/test"}>

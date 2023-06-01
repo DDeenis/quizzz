@@ -49,3 +49,8 @@ export const updateTestSession = async (
 
   return testSession as TestSession | undefined;
 };
+
+export const removeTestSession = async (id: string) => {
+  const result = await supabase.from("test_sessions").delete().eq("id", id);
+  return result.error ? false : true;
+};

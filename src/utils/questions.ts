@@ -5,7 +5,7 @@ import {
 } from "@/types/question";
 import { TestSession } from "@/types/testSession";
 
-const complexityToScoreMap = {
+export const complexityToScoreMap = {
   [QuestionComplexity.Low]: 1,
   [QuestionComplexity.Medium]: 2,
   [QuestionComplexity.High]: 3,
@@ -53,6 +53,12 @@ function getISOnow() {
 function getISODate(dateISOStr: string) {
   const str = dateISOStr.slice(0, -10);
   return Date.parse(str);
+}
+
+export function getISODistanceToInSeconds(date: string) {
+  const dateMs = getISODate(date);
+  const now = getISOnow();
+  return (dateMs - now) / 1000;
 }
 
 export const hashFromString = (source: string) => {

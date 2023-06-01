@@ -2,9 +2,10 @@ export interface QuestionAnswer {
   id: string;
   questionId: string;
   userId: string;
-  testSessionId: string;
+  randomSeed: string;
+  score: number;
   answerType: AnswerType;
-  answerData: AnswerData;
+  answerData: DetailedAnswerData[];
 }
 
 export interface QuestionAnswerCreateObject {
@@ -21,4 +22,9 @@ export enum AnswerType {
 
 interface AnswerData {
   variants: string[];
+}
+
+export interface DetailedAnswerData {
+  variant: string;
+  answerType: AnswerType;
 }

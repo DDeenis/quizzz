@@ -1,9 +1,12 @@
+import { QuestionAnswerCreateObject } from "./questionAnswer";
+
 export interface TestResult {
   id: string;
   testId: string;
   userId: string;
-  testSessionId: string;
+  randomSeed: string;
   score: number;
+  maxScore?: number;
   countCorrect: number;
   countIncorrect: number;
 }
@@ -11,7 +14,6 @@ export interface TestResult {
 export interface TestResultCreateObject {
   testId: string;
   userId: string;
-  score: number;
-  countCorrect: number;
-  countIncorrect: number;
+  randomSeed: string;
+  answers: QuestionAnswerCreateObject[];
 }
