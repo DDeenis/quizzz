@@ -30,16 +30,27 @@ export const studentTestsRouter = createTRPCRouter({
       );
     }),
 
-  // getTestSession: protectedProcedure
-  //   .input(z.object({ testId: z.string() }))
-  //   .query(async ({ input, ctx }) => {
-  //     return await getTestSession(input.testId, ctx.session.user.id);
-  //   }),
-
   getTestWithSession: protectedProcedure
     .input(z.object({ testId: z.string(), testSessionId: z.string() }))
     .query(async ({ input, ctx }) => {
-      return await getTestWithSession(input.testId, input.testSessionId);
+      const result = await getTestWithSession(
+        input.testId,
+        input.testSessionId
+      );
+
+      if (!result) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+        });
+      }
+
+      if (result.testSession.userId !== ctx.session.user.id) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+        });
+      }
+
+      return result;
     }),
 
   remove: protectedProcedure
@@ -51,7 +62,9 @@ export const studentTestsRouter = createTRPCRouter({
         throw new TRPCError({
           code: "NOT_FOUND",
         });
-      } else if (testSession.userId !== ctx.session.user.id) {
+      }
+
+      if (testSession.userId !== ctx.session.user.id) {
         throw new TRPCError({
           code: "FORBIDDEN",
         });
@@ -84,7 +97,9 @@ export const studentTestsRouter = createTRPCRouter({
         throw new TRPCError({
           code: "NOT_FOUND",
         });
-      } else if (testSession.userId !== ctx.session.user.id) {
+      }
+
+      if (testSession.userId !== ctx.session.user.id) {
         throw new TRPCError({
           code: "FORBIDDEN",
         });

@@ -114,23 +114,6 @@ export default function Header() {
     <Box>
       <AppBar position="static">
         <Toolbar>
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="open drawer"
-            sx={{ mr: 2 }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography
-            variant="h6"
-            noWrap
-            component="div"
-            sx={{ display: { xs: "none", sm: "block" } }}
-          >
-            MUI
-          </Typography>
           <Box sx={{ flexGrow: 1 }}>
             <Link href={"/test"}>
               <Button sx={{ color: "white" }}>Tests</Button>

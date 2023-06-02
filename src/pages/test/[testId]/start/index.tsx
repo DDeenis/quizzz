@@ -1,3 +1,4 @@
+import { TestInfoCard } from "@/components/TestInfoCard";
 import { useProtectedSession } from "@/hooks/session";
 import { api } from "@/utils/api";
 import { getTotalScore } from "@/utils/questions";
@@ -49,39 +50,25 @@ export default function StartTestPage() {
       alignItems={"center"}
       height={"100%"}
     >
-      <Card sx={{ maxWidth: 700, width: "100%" }} variant="outlined">
-        <CardContent>
-          <Typography variant="h4" component="div" textAlign={"center"}>
-            {test.name}
-          </Typography>
-          <Box display={"flex"} flexWrap={"wrap"} gap={1} my={2}>
-            <Chip color="info" label={`${test.questionsCount} questions`} />
-            <Chip color="warning" label={`${test.time} minutes`} />
-            <Chip
-              color="warning"
-              label={`You need to get ${test.minimumScore} points`}
-            />
-          </Box>
-          <Typography variant="body1" mb={2}>
-            {test.description}
-          </Typography>
+      <TestInfoCard
+        testInfo={test}
+        contentSection={
           <Typography variant="body2">
             If you close this test before you have completed it, your answers
             will not be saved.
           </Typography>
-          {/* <Typography variant="caption">
-            You have not passed this test before
-          </Typography> */}
-        </CardContent>
-        <CardActions>
-          <Link href={"/test"}>
-            <Button>Cancel</Button>
-          </Link>
-          <Button variant="contained" sx={{ ml: 1 }} onClick={onStartTest}>
-            {isLoadingStart ? "Loading..." : "Start test"}
-          </Button>
-        </CardActions>
-      </Card>
+        }
+        actionsSection={
+          <>
+            <Link href={"/test"}>
+              <Button>Cancel</Button>
+            </Link>
+            <Button variant="contained" sx={{ ml: 1 }} onClick={onStartTest}>
+              {isLoadingStart ? "Loading..." : "Start test"}
+            </Button>
+          </>
+        }
+      />
     </Box>
   ) : (
     <Typography variant="body2" color={"red"}>

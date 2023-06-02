@@ -2,7 +2,6 @@ import type { TestResult, TestResultCreateObject } from "@/types/testResult";
 import { supabase } from "./supabase";
 import {
   complexityToScoreMap,
-  getTotalScore,
   shuffleQuestionsForTest,
 } from "@/utils/questions";
 import {
@@ -11,7 +10,7 @@ import {
   QuestionAnswer,
 } from "@/types/questionAnswer";
 import { QuestionComplexity } from "@/types/question";
-import { questionAnswerFragment, testResultFragment } from "./fragments";
+import { questionAnswerFragment } from "./fragments";
 import { Test } from "@/types/test";
 import { getTestById } from "./test";
 

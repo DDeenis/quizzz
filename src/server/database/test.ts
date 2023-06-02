@@ -4,12 +4,12 @@ import { testFragment } from "./fragments";
 import { getTotalScore, shuffleQuestionsForTest } from "@/utils/questions";
 import { getTestSessionById } from "./testSession";
 
-export const getAllTests = async () => {
+export const getAllTestsPreview = async () => {
   const response = await supabase.from("tests").select().is("deletedAt", null);
   return response.data as Omit<Test, "questions">[] | null;
 };
 
-export const getAllTestsWithDeleted = async () => {
+export const getAllTestsPreviewWithDeleted = async () => {
   const response = await supabase.from("tests").select();
   return response.data as Omit<Test, "questions">[] | null;
 };
@@ -30,6 +30,13 @@ export const getTestById = async (id: string) => {
   const test = matches.data?.[0];
 
   return test as Test | undefined;
+};
+
+export const getTestPreviewById = async (id: string) => {
+  const matches = await supabase.from("tests").select().eq("id", id);
+  const test = matches.data?.[0];
+
+  return test as Omit<Test, "questions"> | undefined;
 };
 
 export const getTestWithSession = async (id: string, testSessionId: string) => {

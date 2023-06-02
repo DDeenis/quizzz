@@ -1,3 +1,4 @@
+import { Timer } from "@/components/Timer";
 import { useProtectedSession } from "@/hooks/session";
 import { Question, QuestionType } from "@/types/question";
 import { QuestionAnswerCreateObject } from "@/types/questionAnswer";
@@ -280,46 +281,3 @@ const QuestionForm = ({
     </Box>
   );
 };
-
-const formatTime = (timeInSeconds: number) => {
-  const minutes = Math.floor(timeInSeconds / 60);
-  const seconds = timeInSeconds - minutes * 60;
-  return `${minutes.toString().padStart(2, "0")}:${seconds
-    .toString()
-    .padStart(2, "0")}`;
-};
-
-const Timer = React.memo(
-  ({
-    timeInMinutes,
-    onTimerEnd,
-  }: {
-    timeInMinutes: number;
-    onTimerEnd: () => void;
-  }) => {
-    const targetSeconds = timeInMinutes * 60;
-    const [timeInSeconds, setTimeInSeconds] = useState(0);
-
-    useEffect(() => {
-      const intervalId = setInterval(() => {
-        setTimeInSeconds((t) => t + 1);
-      }, 1000);
-
-      const timeotId = setTimeout(() => {
-        onTimerEnd();
-        clearInterval(intervalId);
-      }, targetSeconds * 60 * 1000);
-
-      return () => {
-        clearInterval(intervalId);
-        clearTimeout(timeotId);
-      };
-    }, []);
-
-    return (
-      <Typography variant="subtitle1">
-        {formatTime(targetSeconds - timeInSeconds)}
-      </Typography>
-    );
-  }
-);

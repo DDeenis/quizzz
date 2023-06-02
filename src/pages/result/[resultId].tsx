@@ -1,3 +1,4 @@
+import { TestInfoCard } from "@/components/TestInfoCard";
 import { useProtectedSession } from "@/hooks/session";
 import { Question, QuestionType } from "@/types/question";
 import { AnswerType } from "@/types/questionAnswer";
@@ -51,57 +52,46 @@ export default function TestPage() {
         alignItems={"center"}
         height={"100%"}
       >
-        <Card
-          sx={{ maxWidth: 700, width: "100%", borderColor: passedColor }}
-          variant="outlined"
-        >
-          <CardContent>
-            <Typography variant="h4" component="div" textAlign={"center"}>
-              {data.test.name}
-            </Typography>
-            <Box display={"flex"} flexWrap={"wrap"} gap={1} my={2}>
-              <Chip
-                color="info"
-                label={`${data.test.questions?.length} questions`}
-              />
-              <Chip color="warning" label={`${data.test.time} minutes`} />
-              <Chip
-                color="warning"
-                label={`Minimum ${data.test.minimumScore} points to pass`}
-              />
-            </Box>
-            <Typography variant="body1" mb={2}>
-              {data.test.description}
-            </Typography>
-            <Typography variant="subtitle1" mb={2} fontWeight={"bold"}>
-              Your results:
-            </Typography>
-            <Box component={"ul"}>
-              <Box component={"li"}>
-                Score:{" "}
-                <Typography
-                  color={passedColor}
-                  fontWeight={"bold"}
-                  component={"span"}
-                >
-                  {data.testResult.score}
-                </Typography>{" "}
-                of{" "}
-                <Typography fontWeight={"bold"} component={"span"}>
-                  {data.testResult.maxScore}
-                </Typography>{" "}
-                (minimum {data.test.minimumScore})
-              </Box>
-              <Box component={"li"}>
-                {data.testResult.countCorrect} correct answers
-              </Box>
-              <Box component={"li"}>
-                {data.testResult.countIncorrect} incorrect or partially correct
-                answers
+        <TestInfoCard
+          testInfo={data.test}
+          borderColor={passedColor}
+          contentSection={
+            <Box component={"figure"} m={0}>
+              <Typography
+                variant="subtitle1"
+                mb={2}
+                fontWeight={"bold"}
+                component={"figcaption"}
+              >
+                Your results:
+              </Typography>
+              <Box component={"ul"}>
+                <Box component={"li"}>
+                  Score:{" "}
+                  <Typography
+                    color={passedColor}
+                    fontWeight={"bold"}
+                    component={"span"}
+                  >
+                    {data.testResult.score}
+                  </Typography>{" "}
+                  of{" "}
+                  <Typography fontWeight={"bold"} component={"span"}>
+                    {data.testResult.maxScore}
+                  </Typography>{" "}
+                  (minimum {data.test.minimumScore})
+                </Box>
+                <Box component={"li"}>
+                  {data.testResult.countCorrect} correct answers
+                </Box>
+                <Box component={"li"}>
+                  {data.testResult.countIncorrect} incorrect or partially
+                  correct answers
+                </Box>
               </Box>
             </Box>
-          </CardContent>
-        </Card>
+          }
+        />
       </Box>
       {data.test.questions?.map((q, i) => {
         const answer = data.testResult.answers?.find(
@@ -161,8 +151,12 @@ const QuestionComponent = ({
             {answer.score} points
           </Typography>
         </Box>
-        <Typography variant={"body1"} textTransform={"capitalize"}>
+        <Typography variant={"caption"} textTransform={"capitalize"}>
           Complexity: {question.complexity}
+        </Typography>
+        {" | "}
+        <Typography variant={"caption"}>
+          Answers count: {question.answerData.length}
         </Typography>
         <Typography variant="h6" mt={2} mb={1}>
           {question.questionData.question}
@@ -175,6 +169,8 @@ const QuestionComponent = ({
             const answerData = answer.answerData.find((a) => a.variant === v);
             const questionColor = answerData
               ? getAnswerTypeColor(answerData.answerType)
+              : question.answerData.includes(v)
+              ? "green"
               : undefined;
             return (
               <Box display={"flex"} alignItems={"center"} gap={2} key={i}>

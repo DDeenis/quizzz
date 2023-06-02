@@ -3,8 +3,8 @@ import { adminProcedure, createTRPCRouter, protectedProcedure } from "../trpc";
 import {
   createTest,
   deleteTest,
-  getAllTests,
-  getAllTestsWithDeleted,
+  getAllTestsPreview,
+  getAllTestsPreviewWithDeleted,
   getTestById,
   updateTest,
 } from "@/server/database/test";
@@ -105,8 +105,8 @@ export const testsRouter = createTRPCRouter({
     }),
 
   getAll: protectedProcedure.query(async ({ ctx }) => {
-    if (ctx.session.user.isAdmin) return await getAllTestsWithDeleted();
-    return await getAllTests();
+    if (ctx.session.user.isAdmin) return await getAllTestsPreviewWithDeleted();
+    return await getAllTestsPreview();
   }),
 
   getById: protectedProcedure
