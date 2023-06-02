@@ -1,12 +1,3 @@
-export const questionAnswerFragment = `
-    id,
-    questionId,
-    userId,
-    answerType,
-    answerData,
-    testSessionId
-`;
-
 export const questionFragment = `
     id,
     testId,
@@ -31,5 +22,30 @@ export const testFragment = `
     maximumScore,
     questions ( 
         ${questionFragment}
+    )
+`;
+
+export const questionAnswerFragment = `
+    id,
+    questionId,
+    userId,
+    answerType,
+    answerData,
+    score,
+    testSessionId
+`;
+
+export const testResultFragment = `
+    id,
+    testId,
+    userId,
+    testSessionId,
+    score,
+    maxScore,
+    countCorrect,
+    countIncorrect,
+    createdAt,
+    question_answers (
+        ${questionAnswerFragment}
     )
 `;

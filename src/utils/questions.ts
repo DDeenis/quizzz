@@ -77,3 +77,44 @@ function mulberry32(seed: number) {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
+
+export function shuffleQuestionsForTest({
+  questions,
+  minimumScore,
+  questionsCount,
+  testSessionId,
+}: {
+  questions: Question[];
+  questionsCount: number;
+  minimumScore: number;
+  testSessionId: string;
+}) {
+  const randomSeed = hashFromString(testSessionId);
+  const questionsShuffled = shuffleArray(questions, randomSeed);
+  let questionsForTest: Question[] = [];
+
+  let i = 0;
+  while (
+    getTotalScore(questionsForTest) < minimumScore ||
+    questionsForTest.length < questionsCount
+  ) {
+    const question = questionsShuffled[i++];
+    // this probably won't happen, but just in case return all questions
+    if (!question) {
+      console.error(
+        `Something went wrong while selecting questions for test session ${testSessionId}`
+      );
+      questionsForTest = questionsShuffled;
+      break;
+    }
+    questionsForTest.push(question);
+  }
+
+  return questionsForTest.map((q) => ({
+    ...q,
+    questionData: {
+      ...q.questionData,
+      variants: shuffleArray(q.questionData.variants),
+    },
+  }));
+}

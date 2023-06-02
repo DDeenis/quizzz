@@ -1,8 +1,7 @@
 import type { Test, TestCreateObject, TestUpdateObject } from "@/types/test";
 import { supabase } from "./supabase";
 import { testFragment } from "./fragments";
-import { getTotalScore, hashFromString, shuffleArray } from "@/utils/questions";
-import { Question } from "@/types/question";
+import { getTotalScore, shuffleQuestionsForTest } from "@/utils/questions";
 import { getTestSessionById } from "./testSession";
 
 export const getAllTests = async () => {
@@ -38,8 +37,6 @@ export const getTestWithSession = async (id: string, testSessionId: string) => {
 
   if (!testSession) return null;
 
-  const randomSeed = hashFromString(testSessionId);
-
   const matches = await supabase
     .from("tests")
     .select(testFragment)
@@ -49,82 +46,20 @@ export const getTestWithSession = async (id: string, testSessionId: string) => {
   if (!test || !test.questions) return;
 
   const { questionsCount, minimumScore, questions } = test;
-  const questionsShuffled = shuffleArray(questions, randomSeed);
-  let questionsForTest: Question[] = [];
-
-  let i = 0;
-  while (
-    getTotalScore(questionsForTest) < minimumScore ||
-    questionsForTest.length < questionsCount
-  ) {
-    const question = questionsShuffled[i++];
-    // this probably won't happen, but just in case return all questions
-    if (!question) {
-      console.error(
-        `Something went wrong while selecting questions for test ${test.id}`
-      );
-      questionsForTest = questionsShuffled;
-      break;
-    }
-    questionsForTest.push(question);
-  }
+  const questionsForTest = shuffleQuestionsForTest({
+    questions,
+    minimumScore,
+    questionsCount,
+    testSessionId,
+  });
 
   return {
     testSession,
     test: {
       ...test,
-      questions: questionsForTest.map((q) => ({
-        ...q,
-        questionData: {
-          ...q.questionData,
-          variants: shuffleArray(q.questionData.variants),
-        },
-      })),
+      questions: questionsForTest,
     } as Test,
   };
-};
-
-export const getTestForStudent = async (id: string) => {
-  const matches = await supabase
-    .from("tests")
-    .select(testFragment)
-    .eq("id", id);
-  const test = matches.data?.[0] as Test | undefined;
-
-  if (!test || !test.questions) return;
-
-  const { questionsCount, minimumScore, questions } = test;
-  const questionsShuffled = shuffleArray(questions);
-  // const questionsSorted = questions.sort((q1, q2) => q1.complexity === );
-  let questionsForTest: Question[] = [];
-
-  let i = 0;
-  while (
-    getTotalScore(questionsForTest) < minimumScore ||
-    questionsForTest.length < questionsCount
-  ) {
-    const question = questionsShuffled[i++];
-    // this probably won't happen, but just in case return all questions
-    if (!question) {
-      console.error(
-        `Something went wrong while selecting questions for test ${test.id}`
-      );
-      questionsForTest = questionsShuffled;
-      break;
-    }
-    questionsForTest.push(question);
-  }
-
-  return {
-    ...test,
-    questions: questionsForTest.map((q) => ({
-      ...q,
-      questionData: {
-        ...q.questionData,
-        variants: shuffleArray(q.questionData.variants),
-      },
-    })),
-  } as Test;
 };
 
 export const createTest = async (testCreateObj: TestCreateObject) => {

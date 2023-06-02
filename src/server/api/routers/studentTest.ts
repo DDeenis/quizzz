@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { getTestForStudent, getTestWithSession } from "@/server/database/test";
+import { getTestWithSession } from "@/server/database/test";
 import {
   createTestSession,
   getTestSession,
@@ -11,16 +11,6 @@ import { TRPCError } from "@trpc/server";
 import { createTestResult } from "@/server/database/testResult";
 
 export const studentTestsRouter = createTRPCRouter({
-  getById: protectedProcedure
-    .input(
-      z.object({
-        testId: z.string(),
-      })
-    )
-    .query(async ({ input }) => {
-      return await getTestForStudent(input.testId);
-    }),
-
   createTestSession: protectedProcedure
     .input(z.object({ testId: z.string(), timeInMinutes: z.number() }))
     .mutation(async ({ input, ctx }) => {
@@ -75,7 +65,7 @@ export const studentTestsRouter = createTRPCRouter({
       z.object({
         testId: z.string(),
         userId: z.string(),
-        randomSeed: z.string(),
+        testSessionId: z.string(),
         answers: z.array(
           z.object({
             questionId: z.string(),
@@ -88,7 +78,7 @@ export const studentTestsRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const testSession = await getTestSessionById(input.randomSeed);
+      const testSession = await getTestSessionById(input.testSessionId);
 
       if (!testSession) {
         throw new TRPCError({
@@ -103,7 +93,7 @@ export const studentTestsRouter = createTRPCRouter({
       const testResult = await createTestResult(input);
 
       if (testResult) {
-        await removeTestSession(input.randomSeed);
+        await removeTestSession(input.testSessionId);
       }
 
       return testResult;

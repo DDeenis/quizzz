@@ -81,18 +81,19 @@ export default function TestPage() {
 
     const answers: QuestionAnswerCreateObject[] = [];
     for (let i = 0; i < test.questions.length; i++) {
-      console.log(test.questions[i]);
+      const answerData = formValues[i]?.answerData;
+      if (!answerData) return;
 
       answers.push({
         userId: session!.user.id,
         questionId: test.questions?.[i]?.id!,
-        answerData: formValues[i]!.answerData,
+        answerData,
       });
     }
 
     const testResult: TestResultCreateObject = {
       testId: testId as string,
-      randomSeed: testSessionId as string,
+      testSessionId: testSessionId as string,
       userId: session!.user.id,
       answers,
     };
@@ -108,6 +109,11 @@ export default function TestPage() {
     removeTestSession(testSessionId as string);
     // TODO: show modal 'your session has expired'
     router.push(`/test/${testId}/start`);
+  };
+
+  const onCancelTest = () => {
+    removeTestSession(testSessionId as string);
+    router.push(`/test`);
   };
 
   return isLoading ? (
@@ -176,7 +182,15 @@ export default function TestPage() {
             disabled={!form.formState.isValid}
             sx={{ display: hasNext ? "none" : "inline" }}
           >
-            Finish test
+            {submitTest.isLoading ? "Loading..." : "Finish test"}
+          </Button>
+          <Button
+            variant="text"
+            type="button"
+            style={{ marginLeft: "auto" }}
+            onClick={onCancelTest}
+          >
+            Cancel test
           </Button>
         </CardActions>
       </Card>

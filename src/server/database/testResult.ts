@@ -1,16 +1,23 @@
 import type { TestResult, TestResultCreateObject } from "@/types/testResult";
 import { supabase } from "./supabase";
-import { complexityToScoreMap, getTotalScore } from "@/utils/questions";
+import {
+  complexityToScoreMap,
+  getTotalScore,
+  shuffleQuestionsForTest,
+} from "@/utils/questions";
 import {
   AnswerType,
   DetailedAnswerData,
   QuestionAnswer,
 } from "@/types/questionAnswer";
 import { QuestionComplexity } from "@/types/question";
+import { questionAnswerFragment, testResultFragment } from "./fragments";
+import { Test } from "@/types/test";
+import { getTestById } from "./test";
 
 export const getTestResults = async (testId: string, userId: string) => {
   const response = await supabase
-    .from("testResults")
+    .from("test_results")
     .select()
     .eq("testId", testId)
     .eq("userId", userId);
@@ -19,7 +26,7 @@ export const getTestResults = async (testId: string, userId: string) => {
 
 export const getTestResultsByTest = async (testId: string) => {
   const response = await supabase
-    .from("testResults")
+    .from("test_results")
     .select()
     .eq("testId", testId);
   return response.data as TestResult[] | null;
@@ -27,10 +34,51 @@ export const getTestResultsByTest = async (testId: string) => {
 
 export const getTestResultsByUser = async (userId: string) => {
   const response = await supabase
-    .from("testResults")
+    .from("test_results")
     .select()
     .eq("userId", userId);
   return response.data as TestResult[] | null;
+};
+
+export const getTestResultById = async (id: string) => {
+  const response = await supabase.from("test_results").select().eq("id", id);
+  return response.data?.[0] as TestResult | null;
+};
+
+export const getTestResultWithTest = async (id: string) => {
+  const testResult = await getTestResultById(id);
+  if (!testResult) return null;
+
+  const test = await getTestById(testResult.testId);
+  if (!test || !test.questions) return null;
+
+  const { questions, minimumScore, questionsCount } = test;
+  const questionShuffled = shuffleQuestionsForTest({
+    questions,
+    minimumScore,
+    questionsCount,
+    testSessionId: testResult.testSessionId,
+  });
+
+  const questionAnswersResponse = await supabase
+    .from("question_answers")
+    .select(questionAnswerFragment)
+    .eq("testSessionId", testResult.testSessionId);
+  const questionAnswers = questionAnswersResponse.data as
+    | QuestionAnswer[]
+    | null;
+  if (!questionAnswers) return;
+
+  return {
+    testResult: {
+      ...testResult,
+      answers: questionAnswers,
+    } as TestResult,
+    test: {
+      ...test,
+      questions: questionShuffled,
+    } as Test,
+  };
 };
 
 export const createTestResult = async (
@@ -90,7 +138,7 @@ export const createTestResult = async (
       questionAnswers.push({
         userId: answer.userId,
         questionId: question.id,
-        randomSeed: testResultCreateObj.randomSeed,
+        testSessionId: testResultCreateObj.testSessionId,
         answerData: detailedAnswer,
         answerType: questionAnswerType,
         score,
@@ -102,7 +150,7 @@ export const createTestResult = async (
       .insert({
         testId: testResultCreateObj.testId,
         userId: testResultCreateObj.userId,
-        randomSeed: testResultCreateObj.randomSeed,
+        testSessionId: testResultCreateObj.testSessionId,
         score: questionAnswers.reduce((acc, qa) => acc + qa.score, 0),
         maxScore: totalMaxScore,
         countCorrect: questionAnswers.filter(
@@ -136,7 +184,7 @@ export const updateTestResult = async (
   testResultUpdateObj: TestResultCreateObject
 ) => {
   const result = await supabase
-    .from("testResults")
+    .from("test_results")
     .update(testResultUpdateObj)
     .eq("id", id)
     .select();

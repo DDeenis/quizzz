@@ -5,7 +5,6 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import { useMemo } from "react";
 
 export default function TestsListPage() {
@@ -27,7 +26,9 @@ export default function TestsListPage() {
     mutateAsync({ testId }).then(() => refetch());
   };
 
-  return (
+  return isLoading ? (
+    <Typography variant="body2">Loading...</Typography>
+  ) : (
     <>
       {session?.user.isAdmin && (
         <Link href={`test/create`}>
@@ -36,6 +37,7 @@ export default function TestsListPage() {
           </Button>
         </Link>
       )}
+
       <Typography variant="h4" my={2}>
         Available tests
       </Typography>

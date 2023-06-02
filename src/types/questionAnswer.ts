@@ -2,7 +2,7 @@ export interface QuestionAnswer {
   id: string;
   questionId: string;
   userId: string;
-  randomSeed: string;
+  testSessionId: string;
   score: number;
   answerType: AnswerType;
   answerData: DetailedAnswerData[];
