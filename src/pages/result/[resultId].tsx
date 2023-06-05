@@ -88,6 +88,9 @@ export default function TestPage() {
                   {data.testResult.countIncorrect} incorrect or partially
                   correct answers
                 </Box>
+                <Box component={"li"}>
+                  Passed at {new Date(data.testResult.createdAt).toUTCString()}
+                </Box>
               </Box>
             </Box>
           }

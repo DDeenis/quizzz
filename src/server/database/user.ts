@@ -28,3 +28,20 @@ export const createUser = async (userCreateObj: UserCreateObject) => {
 
   return user as User | undefined;
 };
+
+export const updateUser = async (
+  userId: string,
+  userUpdateObject: Partial<UserCreateObject>
+) => {
+  try {
+    const result = await supabase
+      .from("users")
+      .update(userUpdateObject)
+      .eq("id", userId)
+      .select();
+
+    return result.data?.[0] as User;
+  } catch (err) {
+    console.error(err);
+  }
+};

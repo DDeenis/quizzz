@@ -201,6 +201,7 @@ export default function TestPage() {
         flexWrap={"wrap"}
         gap={1}
         mt={2}
+        // maxWidth={900}
       >
         {test.questions?.map((_, i) => {
           return (

@@ -16,6 +16,8 @@ import { RegisterForm, SignInForm } from "./AuthForms";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Link from "next/link";
+import Avatar from "@mui/material/Avatar";
+import { stringAvatar } from "@/utils/user";
 
 export default function Header() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -71,7 +73,9 @@ export default function Header() {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+      <Link href={`/user/${session.data?.user.id}`}>
+        <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+      </Link>
       <MenuItem onClick={handleMenuClose}>
         <Button onClick={() => void signOut()}>Sign Out</Button>
       </MenuItem>
@@ -95,17 +99,22 @@ export default function Header() {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
-      <MenuItem onClick={handleProfileMenuOpen}>
-        <IconButton
-          size="large"
-          aria-label="account of current user"
-          aria-controls="primary-search-account-menu"
-          aria-haspopup="true"
-          color="inherit"
-        >
-          <AccountCircle />
-        </IconButton>
-        <p>Profile</p>
+      <Link href={`/user/${session.data?.user.id}`}>
+        <MenuItem onClick={handleProfileMenuOpen}>
+          <IconButton
+            size="large"
+            aria-label="account of current user"
+            aria-controls="primary-search-account-menu"
+            aria-haspopup="true"
+            color="inherit"
+          >
+            <AccountCircle />
+          </IconButton>
+          <p>Profile</p>
+        </MenuItem>
+      </Link>
+      <MenuItem onClick={handleMenuClose}>
+        <Button onClick={() => void signOut()}>Sign Out</Button>
       </MenuItem>
     </Menu>
   );
@@ -130,7 +139,7 @@ export default function Header() {
                 onClick={handleProfileMenuOpen}
                 color="inherit"
               >
-                <AccountCircle />
+                <Avatar {...stringAvatar(session.data.user.fullName)} />
               </IconButton>
             ) : (
               <Button

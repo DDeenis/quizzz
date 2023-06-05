@@ -9,6 +9,7 @@ import {
   updateTest,
 } from "@/server/database/test";
 import { QuestionType, QuestionComplexity } from "@/types/question";
+import { TRPCError } from "@trpc/server";
 
 const testCreateScheme = z.object({
   name: z.string(),
@@ -116,6 +117,14 @@ export const testsRouter = createTRPCRouter({
       })
     )
     .query(async ({ input }) => {
-      return await getTestById(input.testId);
+      const test = await getTestById(input.testId);
+
+      if (!test) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+        });
+      }
+
+      return test;
     }),
 });

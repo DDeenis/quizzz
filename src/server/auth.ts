@@ -5,7 +5,6 @@ import {
   type NextAuthOptions,
   type DefaultSession,
 } from "next-auth";
-import DiscordProvider from "next-auth/providers/discord";
 import Email from "next-auth/providers/email";
 import { getUserByEmail } from "./database/user";
 import { User } from "@/types/user";

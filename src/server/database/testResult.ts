@@ -1,4 +1,8 @@
-import type { TestResult, TestResultCreateObject } from "@/types/testResult";
+import type {
+  TestResult,
+  TestResultCreateObject,
+  TestResultPreview,
+} from "@/types/testResult";
 import { supabase } from "./supabase";
 import {
   complexityToScoreMap,
@@ -34,9 +38,9 @@ export const getTestResultsByTest = async (testId: string) => {
 export const getTestResultsByUser = async (userId: string) => {
   const response = await supabase
     .from("test_results")
-    .select()
+    .select("*, tests ( * )")
     .eq("userId", userId);
-  return response.data as TestResult[] | null;
+  return response.data as TestResultPreview[] | null;
 };
 
 export const getTestResultById = async (id: string) => {

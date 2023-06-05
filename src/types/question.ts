@@ -1,8 +1,3 @@
-import type {
-  QuestionAnswer,
-  QuestionAnswerCreateObject,
-} from "./questionAnswer";
-
 export type Question =
   | {
       id: string;
