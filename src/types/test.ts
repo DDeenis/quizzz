@@ -37,3 +37,8 @@ export interface TestUpdateObject {
   description?: string;
   questions: QuestionUpdateObject[];
 }
+
+export interface TestOption {
+  id: string;
+  name: string;
+}

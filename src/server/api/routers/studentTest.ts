@@ -53,7 +53,7 @@ export const studentTestsRouter = createTRPCRouter({
       return result;
     }),
 
-  remove: protectedProcedure
+  removeTestSession: protectedProcedure
     .input(z.object({ testSessionId: z.string() }))
     .mutation(async ({ input, ctx }) => {
       const testSession = await getTestSessionById(input.testSessionId);

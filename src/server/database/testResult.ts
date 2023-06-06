@@ -1,5 +1,6 @@
 import type {
   TestResult,
+  TestResultAdminData,
   TestResultCreateObject,
   TestResultPreview,
 } from "@/types/testResult";
@@ -84,6 +85,16 @@ export const getTestResultWithTest = async (id: string) => {
   };
 };
 
+export const getTestResultsForAdmin = async (testId: String) => {
+  const result = await supabase
+    .from("test_results")
+    .select(
+      "*, tests ( id, name, authorId, questionsCount, minimumScore ), users ( * )"
+    )
+    .eq("testId", testId);
+  return (result.data ?? []) as TestResultAdminData[];
+};
+
 export const createTestResult = async (
   testResultCreateObj: TestResultCreateObject
 ) => {
@@ -124,7 +135,7 @@ export const createTestResult = async (
       }
 
       const questionAnswerType =
-        countIncorrect >= totalAnswers
+        countIncorrect >= totalAnswers || countCorrect < totalAnswers / 2
           ? AnswerType.Incorrect
           : countCorrect === totalAnswers && countIncorrect === 0
           ? AnswerType.Correct

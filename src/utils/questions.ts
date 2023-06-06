@@ -52,7 +52,7 @@ function getISOnow() {
 }
 
 function getISODate(dateISOStr: string) {
-  const str = dateISOStr.slice(0, -10);
+  const str = dateISOStr.substring(0, 19);
   return Date.parse(str);
 }
 

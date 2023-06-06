@@ -1,5 +1,6 @@
 import { QuestionAnswer, QuestionAnswerCreateObject } from "./questionAnswer";
 import { Test } from "./test";
+import { User } from "./user";
 
 export interface TestResult {
   id: string;
@@ -32,4 +33,15 @@ export interface TestResultPreview {
   countIncorrect: number;
   createdAt: string;
   tests: Omit<Test, "questions">;
+}
+
+export interface TestResultAdminData extends Omit<TestResult, "answers"> {
+  tests: {
+    id: string;
+    name: string;
+    authorId: string;
+    questionsCount: number;
+    minimumScore: number;
+  };
+  users: User;
 }

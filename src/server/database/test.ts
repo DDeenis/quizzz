@@ -1,4 +1,9 @@
-import type { Test, TestCreateObject, TestUpdateObject } from "@/types/test";
+import type {
+  Test,
+  TestCreateObject,
+  TestOption,
+  TestUpdateObject,
+} from "@/types/test";
 import { supabase } from "./supabase";
 import { testFragment } from "./fragments";
 import { getTotalScore, shuffleQuestionsForTest } from "@/utils/questions";
@@ -67,6 +72,11 @@ export const getTestWithSession = async (id: string, testSessionId: string) => {
       questions: questionsForTest,
     } as Test,
   };
+};
+
+export const getTestsAsOptions = async () => {
+  const result = await supabase.from("tests").select("id, name");
+  return (result.data ?? []) as TestOption[];
 };
 
 export const createTest = async (testCreateObj: TestCreateObject) => {

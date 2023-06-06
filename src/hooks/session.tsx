@@ -1,6 +1,6 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import { useLayoutEffect } from "react";
+import { useEffect } from "react";
 
 export const useProtectedSession = () => {
   const { push } = useRouter();
@@ -22,7 +22,7 @@ export const useAdminSession = () => {
     },
   });
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (!session.data?.user.isAdmin) {
       push("/");
     }

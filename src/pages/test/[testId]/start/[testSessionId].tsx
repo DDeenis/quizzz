@@ -34,7 +34,7 @@ export default function TestPage() {
       },
       { enabled: false, staleTime: Infinity }
     );
-  const { mutate } = api.studentTests.remove.useMutation();
+  const { mutate } = api.studentTests.removeTestSession.useMutation();
   const submitTest = api.studentTests.submitTest.useMutation();
   const form = useForm<QuestionAnswerCreateObject[]>({
     defaultValues: [],
@@ -64,7 +64,8 @@ export default function TestPage() {
   useEffect(() => {
     const testSession = data?.testSession;
     if (!testSession || !isSuccess) return;
-    if (isTestSessionExpired(testSession)) {
+    const isExpired = isTestSessionExpired(testSession);
+    if (isExpired) {
       removeTestSession(testSession.id);
       router.push(`/test/${testId}/start`);
     }
@@ -107,6 +108,7 @@ export default function TestPage() {
     if (form.formState.isValid) {
       onSubmit();
     }
+
     removeTestSession(testSessionId as string);
     // TODO: show modal 'your session has expired'
     router.push(`/test/${testId}/start`);

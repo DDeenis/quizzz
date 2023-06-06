@@ -18,6 +18,7 @@ import Tab from "@mui/material/Tab";
 import Link from "next/link";
 import Avatar from "@mui/material/Avatar";
 import { stringAvatar } from "@/utils/user";
+import { TabPanel } from "./TabPanel";
 
 export default function Header() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -76,6 +77,11 @@ export default function Header() {
       <Link href={`/user/${session.data?.user.id}`}>
         <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
       </Link>
+      {session.data?.user.isAdmin && (
+        <Link href={`/admin`}>
+          <MenuItem onClick={handleMenuClose}>Admin panel</MenuItem>
+        </Link>
+      )}
       <MenuItem onClick={handleMenuClose}>
         <Button onClick={() => void signOut()}>Sign Out</Button>
       </MenuItem>
@@ -113,6 +119,11 @@ export default function Header() {
           <p>Profile</p>
         </MenuItem>
       </Link>
+      {session.data?.user.isAdmin && (
+        <Link href={`/admin`}>
+          <MenuItem onClick={handleMenuClose}>Admin panel</MenuItem>
+        </Link>
+      )}
       <MenuItem onClick={handleMenuClose}>
         <Button onClick={() => void signOut()}>Sign Out</Button>
       </MenuItem>
@@ -206,26 +217,5 @@ export default function Header() {
         </Box>
       </Modal>
     </Box>
-  );
-}
-
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
-
-function TabPanel(props: TabPanelProps) {
-  const { children, value, index } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-    >
-      {value === index && children}
-    </div>
   );
 }

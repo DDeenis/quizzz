@@ -6,6 +6,7 @@ import { RegisterForm, SignInForm } from "@/components/AuthForms";
 import React, { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
+import { TabPanel } from "@/components/TabPanel";
 
 export default function Home() {
   const [currentTab, setCurrentTab] = React.useState(0);
@@ -65,26 +66,5 @@ export default function Home() {
         </Box>
       </Box>
     </>
-  );
-}
-
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
-
-function TabPanel(props: TabPanelProps) {
-  const { children, value, index } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-    >
-      {value === index && children}
-    </div>
   );
 }

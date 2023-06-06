@@ -77,9 +77,9 @@ export default function TestPage() {
                   </Typography>{" "}
                   of{" "}
                   <Typography fontWeight={"bold"} component={"span"}>
-                    {data.testResult.maxScore}
+                    {data.test.minimumScore}
                   </Typography>{" "}
-                  (minimum {data.test.minimumScore})
+                  (maximum {data.testResult.maxScore})
                 </Box>
                 <Box component={"li"}>
                   {data.testResult.countCorrect} correct answers

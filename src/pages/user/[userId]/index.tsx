@@ -111,13 +111,13 @@ export default function ProfilePage() {
             </Button>
           )}
         </Box>
-        {canViewDetailed && testResultsData.data?.length && (
+        {canViewDetailed && Boolean(testResultsData.data?.length) && (
           <>
             <Typography variant="h5" textAlign={"center"}>
               Your results
             </Typography>
             <Box display={"flex"} flexWrap={"wrap"} gap={2}>
-              {testResultsData.data.map((tr) => (
+              {testResultsData.data?.map((tr) => (
                 <ResultCard result={tr} key={tr.id} />
               ))}
             </Box>
@@ -182,9 +182,9 @@ const ResultCard = ({ result }: { result: TestResultPreview }) => {
           </Typography>{" "}
           of{" "}
           <Typography fontWeight={"bold"} component={"span"}>
-            {result.maxScore}
+            {result.tests.minimumScore}
           </Typography>{" "}
-          (minimum {result.tests.minimumScore})
+          (maximum {result.maxScore})
         </Box>
         <Box component={"li"}>{result.countCorrect} correct answers</Box>
         <Box component={"li"}>
