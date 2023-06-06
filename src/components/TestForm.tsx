@@ -83,7 +83,7 @@ export function TestForm(props: TestFormProps) {
         },
       },
     },
-    // shouldUnregister: true,
+    shouldUnregister: true,
   });
 
   const appendQuestion = () =>
@@ -96,20 +96,15 @@ export function TestForm(props: TestFormProps) {
   const removeQuestion = (i: number) => () => {
     const question = getValues().questions[i];
     questionFieldsArray.remove(i);
-    unregister(`questions.${i}`);
     // @ts-expect-error
     props.onRemoveQuestion?.(question);
   };
 
   const onSubmit = handleSubmit(props.onSubmit);
 
-  // fix weird react-hook-forms bug (answerData is not set in defaultValues)
   useEffect(() => {
     if (props.test?.questions) {
-      for (let i = 0; i < props.test.questions.length; i++) {
-        const question = props.test.questions[i];
-        setValue(`questions.${i}.answerData`, question?.answerData ?? []);
-      }
+      setValue("questions", props.test.questions);
     }
   }, []);
 
@@ -313,10 +308,6 @@ const FormField = ({
     defaultVariansSet.current = true;
   }, []);
 
-  useEffect(() => {
-    setValue(`questions.${index}.answerData`, []);
-  }, [questionType]);
-
   return (
     <Card sx={{ p: 2 }}>
       <Box
@@ -395,6 +386,9 @@ const FormField = ({
                     fullWidth
                     inputProps={register(`questions.${index}.questionType`, {
                       required: true,
+                      onChange() {
+                        setValue(`questions.${index}.answerData`, []);
+                      },
                     })}
                   >
                     <MenuItem value={QuestionType.SingleVariant}>

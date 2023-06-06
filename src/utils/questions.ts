@@ -15,6 +15,7 @@ export const getTotalScore = (
   questions: (Question | QuestionCreateObject)[]
 ) => {
   let totalScore = 0;
+
   for (let q of questions) {
     totalScore += complexityToScoreMap[q.complexity];
   }
