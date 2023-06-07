@@ -157,7 +157,7 @@ export default function TestPage() {
                   <Typography variant="h6" mt={2} mb={1}>
                     {currentQuestion.questionData.question}
                   </Typography>
-                  <Typography variant="body2" mb={2}>
+                  <Typography variant="body2" whiteSpace={"pre-line"} mb={2}>
                     {currentQuestion.questionData.description}
                   </Typography>
                   <QuestionForm

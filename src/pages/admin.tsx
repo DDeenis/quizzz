@@ -136,11 +136,24 @@ export default function AdminPage() {
               onChange={handleUserChange}
             >
               <MenuItem value={""}>-- all --</MenuItem>
-              {userOptions?.map((o) => (
-                <MenuItem value={o.id} key={o.id}>
-                  {o.name}
-                </MenuItem>
-              ))}
+              {userOptions?.map((o) => {
+                const avatarProps = stringAvatar(o.name);
+                return (
+                  <MenuItem value={o.id} key={o.id}>
+                    <Avatar
+                      children={avatarProps.children}
+                      sx={{
+                        mr: 1,
+                        width: 24,
+                        height: 24,
+                        fontSize: "0.75rem",
+                        ...avatarProps.sx,
+                      }}
+                    />
+                    {o.name}
+                  </MenuItem>
+                );
+              })}
             </Select>
           </FormControl>
         </Box>

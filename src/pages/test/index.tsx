@@ -6,12 +6,15 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Head from "next/head";
 import Link from "next/link";
+import DeleteIcon from "@mui/icons-material/Delete";
+import RestoreIcon from "@mui/icons-material/Restore";
 import { useMemo } from "react";
 
 export default function TestsListPage() {
   const { data, isLoading, dataUpdatedAt, refetch } =
     api.tests.getAll.useQuery();
-  const { mutateAsync } = api.tests.deleteTest.useMutation();
+  const deleteTest = api.tests.deleteTest.useMutation();
+  const restoreTest = api.tests.restoreTest.useMutation();
   const { data: session } = useProtectedSession();
 
   const tests = useMemo(() => {
@@ -24,7 +27,14 @@ export default function TestsListPage() {
   }, [dataUpdatedAt]);
 
   const createOnDelete = (testId: string) => () => {
-    mutateAsync({ testId }).then(() => refetch());
+    deleteTest
+      .mutateAsync({ testId })
+      .then((isDeleted) => isDeleted && void refetch());
+  };
+  const createOnRestore = (testId: string) => () => {
+    restoreTest
+      .mutateAsync({ testId })
+      .then((isRestored) => isRestored && void refetch());
   };
 
   return (
@@ -67,8 +77,8 @@ export default function TestsListPage() {
                   <TestCard
                     test={test}
                     isAdmin={session?.user.isAdmin}
-                    isDeleted={true}
                     onDelete={createOnDelete(test.id)}
+                    onRestore={createOnRestore(test.id)}
                     key={test.id}
                   />
                 ))}
@@ -84,11 +94,13 @@ export default function TestsListPage() {
 interface TestCardProps {
   test: Test;
   isAdmin?: boolean;
-  isDeleted?: boolean;
-  onDelete: () => void;
+  onDelete?: () => void;
+  onRestore?: () => void;
 }
 
-const TestCard = ({ test, isAdmin, isDeleted, onDelete }: TestCardProps) => {
+const TestCard = ({ test, isAdmin, onDelete, onRestore }: TestCardProps) => {
+  const isDeleted = Boolean(test.deletedAt);
+
   return (
     <Box
       p={2}
@@ -121,9 +133,27 @@ const TestCard = ({ test, isAdmin, isDeleted, onDelete }: TestCardProps) => {
               Edit test
             </Button>
           </Link>
-          <Button variant="outlined" color="error" fullWidth onClick={onDelete}>
-            Delete test
-          </Button>
+          {!isDeleted ? (
+            <Button
+              variant="outlined"
+              color="error"
+              fullWidth
+              onClick={onDelete}
+            >
+              <DeleteIcon sx={{ mr: 1 }} />
+              Delete test
+            </Button>
+          ) : (
+            <Button
+              variant="outlined"
+              color="info"
+              fullWidth
+              onClick={onRestore}
+            >
+              <RestoreIcon sx={{ mr: 1 }} />
+              Restore test
+            </Button>
+          )}
         </>
       )}
     </Box>

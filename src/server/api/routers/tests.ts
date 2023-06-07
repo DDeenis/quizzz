@@ -6,6 +6,7 @@ import {
   getAllTestsPreview,
   getAllTestsPreviewWithDeleted,
   getTestById,
+  restoreTest,
   updateTest,
 } from "@/server/database/test";
 import { QuestionType, QuestionComplexity } from "@/types/question";
@@ -103,6 +104,16 @@ export const testsRouter = createTRPCRouter({
     )
     .mutation(async ({ input }) => {
       return await deleteTest(input.testId);
+    }),
+
+  restoreTest: adminProcedure
+    .input(
+      z.object({
+        testId: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      return await restoreTest(input.testId);
     }),
 
   getAll: protectedProcedure.query(async ({ ctx }) => {
