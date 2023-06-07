@@ -140,17 +140,18 @@ export default function AdminPage() {
                 const avatarProps = stringAvatar(o.name);
                 return (
                   <MenuItem value={o.id} key={o.id}>
-                    <Avatar
-                      children={avatarProps.children}
-                      sx={{
-                        mr: 1,
-                        width: 24,
-                        height: 24,
-                        fontSize: "0.75rem",
-                        ...avatarProps.sx,
-                      }}
-                    />
-                    {o.name}
+                    <Box display={"flex"} alignItems={"center"} gap={1}>
+                      <Avatar
+                        children={avatarProps.children}
+                        sx={{
+                          width: 24,
+                          height: 24,
+                          fontSize: "0.75rem",
+                          ...avatarProps.sx,
+                        }}
+                      />
+                      {o.name}
+                    </Box>
                   </MenuItem>
                 );
               })}
