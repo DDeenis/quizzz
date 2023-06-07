@@ -17,6 +17,7 @@ import Checkbox from "@mui/material/Checkbox";
 import Chip from "@mui/material/Chip";
 import Radio from "@mui/material/Radio";
 import Typography from "@mui/material/Typography";
+import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useMemo } from "react";
 import { useEffect, useState } from "react";
@@ -119,109 +120,119 @@ export default function TestPage() {
     router.push(`/test`);
   };
 
-  return isLoading ? (
-    <Typography variant="body2">Loading...</Typography>
-  ) : test ? (
-    <Box>
-      <Typography variant="h3" textAlign={"center"}>
-        {test.name}
-      </Typography>
-      <Card
-        sx={{ maxWidth: 900, width: "100%", mt: 3, mx: "auto" }}
-        variant="outlined"
-        component={"form"}
-        onSubmit={onSubmit}
-      >
-        <CardContent>
+  return (
+    <>
+      <Head>
+        <title>Question {currentQuestionIndex + 1}</title>
+      </Head>
+      {isLoading ? (
+        <Typography variant="body2">Loading...</Typography>
+      ) : test ? (
+        <Box>
+          <Typography variant="h3" textAlign={"center"}>
+            {test.name}
+          </Typography>
+          <Card
+            sx={{ maxWidth: 900, width: "100%", mt: 3, mx: "auto" }}
+            variant="outlined"
+            component={"form"}
+            onSubmit={onSubmit}
+          >
+            <CardContent>
+              <Box
+                display={"flex"}
+                justifyContent={"space-between"}
+                alignItems={"center"}
+              >
+                <Typography variant="subtitle1">
+                  Question {currentQuestionIndex + 1}
+                </Typography>
+                <Timer
+                  timeInMinutes={expiresInMinutes}
+                  onTimerEnd={onTimerEnd}
+                />
+              </Box>
+              {currentQuestion && (
+                <>
+                  <Typography variant="h6" mt={2} mb={1}>
+                    {currentQuestion.questionData.question}
+                  </Typography>
+                  <Typography variant="body2" mb={2}>
+                    {currentQuestion.questionData.description}
+                  </Typography>
+                  <QuestionForm
+                    question={currentQuestion}
+                    questionIndex={currentQuestionIndex}
+                    control={form.control}
+                    getValues={form.getValues}
+                  />
+                </>
+              )}
+            </CardContent>
+            <CardActions>
+              <Button
+                variant="outlined"
+                type="button"
+                onClick={toPrevQuestion}
+                disabled={!hasPrev}
+              >
+                Previous
+              </Button>
+              {hasNext && (
+                <Button
+                  variant="contained"
+                  type="button"
+                  onClick={toNextQuestion}
+                  disabled={!hasNext}
+                >
+                  Next
+                </Button>
+              )}
+              <Button
+                variant="contained"
+                type="submit"
+                disabled={!form.formState.isValid}
+                sx={{ display: hasNext ? "none" : "inline" }}
+              >
+                {submitTest.isLoading ? "Loading..." : "Finish test"}
+              </Button>
+              <Button
+                variant="text"
+                type="button"
+                style={{ marginLeft: "auto" }}
+                onClick={onCancelTest}
+              >
+                Cancel test
+              </Button>
+            </CardActions>
+          </Card>
           <Box
             display={"flex"}
-            justifyContent={"space-between"}
-            alignItems={"center"}
+            justifyContent={"center"}
+            flexWrap={"wrap"}
+            gap={1}
+            mt={2}
+            // maxWidth={900}
           >
-            <Typography variant="subtitle1">
-              Question {currentQuestionIndex + 1}
-            </Typography>
-            <Timer timeInMinutes={expiresInMinutes} onTimerEnd={onTimerEnd} />
+            {test.questions?.map((_, i) => {
+              return (
+                <Chip
+                  key={i}
+                  label={i + 1}
+                  color={i === currentQuestionIndex ? "info" : "default"}
+                  sx={{ cursor: "pointer" }}
+                  onClick={() => toQuestion(i)}
+                />
+              );
+            })}
           </Box>
-          {currentQuestion && (
-            <>
-              <Typography variant="h6" mt={2} mb={1}>
-                {currentQuestion.questionData.question}
-              </Typography>
-              <Typography variant="body2" mb={2}>
-                {currentQuestion.questionData.description}
-              </Typography>
-              <QuestionForm
-                question={currentQuestion}
-                questionIndex={currentQuestionIndex}
-                control={form.control}
-                getValues={form.getValues}
-              />
-            </>
-          )}
-        </CardContent>
-        <CardActions>
-          <Button
-            variant="outlined"
-            type="button"
-            onClick={toPrevQuestion}
-            disabled={!hasPrev}
-          >
-            Previous
-          </Button>
-          {hasNext && (
-            <Button
-              variant="contained"
-              type="button"
-              onClick={toNextQuestion}
-              disabled={!hasNext}
-            >
-              Next
-            </Button>
-          )}
-          <Button
-            variant="contained"
-            type="submit"
-            disabled={!form.formState.isValid}
-            sx={{ display: hasNext ? "none" : "inline" }}
-          >
-            {submitTest.isLoading ? "Loading..." : "Finish test"}
-          </Button>
-          <Button
-            variant="text"
-            type="button"
-            style={{ marginLeft: "auto" }}
-            onClick={onCancelTest}
-          >
-            Cancel test
-          </Button>
-        </CardActions>
-      </Card>
-      <Box
-        display={"flex"}
-        justifyContent={"center"}
-        flexWrap={"wrap"}
-        gap={1}
-        mt={2}
-        // maxWidth={900}
-      >
-        {test.questions?.map((_, i) => {
-          return (
-            <Chip
-              key={i}
-              label={i + 1}
-              color={i === currentQuestionIndex ? "info" : "default"}
-              sx={{ cursor: "pointer" }}
-              onClick={() => toQuestion(i)}
-            />
-          );
-        })}
-      </Box>
-    </Box>
-  ) : (
-    <Typography variant="body2" color={"red"}>
-      Failed to load test or test session
-    </Typography>
+        </Box>
+      ) : (
+        <Typography variant="body2" color={"red"}>
+          Failed to load test or test session
+        </Typography>
+      )}
+    </>
   );
 }
 

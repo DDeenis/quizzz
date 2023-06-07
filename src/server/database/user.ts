@@ -1,6 +1,11 @@
 import type { User, UserCreateObject } from "@/types/user";
 import { supabase } from "./supabase";
 
+export const getAllUsers = async (excludeId: string) => {
+  const result = await supabase.from("users").select().neq("id", excludeId);
+  return (result.data ?? []) as User[];
+};
+
 export const getUserById = async (id: string) => {
   const matches = await supabase.from("users").select().eq("id", id);
   const user = matches.data?.[0];
@@ -43,5 +48,37 @@ export const updateUser = async (
     return result.data?.[0] as User;
   } catch (err) {
     console.error(err);
+  }
+};
+
+export const deleteUser = async (userId: string) => {
+  try {
+    const result = await supabase
+      .from("users")
+      .update({ deletedAt: new Date().toISOString() })
+      .eq("id", userId);
+
+    if (result.error) throw result.error;
+
+    return true;
+  } catch (err) {
+    console.error(err);
+    return false;
+  }
+};
+
+export const restoreUser = async (userId: string) => {
+  try {
+    const result = await supabase
+      .from("users")
+      .update({ deletedAt: null })
+      .eq("id", userId);
+
+    if (result.error) throw result.error;
+
+    return true;
+  } catch (err) {
+    console.error(err);
+    return false;
   }
 };

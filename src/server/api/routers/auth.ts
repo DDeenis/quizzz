@@ -40,6 +40,13 @@ export const authRouter = createTRPCRouter({
         });
       }
 
+      if (user.deletedAt) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "User is deleted",
+        });
+      }
+
       return true;
     }),
 });

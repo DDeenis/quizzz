@@ -1,11 +1,11 @@
-import type { TestCreateObject, TestUpdateObject } from "@/types/test";
-import { useSession } from "next-auth/react";
+import type { TestUpdateObject } from "@/types/test";
 import { useRouter } from "next/router";
 import { api } from "@/utils/api";
 import { TestForm } from "@/components/TestForm";
 import { useEffect, useRef } from "react";
 import { QuestionCreateObject, QuestionUpdateObject } from "@/types/question";
 import { useAdminSession } from "@/hooks/session";
+import Head from "next/head";
 
 export default function EditTest() {
   const router = useRouter();
@@ -44,11 +44,18 @@ export default function EditTest() {
     }
   };
 
-  return test ? (
-    <TestForm
-      onSubmit={onSubmit}
-      onRemoveQuestion={onRemoveQuestion}
-      test={test}
-    />
-  ) : null;
+  return (
+    <>
+      <Head>
+        <title>Edit {test?.name}</title>
+      </Head>
+      {test ? (
+        <TestForm
+          onSubmit={onSubmit}
+          onRemoveQuestion={onRemoveQuestion}
+          test={test}
+        />
+      ) : null}
+    </>
+  );
 }

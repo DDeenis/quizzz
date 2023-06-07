@@ -64,93 +64,97 @@ export default function ProfilePage() {
     testResultsData.refetch();
   }, [canViewDetailed]);
 
-  return userData.isLoading ? (
-    <Typography variant="body2">Loading...</Typography>
-  ) : userData.data ? (
+  return (
     <>
       <Head>
-        <title>{userData.data.fullName}</title>
+        <title>Profile: {userData.data?.fullName}</title>
       </Head>
-      <Box
-        display={"flex"}
-        flexDirection={"column"}
-        gap={2}
-        justifyContent={"center"}
-        alignItems={"center"}
-      >
-        <Box maxWidth={"sm"} mb={2}>
-          <Avatar
-            children={avatarProps?.children}
-            alt={userData.data.fullName}
-            sx={{
-              width: 164,
-              height: 164,
-              fontSize: "4.5rem",
-              mx: "auto",
-              ...avatarProps!.sx,
-            }}
-          />
-          <Typography variant="h4" textAlign={"center"} mt={2} mb={1}>
-            {userData.data.fullName}
-          </Typography>
-          {canViewDetailed && (
-            <Typography variant="body1" textAlign={"center"}>
-              {userData.data.email}
-            </Typography>
-          )}
-          <Typography variant="body1" textAlign={"center"}>
-            Member since {new Date(userData.data.createdAt).toDateString()}
-          </Typography>
-          {isPresonalProfile && (
-            <Button
-              variant="contained"
-              sx={{ mx: "auto", mt: 1, display: "flex" }}
-              onClick={openModal}
-            >
-              Edit profile
-            </Button>
-          )}
-        </Box>
-        {canViewDetailed && Boolean(testResultsData.data?.length) && (
-          <>
-            <Typography variant="h5" textAlign={"center"}>
-              Your results
-            </Typography>
-            <Box display={"flex"} flexWrap={"wrap"} gap={2}>
-              {testResultsData.data?.map((tr) => (
-                <ResultCard result={tr} key={tr.id} />
-              ))}
-            </Box>
-          </>
-        )}
-        <Modal open={modalOpen} onClose={closeModal}>
+      {userData.isLoading ? (
+        <Typography variant="body2">Loading...</Typography>
+      ) : userData.data ? (
+        <>
           <Box
-            sx={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              maxWidth: "400px",
-              width: "100%",
-              bgcolor: "background.paper",
-              boxShadow: 24,
-              p: 4,
-            }}
+            display={"flex"}
+            flexDirection={"column"}
+            gap={2}
+            justifyContent={"center"}
+            alignItems={"center"}
           >
-            <EditProfileForm
-              onSubmit={updateUser}
-              onCancel={closeModal}
-              defaultValues={userData.data}
-              emailError={updateUserData.error?.message}
-            />
+            <Box maxWidth={"sm"} mb={2}>
+              <Avatar
+                children={avatarProps?.children}
+                alt={userData.data.fullName}
+                sx={{
+                  width: 164,
+                  height: 164,
+                  fontSize: "4.5rem",
+                  mx: "auto",
+                  ...avatarProps!.sx,
+                }}
+              />
+              <Typography variant="h4" textAlign={"center"} mt={2} mb={1}>
+                {userData.data.fullName}
+              </Typography>
+              {canViewDetailed && (
+                <Typography variant="body1" textAlign={"center"}>
+                  {userData.data.email}
+                </Typography>
+              )}
+              <Typography variant="body1" textAlign={"center"}>
+                Member since {new Date(userData.data.createdAt).toDateString()}
+              </Typography>
+              {isPresonalProfile && (
+                <Button
+                  variant="contained"
+                  sx={{ mx: "auto", mt: 1, display: "flex" }}
+                  onClick={openModal}
+                >
+                  Edit profile
+                </Button>
+              )}
+            </Box>
+            {canViewDetailed && Boolean(testResultsData.data?.length) && (
+              <>
+                <Typography variant="h5" textAlign={"center"}>
+                  Your results
+                </Typography>
+                <Box display={"flex"} flexWrap={"wrap"} gap={2}>
+                  {testResultsData.data?.map((tr) => (
+                    <ResultCard result={tr} key={tr.id} />
+                  ))}
+                </Box>
+              </>
+            )}
+            <Modal open={modalOpen} onClose={closeModal}>
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  maxWidth: "400px",
+                  width: "100%",
+                  bgcolor: "background.paper",
+                  boxShadow: 24,
+                  p: 4,
+                }}
+              >
+                <EditProfileForm
+                  onSubmit={updateUser}
+                  onCancel={closeModal}
+                  defaultValues={userData.data}
+                  emailError={updateUserData.error?.message}
+                />
+              </Box>
+            </Modal>
           </Box>
-        </Modal>
-      </Box>
+        </>
+      ) : (
+        <Typography variant="body2" color={"red"}>
+          Failed to load user profile
+        </Typography>
+      )}
     </>
-  ) : (
-    <Typography variant="body2" color={"red"}>
-      Failed to load user profile
-    </Typography>
   );
 }
 

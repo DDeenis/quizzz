@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { api } from "@/utils/api";
 import { TestForm } from "@/components/TestForm";
 import { useAdminSession } from "@/hooks/session";
+import Head from "next/head";
 
 export default function CreateTest() {
   const { mutateAsync } = api.tests.createTest.useMutation();
@@ -17,5 +18,12 @@ export default function CreateTest() {
     );
   };
 
-  return <TestForm onSubmit={onSubmit} />;
+  return (
+    <>
+      <Head>
+        <title>Create new test</title>
+      </Head>
+      <TestForm onSubmit={onSubmit} />
+    </>
+  );
 }

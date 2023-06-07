@@ -11,6 +11,7 @@ import Checkbox from "@mui/material/Checkbox";
 import Chip from "@mui/material/Chip";
 import Radio from "@mui/material/Radio";
 import Typography from "@mui/material/Typography";
+import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 
@@ -37,86 +38,107 @@ export default function TestPage() {
     refetch();
   }, [resultId, router.isReady]);
 
-  return isLoading ? (
-    <Typography variant="body2">Loading...</Typography>
-  ) : data ? (
-    <Box>
-      <Typography variant="h3" color={passedColor} textAlign={"center"} mb={3}>
-        {isTestPassed
-          ? "You have passed the test!"
-          : "You failed to pass the test"}
-      </Typography>
-      <Box
-        display={"flex"}
-        justifyContent={"center"}
-        alignItems={"center"}
-        height={"100%"}
-      >
-        <TestInfoCard
-          testInfo={data.test}
-          borderColor={passedColor}
-          contentSection={
-            <Box component={"figure"} m={0}>
-              <Typography
-                variant="subtitle1"
-                mb={2}
-                fontWeight={"bold"}
-                component={"figcaption"}
-              >
-                Your results:
-              </Typography>
-              <Box component={"ul"}>
-                <Box component={"li"}>
-                  Score:{" "}
+  return (
+    <>
+      <Head>
+        {isLoading ? (
+          <title>Results: Loading...</title>
+        ) : (
+          <title>
+            Results: {data?.test.name} - {isTestPassed ? "Passed" : "Failed"}
+          </title>
+        )}
+      </Head>
+      {isLoading ? (
+        <Typography variant="body2">Loading...</Typography>
+      ) : data ? (
+        <Box>
+          <Typography
+            variant="h3"
+            color={passedColor}
+            textAlign={"center"}
+            mb={3}
+          >
+            {isTestPassed
+              ? "You have passed the test!"
+              : "You failed to pass the test"}
+          </Typography>
+          <Box
+            display={"flex"}
+            justifyContent={"center"}
+            alignItems={"center"}
+            height={"100%"}
+          >
+            <TestInfoCard
+              testInfo={data.test}
+              borderColor={passedColor}
+              contentSection={
+                <Box component={"figure"} m={0}>
                   <Typography
-                    color={passedColor}
+                    variant="subtitle1"
+                    mb={2}
                     fontWeight={"bold"}
-                    component={"span"}
+                    component={"figcaption"}
                   >
-                    {data.testResult.score}
-                  </Typography>{" "}
-                  of{" "}
-                  <Typography fontWeight={"bold"} component={"span"}>
-                    {data.test.minimumScore}
-                  </Typography>{" "}
-                  (maximum {data.testResult.maxScore})
+                    Your results:
+                  </Typography>
+                  <Box component={"ul"}>
+                    <Box component={"li"}>
+                      Score:{" "}
+                      <Typography
+                        color={passedColor}
+                        fontWeight={"bold"}
+                        component={"span"}
+                      >
+                        {data.testResult.score}
+                      </Typography>{" "}
+                      of{" "}
+                      <Typography fontWeight={"bold"} component={"span"}>
+                        {data.test.minimumScore}
+                      </Typography>{" "}
+                      (maximum {data.testResult.maxScore})
+                    </Box>
+                    <Box component={"li"}>
+                      {data.testResult.countCorrect} correct answers
+                    </Box>
+                    <Box component={"li"}>
+                      {data.testResult.countIncorrect} incorrect or partially
+                      correct answers
+                    </Box>
+                    <Box component={"li"}>
+                      Passed at{" "}
+                      {new Date(data.testResult.createdAt).toUTCString()}
+                    </Box>
+                  </Box>
                 </Box>
-                <Box component={"li"}>
-                  {data.testResult.countCorrect} correct answers
-                </Box>
-                <Box component={"li"}>
-                  {data.testResult.countIncorrect} incorrect or partially
-                  correct answers
-                </Box>
-                <Box component={"li"}>
-                  Passed at {new Date(data.testResult.createdAt).toUTCString()}
-                </Box>
-              </Box>
-            </Box>
-          }
-        />
-      </Box>
-      {data.test.questions?.map((q, i) => {
-        const answer = data.testResult.answers?.find(
-          (a) => a.questionId === q.id
-        );
-        if (!answer) {
-          return <Typography color={"red"}>Failed to load answer</Typography>;
-        }
-        return (
-          <QuestionComponent
-            question={q}
-            answer={answer}
-            questionIndex={i}
-            key={i}
-          />
-        );
-      })}
-    </Box>
-  ) : (
-    <Typography variant="body2" color={"red"}>
-      Failed to load result or test
-    </Typography>
+              }
+            />
+          </Box>
+          {data.test.questions?.map((q, i) => {
+            const answer = data.testResult.answers?.find(
+              (a) => a.questionId === q.id
+            );
+            if (!answer) {
+              return (
+                <Typography color={"red"}>Failed to load answer</Typography>
+              );
+            }
+            return (
+              <QuestionComponent
+                question={q}
+                answer={answer}
+                questionIndex={i}
+                key={i}
+              />
+            );
+          })}
+        </Box>
+      ) : (
+        <Typography variant="body2" color={"red"}>
+          Failed to load result or test
+        </Typography>
+      )}
+    </>
   );
 }
 

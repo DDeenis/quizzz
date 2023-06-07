@@ -9,6 +9,7 @@ import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import Chip from "@mui/material/Chip";
 import Typography from "@mui/material/Typography";
+import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
@@ -41,38 +42,49 @@ export default function StartTestPage() {
       (s) => s && router.push(`/test/${test?.id}/start/${s.id}`)
     );
 
-  return isLoading ? (
-    <Typography variant="body2">Loading...</Typography>
-  ) : test ? (
-    <Box
-      display={"flex"}
-      justifyContent={"center"}
-      alignItems={"center"}
-      height={"100%"}
-    >
-      <TestInfoCard
-        testInfo={test}
-        contentSection={
-          <Typography variant="body2">
-            If you close this test before you have completed it, your answers
-            will not be saved.
-          </Typography>
-        }
-        actionsSection={
-          <>
-            <Link href={"/test"}>
-              <Button>Cancel</Button>
-            </Link>
-            <Button variant="contained" sx={{ ml: 1 }} onClick={onStartTest}>
-              {isLoadingStart ? "Loading..." : "Start test"}
-            </Button>
-          </>
-        }
-      />
-    </Box>
-  ) : (
-    <Typography variant="body2" color={"red"}>
-      Failed to load test
-    </Typography>
+  return (
+    <>
+      <Head>
+        <title>Start test {test?.name}</title>
+      </Head>
+      {isLoading ? (
+        <Typography variant="body2">Loading...</Typography>
+      ) : test ? (
+        <Box
+          display={"flex"}
+          justifyContent={"center"}
+          alignItems={"center"}
+          height={"100%"}
+        >
+          <TestInfoCard
+            testInfo={test}
+            contentSection={
+              <Typography variant="body2">
+                If you close this test before you have completed it, your
+                answers will not be saved.
+              </Typography>
+            }
+            actionsSection={
+              <>
+                <Link href={"/test"}>
+                  <Button>Cancel</Button>
+                </Link>
+                <Button
+                  variant="contained"
+                  sx={{ ml: 1 }}
+                  onClick={onStartTest}
+                >
+                  {isLoadingStart ? "Loading..." : "Start test"}
+                </Button>
+              </>
+            }
+          />
+        </Box>
+      ) : (
+        <Typography variant="body2" color={"red"}>
+          Failed to load test
+        </Typography>
+      )}
+    </>
   );
 }

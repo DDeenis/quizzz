@@ -4,6 +4,7 @@ import { api } from "@/utils/api";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
+import Head from "next/head";
 import Link from "next/link";
 import { useMemo } from "react";
 
@@ -26,47 +27,54 @@ export default function TestsListPage() {
     mutateAsync({ testId }).then(() => refetch());
   };
 
-  return isLoading ? (
-    <Typography variant="body2">Loading...</Typography>
-  ) : (
+  return (
     <>
-      {session?.user.isAdmin && (
-        <Link href={`test/create`}>
-          <Button variant="contained" sx={{ mb: 3 }}>
-            Create new test
-          </Button>
-        </Link>
-      )}
-
-      <Typography variant="h4" my={2}>
-        Available tests
-      </Typography>
-      <Box display={"flex"} flexWrap={"wrap"} gap={4}>
-        {tests.existing?.map((test) => (
-          <TestCard
-            test={test}
-            isAdmin={session?.user.isAdmin}
-            onDelete={createOnDelete(test.id)}
-            key={test.id}
-          />
-        ))}
-      </Box>
-      {!!tests.deleted?.length && (
+      <Head>
+        <title>Tests</title>
+      </Head>
+      {isLoading ? (
+        <Typography variant="body2">Loading...</Typography>
+      ) : (
         <>
+          {session?.user.isAdmin && (
+            <Link href={`test/create`}>
+              <Button variant="contained" sx={{ mb: 3 }}>
+                Create new test
+              </Button>
+            </Link>
+          )}
+
           <Typography variant="h4" my={2}>
-            Deleted tests
+            Available tests
           </Typography>
           <Box display={"flex"} flexWrap={"wrap"} gap={4}>
-            {tests.deleted?.map((test) => (
+            {tests.existing?.map((test) => (
               <TestCard
                 test={test}
                 isAdmin={session?.user.isAdmin}
-                isDeleted={true}
                 onDelete={createOnDelete(test.id)}
                 key={test.id}
               />
             ))}
           </Box>
+          {!!tests.deleted?.length && (
+            <>
+              <Typography variant="h4" my={2}>
+                Deleted tests
+              </Typography>
+              <Box display={"flex"} flexWrap={"wrap"} gap={4}>
+                {tests.deleted?.map((test) => (
+                  <TestCard
+                    test={test}
+                    isAdmin={session?.user.isAdmin}
+                    isDeleted={true}
+                    onDelete={createOnDelete(test.id)}
+                    key={test.id}
+                  />
+                ))}
+              </Box>
+            </>
+          )}
         </>
       )}
     </>
