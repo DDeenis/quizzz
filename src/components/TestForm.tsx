@@ -265,6 +265,7 @@ const FormField = ({
     control,
     name: `questions.${index}.questionType`,
   });
+  const selectedIndexes = useRef(new Set<number>());
 
   const appendVariant = () => variantsFieldsArray.append([{ value: "" }]);
   const getVariant = (i: number) =>
@@ -419,7 +420,14 @@ const FormField = ({
                   required: true,
                   shouldUnregister: true,
                   onChange() {
-                    setValue(`questions.${index}.answerData`, []);
+                    console.log(
+                      selectedIndexes.current,
+                      [...selectedIndexes.current].map((i) => getVariant(i))
+                    );
+                    setValue(
+                      `questions.${index}.answerData`,
+                      [...selectedIndexes.current].map((i) => getVariant(i))
+                    );
                   },
                 })}
               />
@@ -429,6 +437,8 @@ const FormField = ({
                 render={({ field: { onBlur, value, ref } }) => {
                   const variant = getVariant(i);
                   const val = value.includes(variant);
+
+                  val && selectedIndexes.current.add(i);
 
                   return questionType === QuestionType.SingleVariant ? (
                     <Radio
@@ -441,6 +451,9 @@ const FormField = ({
                             ? [variant]
                             : value.filter((v) => v !== variant)
                         );
+                        checked
+                          ? (selectedIndexes.current = new Set([i]))
+                          : selectedIndexes.current.delete(i);
                       }}
                       checked={val}
                       inputRef={ref}
@@ -457,6 +470,9 @@ const FormField = ({
                             ? [...value, variant]
                             : value.filter((v) => v !== variant)
                         );
+                        checked
+                          ? selectedIndexes.current.add(i)
+                          : selectedIndexes.current.delete(i);
                       }}
                       checked={val}
                       inputRef={ref}
