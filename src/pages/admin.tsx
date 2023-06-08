@@ -20,6 +20,7 @@ import Link from "next/link";
 import DeleteIcon from "@mui/icons-material/Delete";
 import RestoreIcon from "@mui/icons-material/Restore";
 import React, { useEffect, useMemo, useState } from "react";
+import { formatDate } from "@/utils/questions";
 
 export default function AdminPage() {
   const session = useAdminSession();
@@ -348,12 +349,4 @@ const UserInfo = ({ user }: { user: User }) => {
       </div>
     </Box>
   );
-};
-
-const formatDate = (dateStr: string) => {
-  const date = new Date(dateStr);
-  return `${date.toLocaleDateString()} ${date
-    .getHours()
-    .toString()
-    .padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
 };

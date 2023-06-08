@@ -44,7 +44,7 @@ export default function QuizPage() {
   const expiresInMinutes = useMemo(() => {
     const expires = data?.quizSession.expires;
     if (!expires) return 0;
-    return Math.floor(getISODistanceToInSeconds(expires) / 60);
+    return Math.ceil(getISODistanceToInSeconds(expires) / 60);
   }, [isSuccess]);
 
   const quiz = data?.quiz;

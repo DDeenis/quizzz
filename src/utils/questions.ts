@@ -119,3 +119,12 @@ export function shuffleQuestionsForQuiz({
     },
   }));
 }
+
+export const formatDate = (dateStr: string) => {
+  const date = new Date(dateStr);
+
+  return `${date.toLocaleDateString()} ${date
+    .getHours()
+    .toString()
+    .padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+};

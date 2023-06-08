@@ -15,6 +15,7 @@ import { useForm } from "react-hook-form";
 import { UserCreateObject } from "@/types/user";
 import FormHelperText from "@mui/material/FormHelperText";
 import Head from "next/head";
+import { formatDate } from "@/utils/questions";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -101,7 +102,8 @@ export default function ProfilePage() {
                 </Typography>
               )}
               <Typography variant="body1" textAlign={"center"}>
-                Member since {new Date(userData.data.createdAt).toDateString()}
+                Member since{" "}
+                {new Date(userData.data.createdAt).toLocaleDateString()}
               </Typography>
               {isPresonalProfile && (
                 <Button
@@ -194,9 +196,7 @@ const ResultCard = ({ result }: { result: QuizResultPreview }) => {
         <Box component={"li"}>
           {result.countIncorrect} incorrect or partially correct answers
         </Box>
-        <Box component={"li"}>
-          Passed at {new Date(result.createdAt).toLocaleDateString()}
-        </Box>
+        <Box component={"li"}>Passed at {formatDate(result.createdAt)}</Box>
       </Box>
       <Link href={`/result/${result.id}`}>
         <Button

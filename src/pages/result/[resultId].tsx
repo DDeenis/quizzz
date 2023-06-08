@@ -4,6 +4,7 @@ import { Question, QuestionType } from "@/types/question";
 import { AnswerType } from "@/types/questionAnswer";
 import { QuestionAnswer } from "@/types/questionAnswer";
 import { api } from "@/utils/api";
+import { formatDate } from "@/utils/questions";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -106,8 +107,7 @@ export default function QuizPage() {
                       correct answers
                     </Box>
                     <Box component={"li"}>
-                      Passed at{" "}
-                      {new Date(data.quizResult.createdAt).toUTCString()}
+                      Passed at {formatDate(data.quizResult.createdAt)}
                     </Box>
                   </Box>
                 </Box>
