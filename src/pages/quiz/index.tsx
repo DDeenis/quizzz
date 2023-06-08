@@ -1,5 +1,5 @@
 import { useProtectedSession } from "@/hooks/session";
-import { Test } from "@/types/test";
+import { Quiz } from "@/types/quiz";
 import { api } from "@/utils/api";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -10,14 +10,14 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import RestoreIcon from "@mui/icons-material/Restore";
 import { useMemo } from "react";
 
-export default function TestsListPage() {
+export default function QuizesListPage() {
   const { data, isLoading, dataUpdatedAt, refetch } =
-    api.tests.getAll.useQuery();
-  const deleteTest = api.tests.deleteTest.useMutation();
-  const restoreTest = api.tests.restoreTest.useMutation();
+    api.quizes.getAll.useQuery();
+  const deleteQuiz = api.quizes.deleteQuiz.useMutation();
+  const restoreQuiz = api.quizes.restoreQuiz.useMutation();
   const { data: session } = useProtectedSession();
 
-  const tests = useMemo(() => {
+  const quizes = useMemo(() => {
     const existing = data?.filter((t) => !t.deletedAt);
     const deleted = data?.filter((t) => t.deletedAt);
     return {
@@ -26,60 +26,60 @@ export default function TestsListPage() {
     };
   }, [dataUpdatedAt]);
 
-  const createOnDelete = (testId: string) => () => {
-    deleteTest
-      .mutateAsync({ testId })
+  const createOnDelete = (quizId: string) => () => {
+    deleteQuiz
+      .mutateAsync({ quizId })
       .then((isDeleted) => isDeleted && void refetch());
   };
-  const createOnRestore = (testId: string) => () => {
-    restoreTest
-      .mutateAsync({ testId })
+  const createOnRestore = (quizId: string) => () => {
+    restoreQuiz
+      .mutateAsync({ quizId })
       .then((isRestored) => isRestored && void refetch());
   };
 
   return (
     <>
       <Head>
-        <title>Tests</title>
+        <title>Quizes</title>
       </Head>
       {isLoading ? (
         <Typography variant="body2">Loading...</Typography>
       ) : (
         <>
           {session?.user.isAdmin && (
-            <Link href={`test/create`}>
+            <Link href={`quiz/create`}>
               <Button variant="contained" sx={{ mb: 3 }}>
-                Create new test
+                Create new quiz
               </Button>
             </Link>
           )}
 
           <Typography variant="h4" my={2}>
-            Available tests
+            Available quizes
           </Typography>
           <Box display={"flex"} flexWrap={"wrap"} gap={4}>
-            {tests.existing?.map((test) => (
-              <TestCard
-                test={test}
+            {quizes.existing?.map((quiz) => (
+              <QuizCard
+                quiz={quiz}
                 isAdmin={session?.user.isAdmin}
-                onDelete={createOnDelete(test.id)}
-                key={test.id}
+                onDelete={createOnDelete(quiz.id)}
+                key={quiz.id}
               />
             ))}
           </Box>
-          {!!tests.deleted?.length && (
+          {!!quizes.deleted?.length && (
             <>
               <Typography variant="h4" my={2}>
-                Deleted tests
+                Deleted quizes
               </Typography>
               <Box display={"flex"} flexWrap={"wrap"} gap={4}>
-                {tests.deleted?.map((test) => (
-                  <TestCard
-                    test={test}
+                {quizes.deleted?.map((quiz) => (
+                  <QuizCard
+                    quiz={quiz}
                     isAdmin={session?.user.isAdmin}
-                    onDelete={createOnDelete(test.id)}
-                    onRestore={createOnRestore(test.id)}
-                    key={test.id}
+                    onDelete={createOnDelete(quiz.id)}
+                    onRestore={createOnRestore(quiz.id)}
+                    key={quiz.id}
                   />
                 ))}
               </Box>
@@ -91,15 +91,15 @@ export default function TestsListPage() {
   );
 }
 
-interface TestCardProps {
-  test: Test;
+interface QuizCardProps {
+  quiz: Quiz;
   isAdmin?: boolean;
   onDelete?: () => void;
   onRestore?: () => void;
 }
 
-const TestCard = ({ test, isAdmin, onDelete, onRestore }: TestCardProps) => {
-  const isDeleted = Boolean(test.deletedAt);
+const QuizCard = ({ quiz, isAdmin, onDelete, onRestore }: QuizCardProps) => {
+  const isDeleted = Boolean(quiz.deletedAt);
 
   return (
     <Box
@@ -111,26 +111,26 @@ const TestCard = ({ test, isAdmin, onDelete, onRestore }: TestCardProps) => {
       borderRadius={2}
     >
       <Typography variant="h4" textAlign={"center"} mb={2}>
-        {test.name}
+        {quiz.name}
       </Typography>
       <Box mb={2}>
         <Typography variant="subtitle1">
-          • {test.questionsCount} questions
+          • {quiz.questionsCount} questions
         </Typography>
-        <Typography variant="subtitle1">• {test.time} minutes</Typography>
+        <Typography variant="subtitle1">• {quiz.time} minutes</Typography>
       </Box>
       {!isAdmin && (
-        <Link href={`/test/${test.id}/start`}>
+        <Link href={`/quiz/${quiz.id}/start`}>
           <Button variant="contained" fullWidth>
-            Start test
+            Start quiz
           </Button>
         </Link>
       )}
       {isAdmin && (
         <>
-          <Link href={`test/${test.id}/edit`}>
+          <Link href={`quiz/${quiz.id}/edit`}>
             <Button variant="outlined" fullWidth sx={{ mb: 1 }}>
-              Edit test
+              Edit quiz
             </Button>
           </Link>
           {!isDeleted ? (
@@ -141,7 +141,7 @@ const TestCard = ({ test, isAdmin, onDelete, onRestore }: TestCardProps) => {
               onClick={onDelete}
             >
               <DeleteIcon sx={{ mr: 1 }} />
-              Delete test
+              Delete quiz
             </Button>
           ) : (
             <Button
@@ -151,7 +151,7 @@ const TestCard = ({ test, isAdmin, onDelete, onRestore }: TestCardProps) => {
               onClick={onRestore}
             >
               <RestoreIcon sx={{ mr: 1 }} />
-              Restore test
+              Restore quiz
             </Button>
           )}
         </>

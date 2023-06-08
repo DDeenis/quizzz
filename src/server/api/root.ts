@@ -1,8 +1,8 @@
 import { createTRPCRouter } from "@/server/api/trpc";
 import { authRouter } from "./routers/auth";
-import { testsRouter } from "./routers/tests";
-import { studentTestsRouter } from "./routers/studentTest";
-import { testResultRouter } from "./routers/testResult";
+import { quizesRouter } from "./routers/quiz";
+import { studentQuizesRouter } from "./routers/studentQuiz";
+import { quizResultRouter } from "./routers/quizResult";
 import { userRouter } from "./routers/user";
 import { adminRouter } from "./routers/admin";
 
@@ -13,9 +13,9 @@ import { adminRouter } from "./routers/admin";
  */
 export const appRouter = createTRPCRouter({
   auth: authRouter,
-  tests: testsRouter,
-  studentTests: studentTestsRouter,
-  testResults: testResultRouter,
+  quizes: quizesRouter,
+  studentQuizes: studentQuizesRouter,
+  quizResults: quizResultRouter,
   users: userRouter,
   admin: adminRouter,
 });

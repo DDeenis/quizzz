@@ -1,13 +1,13 @@
 import type {
-  TestResult,
-  TestResultAdminData,
-  TestResultCreateObject,
-  TestResultPreview,
-} from "@/types/testResult";
+  QuizResult,
+  QuizResultAdminData,
+  QuizResultCreateObject,
+  QuizResultPreview,
+} from "@/types/quizResult";
 import { supabase } from "./supabase";
 import {
   complexityToScoreMap,
-  shuffleQuestionsForTest,
+  shuffleQuestionsForQuiz,
 } from "@/utils/questions";
 import {
   AnswerType,
@@ -16,89 +16,89 @@ import {
 } from "@/types/questionAnswer";
 import { QuestionComplexity } from "@/types/question";
 import { questionAnswerFragment } from "./fragments";
-import { Test } from "@/types/test";
-import { getTestById } from "./test";
+import { Quiz } from "@/types/quiz";
+import { getQuizById } from "./quiz";
 
-export const getTestResults = async (testId: string, userId: string) => {
+export const getQuizResults = async (quizId: string, userId: string) => {
   const response = await supabase
-    .from("test_results")
+    .from("quiz_results")
     .select()
-    .eq("testId", testId)
+    .eq("quizId", quizId)
     .eq("userId", userId);
-  return response.data as TestResult[] | null;
+  return response.data as QuizResult[] | null;
 };
 
-export const getTestResultsByTest = async (testId: string) => {
+export const getQuizResultsByQuiz = async (quizId: string) => {
   const response = await supabase
-    .from("test_results")
+    .from("quiz_results")
     .select()
-    .eq("testId", testId);
-  return response.data as TestResult[] | null;
+    .eq("quizId", quizId);
+  return response.data as QuizResult[] | null;
 };
 
-export const getTestResultsByUser = async (userId: string) => {
+export const getQuizResultsByUser = async (userId: string) => {
   const response = await supabase
-    .from("test_results")
-    .select("*, tests ( * )")
+    .from("quiz_results")
+    .select("*, quizes ( * )")
     .eq("userId", userId);
-  return response.data as TestResultPreview[] | null;
+  return response.data as QuizResultPreview[] | null;
 };
 
-export const getTestResultById = async (id: string) => {
-  const response = await supabase.from("test_results").select().eq("id", id);
-  return response.data?.[0] as TestResult | null;
+export const getQuizResultById = async (id: string) => {
+  const response = await supabase.from("quiz_results").select().eq("id", id);
+  return response.data?.[0] as QuizResult | null;
 };
 
-export const getTestResultWithTest = async (id: string) => {
-  const testResult = await getTestResultById(id);
-  if (!testResult) return null;
+export const getQuizResultWithQuiz = async (id: string) => {
+  const quizResult = await getQuizResultById(id);
+  if (!quizResult) return null;
 
-  const test = await getTestById(testResult.testId);
-  if (!test || !test.questions) return null;
+  const quiz = await getQuizById(quizResult.quizId);
+  if (!quiz || !quiz.questions) return null;
 
-  const { questions, minimumScore, questionsCount } = test;
-  const questionShuffled = shuffleQuestionsForTest({
+  const { questions, minimumScore, questionsCount } = quiz;
+  const questionShuffled = shuffleQuestionsForQuiz({
     questions,
     minimumScore,
     questionsCount,
-    testSessionId: testResult.testSessionId,
+    quizSessionId: quizResult.quizSessionId,
   });
 
   const questionAnswersResponse = await supabase
     .from("question_answers")
     .select(questionAnswerFragment)
-    .eq("testSessionId", testResult.testSessionId);
+    .eq("quizSessionId", quizResult.quizSessionId);
   const questionAnswers = questionAnswersResponse.data as
     | QuestionAnswer[]
     | null;
   if (!questionAnswers) return;
 
   return {
-    testResult: {
-      ...testResult,
+    quizResult: {
+      ...quizResult,
       answers: questionAnswers,
-    } as TestResult,
-    test: {
-      ...test,
+    } as QuizResult,
+    quiz: {
+      ...quiz,
       questions: questionShuffled,
-    } as Test,
+    } as Quiz,
   };
 };
 
-export const getTestResultsForAdmin = async (testId: String) => {
+export const getQuizResultsForAdmin = async (quizId: String) => {
   const result = await supabase
-    .from("test_results")
+    .from("quiz_results")
     .select(
-      "*, tests ( id, name, authorId, questionsCount, minimumScore ), users ( * )"
+      "*, quizes ( id, name, authorId, questionsCount, minimumScore ), users ( * )"
     )
-    .eq("testId", testId);
-  return (result.data ?? []) as TestResultAdminData[];
+    .eq("quizId", quizId);
+  return (result.data ?? []) as QuizResultAdminData[];
 };
 
-export const createTestResult = async (
-  testResultCreateObj: TestResultCreateObject
+export const createQuizResult = async (
+  quizResultCreateObj: QuizResultCreateObject
 ) => {
-  const { answers } = testResultCreateObj;
+  const { answers } = quizResultCreateObj;
 
   try {
     const questions = await supabase
@@ -152,7 +152,7 @@ export const createTestResult = async (
       questionAnswers.push({
         userId: answer.userId,
         questionId: question.id,
-        testSessionId: testResultCreateObj.testSessionId,
+        quizSessionId: quizResultCreateObj.quizSessionId,
         answerData: detailedAnswer,
         answerType: questionAnswerType,
         score,
@@ -160,11 +160,11 @@ export const createTestResult = async (
     }
 
     const result = await supabase
-      .from("test_results")
+      .from("quiz_results")
       .insert({
-        testId: testResultCreateObj.testId,
-        userId: testResultCreateObj.userId,
-        testSessionId: testResultCreateObj.testSessionId,
+        quizId: quizResultCreateObj.quizId,
+        userId: quizResultCreateObj.userId,
+        quizSessionId: quizResultCreateObj.quizSessionId,
         score: questionAnswers.reduce((acc, qa) => acc + qa.score, 0),
         maxScore: totalMaxScore,
         countCorrect: questionAnswers.filter(
@@ -185,24 +185,24 @@ export const createTestResult = async (
       .insert(questionAnswers);
     if (answersResult.error) throw answersResult.error;
 
-    const testResult = result.data?.[0];
-    return testResult as TestResult | undefined;
+    const quizResult = result.data?.[0];
+    return quizResult as QuizResult | undefined;
   } catch (err) {
     console.error(err);
     return;
   }
 };
 
-export const updateTestResult = async (
+export const updateQuizResult = async (
   id: string,
-  testResultUpdateObj: TestResultCreateObject
+  quizResultUpdateObj: QuizResultCreateObject
 ) => {
   const result = await supabase
-    .from("test_results")
-    .update(testResultUpdateObj)
+    .from("quiz_results")
+    .update(quizResultUpdateObj)
     .eq("id", id)
     .select();
-  const testResult = result.data?.[0];
+  const quizResult = result.data?.[0];
 
-  return testResult as TestResult | undefined;
+  return quizResult as QuizResult | undefined;
 };

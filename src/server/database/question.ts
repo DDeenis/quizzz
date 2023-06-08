@@ -1,11 +1,11 @@
 import type { Question, QuestionCreateObject } from "@/types/question";
 import { supabase } from "./supabase";
 
-export const getQuestionsByTest = async (testId: string) => {
+export const getQuestionsByQuiz = async (quizId: string) => {
   const response = await supabase
     .from("questions")
     .select()
-    .eq("testId", testId);
+    .eq("quizId", quizId);
   return response.data as Question[] | null;
 };
 

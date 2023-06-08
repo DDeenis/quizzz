@@ -1,14 +1,14 @@
-export interface TestSession {
+export interface QuizSession {
   id: string;
-  testId: string;
+  quizId: string;
   userId: string;
   createdAt: string;
   expires: string;
   isFinished: boolean;
 }
 
-export interface TestSessionCreateObject {
-  testId: string;
+export interface QuizSessionCreateObject {
+  quizId: string;
   userId: string;
   createdAt: string;
   expires: string;

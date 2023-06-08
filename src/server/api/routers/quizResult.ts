@@ -6,17 +6,17 @@ import {
 } from "@/server/api/trpc";
 import { TRPCError } from "@trpc/server";
 import {
-  getTestResultWithTest,
-  getTestResults,
-  getTestResultsByTest,
-  getTestResultsByUser,
-} from "@/server/database/testResult";
+  getQuizResultWithQuiz,
+  getQuizResults,
+  getQuizResultsByQuiz,
+  getQuizResultsByUser,
+} from "@/server/database/quizResult";
 
-export const testResultRouter = createTRPCRouter({
-  getWithTest: protectedProcedure
-    .input(z.object({ testResultId: z.string() }))
+export const quizResultRouter = createTRPCRouter({
+  getWithQuiz: protectedProcedure
+    .input(z.object({ quizResultId: z.string() }))
     .query(async ({ input, ctx }) => {
-      const result = await getTestResultWithTest(input.testResultId);
+      const result = await getQuizResultWithQuiz(input.quizResultId);
 
       if (!result) {
         throw new TRPCError({
@@ -25,7 +25,7 @@ export const testResultRouter = createTRPCRouter({
       }
 
       if (
-        result?.testResult.userId !== ctx.session.user.id &&
+        result?.quizResult.userId !== ctx.session.user.id &&
         !ctx.session.user.isAdmin
       ) {
         throw new TRPCError({
@@ -36,16 +36,16 @@ export const testResultRouter = createTRPCRouter({
       return result;
     }),
 
-  getAllForTest: adminProcedure
-    .input(z.object({ testId: z.string() }))
+  getAllForQuiz: adminProcedure
+    .input(z.object({ quizId: z.string() }))
     .query(async ({ input }) => {
-      return await getTestResultsByTest(input.testId);
+      return await getQuizResultsByQuiz(input.quizId);
     }),
 
-  getAllForTestByUser: protectedProcedure
-    .input(z.object({ testId: z.string() }))
+  getAllForQuizByUser: protectedProcedure
+    .input(z.object({ quizId: z.string() }))
     .query(async ({ input, ctx }) => {
-      const result = await getTestResults(input.testId, ctx.session.user.id);
+      const result = await getQuizResults(input.quizId, ctx.session.user.id);
 
       if (
         result?.some((tr) => tr.userId !== ctx.session.user.id) &&
@@ -68,7 +68,7 @@ export const testResultRouter = createTRPCRouter({
         });
       }
 
-      const result = await getTestResultsByUser(input.userId);
+      const result = await getQuizResultsByUser(input.userId);
       return result;
     }),
 });

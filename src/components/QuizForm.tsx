@@ -4,7 +4,7 @@ import {
   QuestionType,
   QuestionUpdateObject,
 } from "@/types/question";
-import type { Test, TestCreateObject, TestUpdateObject } from "@/types/test";
+import type { Quiz, QuizCreateObject, QuizUpdateObject } from "@/types/quiz";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
@@ -39,15 +39,15 @@ type RemoveQuestionFn =
   | ((question: QuestionCreateObject) => void)
   | ((question: QuestionUpdateObject) => void);
 
-interface TestFormProps {
-  test?: Test;
+interface QuizFormProps {
+  quiz?: Quiz;
   onSubmit:
-    | ((formData: TestCreateObject) => void)
-    | ((formData: TestUpdateObject) => void);
+    | ((formData: QuizCreateObject) => void)
+    | ((formData: QuizUpdateObject) => void);
   onRemoveQuestion?: RemoveQuestionFn;
 }
 
-export function TestForm(props: TestFormProps) {
+export function QuizForm(props: QuizFormProps) {
   const {
     control,
     register,
@@ -56,13 +56,13 @@ export function TestForm(props: TestFormProps) {
     setValue,
     handleSubmit,
     formState: { errors },
-  } = useForm<TestCreateObject>({
-    defaultValues: props.test,
+  } = useForm<QuizCreateObject>({
+    defaultValues: props.quiz,
   });
   const questionsErrorType = errors.questions?.root?.type;
-  const isUpdate = Boolean(props.test);
+  const isUpdate = Boolean(props.quiz);
 
-  const questionFieldsArray = useFieldArray<TestCreateObject>({
+  const questionFieldsArray = useFieldArray<QuizCreateObject>({
     control: control,
     name: "questions",
     rules: {
@@ -103,8 +103,8 @@ export function TestForm(props: TestFormProps) {
   const onSubmit = handleSubmit(props.onSubmit);
 
   useEffect(() => {
-    if (props.test?.questions) {
-      setValue("questions", props.test.questions);
+    if (props.quiz?.questions) {
+      setValue("questions", props.quiz.questions);
     }
   }, []);
 
@@ -124,7 +124,7 @@ export function TestForm(props: TestFormProps) {
         alignItems={"center"}
       >
         <Typography variant="h2">
-          {isUpdate ? "Update" : "Create new"} test
+          {isUpdate ? "Update" : "Create new"} quiz
         </Typography>
         <Button type="submit" variant="contained" size="large">
           {isUpdate ? "Update" : "Create"}
@@ -150,7 +150,7 @@ export function TestForm(props: TestFormProps) {
         <Box sx={{ flexBasis: { md: "48%", xs: "100%" } }}>
           <TextField
             variant="filled"
-            label="Test name"
+            label="Quiz name"
             sx={{ mb: 2 }}
             required
             fullWidth
@@ -245,12 +245,12 @@ const FormField = ({
   setValue,
 }: {
   index: number;
-  control: Control<TestCreateObject, any>;
-  errors: FieldErrors<TestCreateObject>;
+  control: Control<QuizCreateObject, any>;
+  errors: FieldErrors<QuizCreateObject>;
   onRemove: () => void;
-  register: UseFormRegister<TestCreateObject>;
-  getValues: UseFormGetValues<TestCreateObject>;
-  setValue: UseFormSetValue<TestCreateObject>;
+  register: UseFormRegister<QuizCreateObject>;
+  getValues: UseFormGetValues<QuizCreateObject>;
+  setValue: UseFormSetValue<QuizCreateObject>;
 }) => {
   const variantsForm = useForm<UseArrayHackType>({
     defaultValues: {
@@ -420,10 +420,6 @@ const FormField = ({
                   required: true,
                   shouldUnregister: true,
                   onChange() {
-                    console.log(
-                      selectedIndexes.current,
-                      [...selectedIndexes.current].map((i) => getVariant(i))
-                    );
                     setValue(
                       `questions.${index}.answerData`,
                       [...selectedIndexes.current].map((i) => getVariant(i))

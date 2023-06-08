@@ -4,7 +4,7 @@ import {
   QuestionUpdateObject,
 } from "./question";
 
-export interface Test {
+export interface Quiz {
   id: string;
   name: string;
   description?: string;
@@ -18,7 +18,7 @@ export interface Test {
   questions?: Question[];
 }
 
-export interface TestCreateObject {
+export interface QuizCreateObject {
   name: string;
   authorId: string;
   time: number;
@@ -28,7 +28,7 @@ export interface TestCreateObject {
   questions: QuestionCreateObject[];
 }
 
-export interface TestUpdateObject {
+export interface QuizUpdateObject {
   name: string;
   authorId: string;
   time: number;
@@ -38,7 +38,7 @@ export interface TestUpdateObject {
   questions: QuestionUpdateObject[];
 }
 
-export interface TestOption {
+export interface QuizOption {
   id: string;
   name: string;
 }

@@ -1,7 +1,7 @@
 export type Question =
   | {
       id: string;
-      testId: string;
+      quizId: string;
       questionType: (typeof QuestionType)["SingleVariant"];
       complexity: QuestionComplexity;
       questionData: SingleVariantData;
@@ -11,7 +11,7 @@ export type Question =
     }
   | {
       id: string;
-      testId: string;
+      quizId: string;
       questionType: (typeof QuestionType)["MultipleVariants"];
       complexity: QuestionComplexity;
       questionData: MultipleVariantsData;

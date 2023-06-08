@@ -2,11 +2,11 @@ import { Timer } from "@/components/Timer";
 import { useProtectedSession } from "@/hooks/session";
 import { Question, QuestionType } from "@/types/question";
 import { QuestionAnswerCreateObject } from "@/types/questionAnswer";
-import { TestResultCreateObject } from "@/types/testResult";
+import { QuizResultCreateObject } from "@/types/quizResult";
 import { api } from "@/utils/api";
 import {
   getISODistanceToInSeconds,
-  isTestSessionExpired,
+  isQuizSessionExpired,
 } from "@/utils/questions";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -23,36 +23,36 @@ import React, { useMemo } from "react";
 import { useEffect, useState } from "react";
 import { Control, Controller, useForm } from "react-hook-form";
 
-export default function TestPage() {
+export default function QuizPage() {
   const router = useRouter();
   const { data: session } = useProtectedSession();
-  const { testId, testSessionId } = router.query;
+  const { quizId, quizSessionId } = router.query;
   const { data, refetch, isSuccess, isLoading } =
-    api.studentTests.getTestWithSession.useQuery(
+    api.studentQuizes.getQuizWithSession.useQuery(
       {
-        testId: testId as string,
-        testSessionId: testSessionId as string,
+        quizId: quizId as string,
+        quizSessionId: quizSessionId as string,
       },
       { enabled: false, staleTime: Infinity }
     );
-  const { mutate } = api.studentTests.removeTestSession.useMutation();
-  const submitTest = api.studentTests.submitTest.useMutation();
+  const { mutate } = api.studentQuizes.removeQuizSession.useMutation();
+  const submitQuiz = api.studentQuizes.submitQuiz.useMutation();
   const form = useForm<QuestionAnswerCreateObject[]>({
     defaultValues: [],
   });
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const expiresInMinutes = useMemo(() => {
-    const expires = data?.testSession.expires;
+    const expires = data?.quizSession.expires;
     if (!expires) return 0;
     return Math.floor(getISODistanceToInSeconds(expires) / 60);
   }, [isSuccess]);
 
-  const test = data?.test;
-  const currentQuestion = test?.questions?.[currentQuestionIndex];
+  const quiz = data?.quiz;
+  const currentQuestion = quiz?.questions?.[currentQuestionIndex];
   const hasPrev = currentQuestionIndex > 0;
-  const hasNext = currentQuestionIndex < Number(test?.questions?.length) - 1;
+  const hasNext = currentQuestionIndex < Number(quiz?.questions?.length) - 1;
 
-  const removeTestSession = (id: string) => mutate({ testSessionId: id });
+  const removeQuizSession = (id: string) => mutate({ quizSessionId: id });
 
   useEffect(() => {
     if (!router.isReady) {
@@ -63,12 +63,12 @@ export default function TestPage() {
   }, [router.isReady]);
 
   useEffect(() => {
-    const testSession = data?.testSession;
-    if (!testSession || !isSuccess) return;
-    const isExpired = isTestSessionExpired(testSession);
+    const quizSession = data?.quizSession;
+    if (!quizSession || !isSuccess) return;
+    const isExpired = isQuizSessionExpired(quizSession);
     if (isExpired) {
-      removeTestSession(testSession.id);
-      router.push(`/test/${testId}/start`);
+      removeQuizSession(quizSession.id);
+      router.push(`/quiz/${quizId}/start`);
     }
   }, [isSuccess]);
 
@@ -80,28 +80,28 @@ export default function TestPage() {
 
   const onSubmit = form.handleSubmit((formValues) => {
     const userId = session?.user.id;
-    if (!userId || !test?.questions) return;
+    if (!userId || !quiz?.questions) return;
 
     const answers: QuestionAnswerCreateObject[] = [];
-    for (let i = 0; i < test.questions.length; i++) {
+    for (let i = 0; i < quiz.questions.length; i++) {
       const answerData = formValues[i]?.answerData;
       if (!answerData) return;
 
       answers.push({
         userId: session!.user.id,
-        questionId: test.questions?.[i]?.id!,
+        questionId: quiz.questions?.[i]?.id!,
         answerData,
       });
     }
 
-    const testResult: TestResultCreateObject = {
-      testId: testId as string,
-      testSessionId: testSessionId as string,
+    const quizResult: QuizResultCreateObject = {
+      quizId: quizId as string,
+      quizSessionId: quizSessionId as string,
       userId: session!.user.id,
       answers,
     };
-    submitTest
-      .mutateAsync(testResult)
+    submitQuiz
+      .mutateAsync(quizResult)
       .then((r) => r && router.push(`/result/${r.id}`));
   });
 
@@ -110,14 +110,14 @@ export default function TestPage() {
       onSubmit();
     }
 
-    removeTestSession(testSessionId as string);
+    removeQuizSession(quizSessionId as string);
     // TODO: show modal 'your session has expired'
-    router.push(`/test/${testId}/start`);
+    router.push(`/quiz/${quizId}/start`);
   };
 
-  const onCancelTest = () => {
-    removeTestSession(testSessionId as string);
-    router.push(`/test`);
+  const onCancelQuiz = () => {
+    removeQuizSession(quizSessionId as string);
+    router.push(`/quiz`);
   };
 
   return (
@@ -127,10 +127,10 @@ export default function TestPage() {
       </Head>
       {isLoading ? (
         <Typography variant="body2">Loading...</Typography>
-      ) : test ? (
+      ) : quiz ? (
         <Box>
           <Typography variant="h3" textAlign={"center"}>
-            {test.name}
+            {quiz.name}
           </Typography>
           <Card
             sx={{ maxWidth: 900, width: "100%", mt: 3, mx: "auto" }}
@@ -194,15 +194,15 @@ export default function TestPage() {
                 disabled={!form.formState.isValid}
                 sx={{ display: hasNext ? "none" : "inline" }}
               >
-                {submitTest.isLoading ? "Loading..." : "Finish test"}
+                {submitQuiz.isLoading ? "Loading..." : "Finish quiz"}
               </Button>
               <Button
                 variant="text"
                 type="button"
                 style={{ marginLeft: "auto" }}
-                onClick={onCancelTest}
+                onClick={onCancelQuiz}
               >
-                Cancel test
+                Cancel quiz
               </Button>
             </CardActions>
           </Card>
@@ -214,7 +214,7 @@ export default function TestPage() {
             mt={2}
             // maxWidth={900}
           >
-            {test.questions?.map((_, i) => {
+            {quiz.questions?.map((_, i) => {
               return (
                 <Chip
                   key={i}
@@ -229,7 +229,7 @@ export default function TestPage() {
         </Box>
       ) : (
         <Typography variant="body2" color={"red"}>
-          Failed to load test or test session
+          Failed to load quiz or quiz session
         </Typography>
       )}
     </>

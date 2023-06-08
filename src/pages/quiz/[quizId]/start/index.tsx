@@ -1,4 +1,4 @@
-import { TestInfoCard } from "@/components/TestInfoCard";
+import { QuizInfoCard } from "@/components/QuizInfoCard";
 import { useProtectedSession } from "@/hooks/session";
 import { api } from "@/utils/api";
 import { getTotalScore } from "@/utils/questions";
@@ -14,20 +14,20 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 
-export default function StartTestPage() {
+export default function StartQuizPage() {
   const router = useRouter();
-  const { testId } = router.query;
+  const { quizId } = router.query;
   const { data } = useProtectedSession();
   const {
-    data: test,
+    data: quiz,
     isLoading,
     refetch,
-  } = api.tests.getById.useQuery(
-    { testId: (testId as string | undefined) ?? "" },
+  } = api.quizes.getById.useQuery(
+    { quizId: (quizId as string | undefined) ?? "" },
     { enabled: false }
   );
   const { mutateAsync, isLoading: isLoadingStart } =
-    api.studentTests.createTestSession.useMutation();
+    api.studentQuizes.createQuizSession.useMutation();
 
   useEffect(() => {
     if (!router.isReady) {
@@ -35,46 +35,46 @@ export default function StartTestPage() {
     }
 
     refetch();
-  }, [testId, router.isReady]);
+  }, [quizId, router.isReady]);
 
-  const onStartTest = () =>
-    mutateAsync({ testId: testId as string, timeInMinutes: test?.time! }).then(
-      (s) => s && router.push(`/test/${test?.id}/start/${s.id}`)
+  const onStartQuiz = () =>
+    mutateAsync({ quizId: quizId as string, timeInMinutes: quiz?.time! }).then(
+      (s) => s && router.push(`/quiz/${quiz?.id}/start/${s.id}`)
     );
 
   return (
     <>
       <Head>
-        <title>Start test {test?.name}</title>
+        <title>Start quiz {quiz?.name}</title>
       </Head>
       {isLoading ? (
         <Typography variant="body2">Loading...</Typography>
-      ) : test ? (
+      ) : quiz ? (
         <Box
           display={"flex"}
           justifyContent={"center"}
           alignItems={"center"}
           height={"100%"}
         >
-          <TestInfoCard
-            testInfo={test}
+          <QuizInfoCard
+            quizInfo={quiz}
             contentSection={
               <Typography variant="body2">
-                If you close this test before you have completed it, your
+                If you close this quiz before you have completed it, your
                 answers will not be saved.
               </Typography>
             }
             actionsSection={
               <>
-                <Link href={"/test"}>
+                <Link href={"/quiz"}>
                   <Button>Cancel</Button>
                 </Link>
                 <Button
                   variant="contained"
                   sx={{ ml: 1 }}
-                  onClick={onStartTest}
+                  onClick={onStartQuiz}
                 >
-                  {isLoadingStart ? "Loading..." : "Start test"}
+                  {isLoadingStart ? "Loading..." : "Start quiz"}
                 </Button>
               </>
             }
@@ -82,7 +82,7 @@ export default function StartTestPage() {
         </Box>
       ) : (
         <Typography variant="body2" color={"red"}>
-          Failed to load test
+          Failed to load quiz
         </Typography>
       )}
     </>

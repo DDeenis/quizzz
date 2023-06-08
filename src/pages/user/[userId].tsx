@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { stringAvatar } from "@/utils/user";
 import Button from "@mui/material/Button";
 import Link from "next/link";
-import { TestResultPreview } from "@/types/testResult";
+import { QuizResultPreview } from "@/types/quizResult";
 import Modal from "@mui/material/Modal";
 import TextField from "@mui/material/TextField";
 import { useForm } from "react-hook-form";
@@ -23,7 +23,7 @@ export default function ProfilePage() {
     { userId: userId as string },
     { enabled: false, staleTime: Infinity }
   );
-  const testResultsData = api.testResults.getAllByUser.useQuery(
+  const quizResultsData = api.quizResults.getAllByUser.useQuery(
     { userId: userId as string },
     { enabled: false }
   );
@@ -61,7 +61,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (!canViewDetailed) return;
-    testResultsData.refetch();
+    quizResultsData.refetch();
   }, [canViewDetailed]);
 
   return (
@@ -113,13 +113,13 @@ export default function ProfilePage() {
                 </Button>
               )}
             </Box>
-            {canViewDetailed && Boolean(testResultsData.data?.length) && (
+            {canViewDetailed && Boolean(quizResultsData.data?.length) && (
               <>
                 <Typography variant="h5" textAlign={"center"}>
                   Your results
                 </Typography>
                 <Box display={"flex"} flexWrap={"wrap"} gap={2}>
-                  {testResultsData.data?.map((tr) => (
+                  {quizResultsData.data?.map((tr) => (
                     <ResultCard result={tr} key={tr.id} />
                   ))}
                 </Box>
@@ -158,8 +158,8 @@ export default function ProfilePage() {
   );
 }
 
-const ResultCard = ({ result }: { result: TestResultPreview }) => {
-  const isPassed = result.score >= result.tests.minimumScore;
+const ResultCard = ({ result }: { result: QuizResultPreview }) => {
+  const isPassed = result.score >= result.quizes.minimumScore;
   const color = isPassed ? "green" : "red";
   return (
     <Box
@@ -176,7 +176,7 @@ const ResultCard = ({ result }: { result: TestResultPreview }) => {
         color={color}
         mb={2}
       >
-        {result.tests.name}
+        {result.quizes.name}
       </Typography>
       <Box component={"ul"}>
         <Box component={"li"}>
@@ -186,7 +186,7 @@ const ResultCard = ({ result }: { result: TestResultPreview }) => {
           </Typography>{" "}
           of{" "}
           <Typography fontWeight={"bold"} component={"span"}>
-            {result.tests.minimumScore}
+            {result.quizes.minimumScore}
           </Typography>{" "}
           (maximum {result.maxScore})
         </Box>

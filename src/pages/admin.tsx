@@ -1,6 +1,6 @@
 import { TabPanel } from "@/components/TabPanel";
 import { useAdminSession } from "@/hooks/session";
-import { TestResultAdminData } from "@/types/testResult";
+import { QuizResultAdminData } from "@/types/quizResult";
 import { User } from "@/types/user";
 import { api } from "@/utils/api";
 import { stringAvatar } from "@/utils/user";
@@ -24,12 +24,12 @@ import React, { useEffect, useMemo, useState } from "react";
 export default function AdminPage() {
   const session = useAdminSession();
   const [currentTab, setCurrentTab] = React.useState(0);
-  const [selectedTestId, setSelectedTestId] = useState<string>("");
+  const [selectedQuizId, setSelectedQuizId] = useState<string>("");
   const [selectedUserId, setSelectedUserId] = useState<string>("");
-  const testOptions = api.admin.getTestOptions.useQuery();
-  const testResults = api.admin.getResultsForTest.useQuery(
+  const quizOptions = api.admin.getQuizOptions.useQuery();
+  const quizResults = api.admin.getResultsForQuiz.useQuery(
     {
-      testId: selectedTestId,
+      quizId: selectedQuizId,
     },
     { enabled: false }
   );
@@ -39,25 +39,25 @@ export default function AdminPage() {
 
   const filteredData = useMemo(() => {
     return selectedUserId
-      ? testResults.data?.filter((tr) => tr.userId === selectedUserId)
-      : testResults.data;
-  }, [testResults.dataUpdatedAt, selectedUserId]);
+      ? quizResults.data?.filter((tr) => tr.userId === selectedUserId)
+      : quizResults.data;
+  }, [quizResults.dataUpdatedAt, selectedUserId]);
 
   const userOptions = useMemo(() => {
-    return testResults.data
+    return quizResults.data
       ?.map((tr) => ({
         id: tr.userId,
         name: tr.users.fullName,
       }))
       .filter((o, i, arr) => arr.findLastIndex((t) => t.id === o.id) === i);
-  }, [testResults.dataUpdatedAt]);
+  }, [quizResults.dataUpdatedAt]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setCurrentTab(newValue);
   };
 
-  const handleTestChange = (event: SelectChangeEvent<string>) => {
-    setSelectedTestId(event.target.value);
+  const handleQuizChange = (event: SelectChangeEvent<string>) => {
+    setSelectedQuizId(event.target.value);
   };
   const handleUserChange = (event: SelectChangeEvent<string>) => {
     setSelectedUserId(event.target.value);
@@ -75,11 +75,11 @@ export default function AdminPage() {
   };
 
   useEffect(() => {
-    if (selectedTestId) {
+    if (selectedQuizId) {
       setSelectedUserId("");
-      testResults.refetch();
+      quizResults.refetch();
     }
-  }, [selectedTestId]);
+  }, [selectedQuizId]);
 
   useEffect(() => {
     if (currentTab === 1) {
@@ -105,21 +105,21 @@ export default function AdminPage() {
           aria-label="basic tabs example"
           centered
         >
-          <Tab label="Test results" />
+          <Tab label="Quiz results" />
           <Tab label="Users" />
         </Tabs>
       </Box>
       <TabPanel value={currentTab} index={0}>
         <Box display={"flex"} flexWrap={"wrap"} gap={2}>
           <FormControl fullWidth sx={{ maxWidth: 340 }}>
-            <InputLabel id={`test-select-label`}>Test</InputLabel>
+            <InputLabel id={`quiz-select-label`}>Quiz</InputLabel>
             <Select
-              labelId={`test-select-label`}
-              label="Test"
-              value={selectedTestId}
-              onChange={handleTestChange}
+              labelId={`quiz-select-label`}
+              label="Quiz"
+              value={selectedQuizId}
+              onChange={handleQuizChange}
             >
-              {testOptions.data?.map((o) => (
+              {quizOptions.data?.map((o) => (
                 <MenuItem value={o.id} key={o.id}>
                   {o.name}
                 </MenuItem>
@@ -127,9 +127,9 @@ export default function AdminPage() {
             </Select>
           </FormControl>
           <FormControl fullWidth sx={{ maxWidth: 340 }}>
-            <InputLabel id={`test-select-label`}>User</InputLabel>
+            <InputLabel id={`quiz-select-label`}>User</InputLabel>
             <Select
-              labelId={`test-select-label`}
+              labelId={`quiz-select-label`}
               label="User"
               value={selectedUserId}
               disabled={!userOptions?.length}
@@ -159,9 +159,9 @@ export default function AdminPage() {
           </FormControl>
         </Box>
         <Box mt={4}>
-          {!selectedTestId && (
+          {!selectedQuizId && (
             <Typography variant="subtitle2" textAlign={"center"}>
-              Select test to see the data
+              Select quiz to see the data
             </Typography>
           )}
           {filteredData && filteredData.length === 0 && (
@@ -169,14 +169,14 @@ export default function AdminPage() {
               No data to display
             </Typography>
           )}
-          {selectedTestId && testResults.isLoading && (
+          {selectedQuizId && quizResults.isLoading && (
             <Typography variant="subtitle2" textAlign={"center"}>
               Loading...
             </Typography>
           )}
           <Box display={"flex"} flexDirection={"column"} gap={2}>
             {filteredData?.map((tr) => (
-              <ResultCard testResult={tr} key={tr.id} />
+              <ResultCard quizResult={tr} key={tr.id} />
             ))}
           </Box>
         </Box>
@@ -207,8 +207,8 @@ export default function AdminPage() {
   );
 }
 
-const ResultCard = ({ testResult }: { testResult: TestResultAdminData }) => {
-  const isPassed = testResult.score >= testResult.tests.minimumScore;
+const ResultCard = ({ quizResult }: { quizResult: QuizResultAdminData }) => {
+  const isPassed = quizResult.score >= quizResult.quizes.minimumScore;
   const color = isPassed ? "green" : "red";
 
   return (
@@ -223,38 +223,38 @@ const ResultCard = ({ testResult }: { testResult: TestResultAdminData }) => {
       alignItems={"center"}
       gap={2}
     >
-      <UserInfo user={testResult.users} />
+      <UserInfo user={quizResult.users} />
       <Divider orientation="vertical" flexItem />
       <Box textAlign={{ xs: "center", lg: "start" }}>
         <Typography color={color} variant="subtitle1" fontWeight={"bold"}>
-          {isPassed ? "Test passed" : "Test failed"}
+          {isPassed ? "Quiz passed" : "Quiz failed"}
         </Typography>
         <Typography variant="body2">
-          {testResult.score} points out of {testResult.tests.minimumScore}{" "}
+          {quizResult.score} points out of {quizResult.quizes.minimumScore}{" "}
           minimum
         </Typography>
       </Box>
       <Box ml={{ lg: 1 }}>
         <Typography variant="body2">
-          • {testResult.tests.minimumScore} minimum points
+          • {quizResult.quizes.minimumScore} minimum points
         </Typography>
         <Typography variant="body2">
-          • {testResult.maxScore} maximum points
+          • {quizResult.maxScore} maximum points
         </Typography>
       </Box>
       <Box ml={{ lg: 1 }}>
         <Typography variant="body2" color={"green"}>
-          • {testResult.countCorrect} correct answers
+          • {quizResult.countCorrect} correct answers
         </Typography>
         <Typography variant="body2" color={"red"}>
-          • {testResult.countIncorrect} incorrect answers
+          • {quizResult.countIncorrect} incorrect answers
         </Typography>
       </Box>
       <Typography variant="body2" ml={{ lg: "auto" }}>
-        Passed at {formatDate(testResult.createdAt)}
+        Passed at {formatDate(quizResult.createdAt)}
       </Typography>
       <Divider orientation="vertical" flexItem />
-      <Link href={`/result/${testResult.id}`}>
+      <Link href={`/result/${quizResult.id}`}>
         <Button variant="text">Details</Button>
       </Link>
     </Box>

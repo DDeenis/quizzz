@@ -1,21 +1,21 @@
-import type { TestUpdateObject } from "@/types/test";
+import type { QuizUpdateObject } from "@/types/quiz";
 import { useRouter } from "next/router";
 import { api } from "@/utils/api";
-import { TestForm } from "@/components/TestForm";
+import { QuizForm } from "@/components/QuizForm";
 import { useEffect, useRef } from "react";
 import { QuestionCreateObject, QuestionUpdateObject } from "@/types/question";
 import { useAdminSession } from "@/hooks/session";
 import Head from "next/head";
 
-export default function EditTest() {
+export default function EditQuiz() {
   const router = useRouter();
-  const { testId } = router.query;
-  const { data: test, refetch } = api.tests.getById.useQuery(
-    { testId: (testId as string | undefined) ?? "" },
+  const { quizId } = router.query;
+  const { data: quiz, refetch } = api.quizes.getById.useQuery(
+    { quizId: (quizId as string | undefined) ?? "" },
     { enabled: false, cacheTime: 0, staleTime: 0 }
   );
   useAdminSession();
-  const { mutateAsync } = api.tests.updateTest.useMutation();
+  const { mutateAsync } = api.quizes.updateQuiz.useMutation();
   const deletedQuestionsRef = useRef<string[]>([]);
 
   useEffect(() => {
@@ -24,15 +24,15 @@ export default function EditTest() {
     }
 
     refetch();
-  }, [testId, router.isReady]);
+  }, [quizId, router.isReady]);
 
-  const onSubmit = (formValues: TestUpdateObject) => {
+  const onSubmit = (formValues: QuizUpdateObject) => {
     mutateAsync({
-      testId: testId as string,
-      testUpdateObject: formValues,
+      quizId: quizId as string,
+      quizUpdateObject: formValues,
       deletedQuestionIds: deletedQuestionsRef.current,
     }).then((createdSuccessfully) => {
-      createdSuccessfully && router.push("/test");
+      createdSuccessfully && router.push("/quiz");
     });
   };
 
@@ -47,13 +47,13 @@ export default function EditTest() {
   return (
     <>
       <Head>
-        <title>Edit {test?.name}</title>
+        <title>Edit {quiz?.name}</title>
       </Head>
-      {test ? (
-        <TestForm
+      {quiz ? (
+        <QuizForm
           onSubmit={onSubmit}
           onRemoveQuestion={onRemoveQuestion}
-          test={test}
+          quiz={quiz}
         />
       ) : null}
     </>

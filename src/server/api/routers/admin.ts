@@ -1,18 +1,18 @@
 import { z } from "zod";
 import { adminProcedure, createTRPCRouter } from "../trpc";
-import { getTestsAsOptions } from "@/server/database/test";
-import { getTestResultsForAdmin } from "@/server/database/testResult";
+import { getQuizesAsOptions } from "@/server/database/quiz";
+import { getQuizResultsForAdmin } from "@/server/database/quizResult";
 import { deleteUser, getAllUsers, restoreUser } from "@/server/database/user";
 
 export const adminRouter = createTRPCRouter({
-  getTestOptions: adminProcedure.query(async () => {
-    return await getTestsAsOptions();
+  getQuizOptions: adminProcedure.query(async () => {
+    return await getQuizesAsOptions();
   }),
 
-  getResultsForTest: adminProcedure
-    .input(z.object({ testId: z.string() }))
+  getResultsForQuiz: adminProcedure
+    .input(z.object({ quizId: z.string() }))
     .query(async ({ input }) => {
-      return await getTestResultsForAdmin(input.testId);
+      return await getQuizResultsForAdmin(input.quizId);
     }),
 
   getAllUsers: adminProcedure.query(async ({ ctx }) => {

@@ -1,6 +1,6 @@
 export const questionFragment = `
     id,
-    testId,
+    quizId,
     questionType,
     complexity,
     questionData,
@@ -9,7 +9,7 @@ export const questionFragment = `
     image
 `;
 
-export const testFragment = `
+export const quizFragment = `
     id,
     name,
     description,
@@ -32,14 +32,14 @@ export const questionAnswerFragment = `
     answerType,
     answerData,
     score,
-    testSessionId
+    quizSessionId
 `;
 
-export const testResultFragment = `
+export const quizResultFragment = `
     id,
-    testId,
+    quizId,
     userId,
-    testSessionId,
+    quizSessionId,
     score,
     maxScore,
     countCorrect,

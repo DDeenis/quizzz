@@ -1,4 +1,4 @@
-import { TestInfoCard } from "@/components/TestInfoCard";
+import { QuizInfoCard } from "@/components/QuizInfoCard";
 import { useProtectedSession } from "@/hooks/session";
 import { Question, QuestionType } from "@/types/question";
 import { AnswerType } from "@/types/questionAnswer";
@@ -15,20 +15,20 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 
-export default function TestPage() {
+export default function QuizPage() {
   const router = useRouter();
   const { resultId } = router.query;
-  const { data, refetch, isLoading } = api.testResults.getWithTest.useQuery(
+  const { data, refetch, isLoading } = api.quizResults.getWithQuiz.useQuery(
     {
-      testResultId: resultId as string,
+      quizResultId: resultId as string,
     },
     { enabled: false, staleTime: Infinity, retry: false }
   );
   useProtectedSession();
 
-  const isTestPassed =
-    (data?.testResult.score ?? 0) >= (data?.test.minimumScore ?? 0);
-  const passedColor = isTestPassed ? "green" : "red";
+  const isQuizPassed =
+    (data?.quizResult.score ?? 0) >= (data?.quiz.minimumScore ?? 0);
+  const passedColor = isQuizPassed ? "green" : "red";
 
   useEffect(() => {
     if (!router.isReady) {
@@ -45,7 +45,7 @@ export default function TestPage() {
           <title>Results: Loading...</title>
         ) : (
           <title>
-            Results: {data?.test.name} - {isTestPassed ? "Passed" : "Failed"}
+            Results: {data?.quiz.name} - {isQuizPassed ? "Passed" : "Failed"}
           </title>
         )}
       </Head>
@@ -59,9 +59,9 @@ export default function TestPage() {
             textAlign={"center"}
             mb={3}
           >
-            {isTestPassed
-              ? "You have passed the test!"
-              : "You failed to pass the test"}
+            {isQuizPassed
+              ? "You have passed the quiz!"
+              : "You failed to pass the quiz"}
           </Typography>
           <Box
             display={"flex"}
@@ -69,8 +69,8 @@ export default function TestPage() {
             alignItems={"center"}
             height={"100%"}
           >
-            <TestInfoCard
-              testInfo={data.test}
+            <QuizInfoCard
+              quizInfo={data.quiz}
               borderColor={passedColor}
               contentSection={
                 <Box component={"figure"} m={0}>
@@ -90,32 +90,32 @@ export default function TestPage() {
                         fontWeight={"bold"}
                         component={"span"}
                       >
-                        {data.testResult.score}
+                        {data.quizResult.score}
                       </Typography>{" "}
                       of{" "}
                       <Typography fontWeight={"bold"} component={"span"}>
-                        {data.test.minimumScore}
+                        {data.quiz.minimumScore}
                       </Typography>{" "}
-                      (maximum {data.testResult.maxScore})
+                      (maximum {data.quizResult.maxScore})
                     </Box>
                     <Box component={"li"}>
-                      {data.testResult.countCorrect} correct answers
+                      {data.quizResult.countCorrect} correct answers
                     </Box>
                     <Box component={"li"}>
-                      {data.testResult.countIncorrect} incorrect or partially
+                      {data.quizResult.countIncorrect} incorrect or partially
                       correct answers
                     </Box>
                     <Box component={"li"}>
                       Passed at{" "}
-                      {new Date(data.testResult.createdAt).toUTCString()}
+                      {new Date(data.quizResult.createdAt).toUTCString()}
                     </Box>
                   </Box>
                 </Box>
               }
             />
           </Box>
-          {data.test.questions?.map((q, i) => {
-            const answer = data.testResult.answers?.find(
+          {data.quiz.questions?.map((q, i) => {
+            const answer = data.quizResult.answers?.find(
               (a) => a.questionId === q.id
             );
             if (!answer) {
@@ -135,7 +135,7 @@ export default function TestPage() {
         </Box>
       ) : (
         <Typography variant="body2" color={"red"}>
-          Failed to load result or test
+          Failed to load result or quiz
         </Typography>
       )}
     </>

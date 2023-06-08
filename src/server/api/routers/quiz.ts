@@ -1,18 +1,18 @@
 import { z } from "zod";
 import { adminProcedure, createTRPCRouter, protectedProcedure } from "../trpc";
 import {
-  createTest,
-  deleteTest,
-  getAllTestsPreview,
-  getAllTestsPreviewWithDeleted,
-  getTestById,
-  restoreTest,
-  updateTest,
-} from "@/server/database/test";
+  createQuiz,
+  deleteQuiz,
+  getAllQuizesPreview,
+  getAllQuizesPreviewWithDeleted,
+  getQuizById,
+  restoreQuiz,
+  updateQuiz,
+} from "@/server/database/quiz";
 import { QuestionType, QuestionComplexity } from "@/types/question";
 import { TRPCError } from "@trpc/server";
 
-const testCreateScheme = z.object({
+const quizCreateScheme = z.object({
   name: z.string(),
   time: z.number().min(1),
   questionsCount: z.number().min(1),
@@ -36,7 +36,7 @@ const testCreateScheme = z.object({
   ),
 });
 
-const testUpdateScheme = z.object({
+const quizUpdateScheme = z.object({
   name: z.string(),
   time: z.number().min(1),
   questionsCount: z.number().min(1),
@@ -61,81 +61,81 @@ const testUpdateScheme = z.object({
   ),
 });
 
-export const testsRouter = createTRPCRouter({
-  createTest: adminProcedure
+export const quizesRouter = createTRPCRouter({
+  createQuiz: adminProcedure
     .input(
       z.object({
-        testCreateObject: testCreateScheme,
+        quizCreateObject: quizCreateScheme,
       })
     )
     .mutation(async ({ input, ctx }) => {
       // @ts-ignore
-      return await createTest({
-        ...input.testCreateObject,
+      return await createQuiz({
+        ...input.quizCreateObject,
         authorId: ctx.session.user.id,
       });
     }),
 
-  updateTest: adminProcedure
+  updateQuiz: adminProcedure
     .input(
       z.object({
-        testId: z.string(),
-        testUpdateObject: testUpdateScheme,
+        quizId: z.string(),
+        quizUpdateObject: quizUpdateScheme,
         deletedQuestionIds: z.array(z.string()).optional().nullable(),
       })
     )
     .mutation(async ({ input, ctx }) => {
-      return await updateTest(
-        input.testId,
+      return await updateQuiz(
+        input.quizId,
         // @ts-expect-error
         {
-          ...input.testUpdateObject,
+          ...input.quizUpdateObject,
           authorId: ctx.session.user.id,
         },
         input.deletedQuestionIds
       );
     }),
 
-  deleteTest: adminProcedure
+  deleteQuiz: adminProcedure
     .input(
       z.object({
-        testId: z.string(),
+        quizId: z.string(),
       })
     )
     .mutation(async ({ input }) => {
-      return await deleteTest(input.testId);
+      return await deleteQuiz(input.quizId);
     }),
 
-  restoreTest: adminProcedure
+  restoreQuiz: adminProcedure
     .input(
       z.object({
-        testId: z.string(),
+        quizId: z.string(),
       })
     )
     .mutation(async ({ input }) => {
-      return await restoreTest(input.testId);
+      return await restoreQuiz(input.quizId);
     }),
 
   getAll: protectedProcedure.query(async ({ ctx }) => {
-    if (ctx.session.user.isAdmin) return await getAllTestsPreviewWithDeleted();
-    return await getAllTestsPreview();
+    if (ctx.session.user.isAdmin) return await getAllQuizesPreviewWithDeleted();
+    return await getAllQuizesPreview();
   }),
 
   getById: protectedProcedure
     .input(
       z.object({
-        testId: z.string(),
+        quizId: z.string(),
       })
     )
     .query(async ({ input }) => {
-      const test = await getTestById(input.testId);
+      const quiz = await getQuizById(input.quizId);
 
-      if (!test) {
+      if (!quiz) {
         throw new TRPCError({
           code: "NOT_FOUND",
         });
       }
 
-      return test;
+      return quiz;
     }),
 });

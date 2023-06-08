@@ -1,12 +1,12 @@
 import { QuestionAnswer, QuestionAnswerCreateObject } from "./questionAnswer";
-import { Test } from "./test";
+import { Quiz } from "./quiz";
 import { User } from "./user";
 
-export interface TestResult {
+export interface QuizResult {
   id: string;
-  testId: string;
+  quizId: string;
   userId: string;
-  testSessionId: string;
+  quizSessionId: string;
   score: number;
   maxScore?: number;
   countCorrect: number;
@@ -15,28 +15,28 @@ export interface TestResult {
   answers?: QuestionAnswer[];
 }
 
-export interface TestResultCreateObject {
-  testId: string;
+export interface QuizResultCreateObject {
+  quizId: string;
   userId: string;
-  testSessionId: string;
+  quizSessionId: string;
   answers: QuestionAnswerCreateObject[];
 }
 
-export interface TestResultPreview {
+export interface QuizResultPreview {
   id: string;
-  testId: string;
+  quizId: string;
   userId: string;
-  testSessionId: string;
+  quizSessionId: string;
   score: number;
   maxScore?: number;
   countCorrect: number;
   countIncorrect: number;
   createdAt: string;
-  tests: Omit<Test, "questions">;
+  quizes: Omit<Quiz, "questions">;
 }
 
-export interface TestResultAdminData extends Omit<TestResult, "answers"> {
-  tests: {
+export interface QuizResultAdminData extends Omit<QuizResult, "answers"> {
+  quizes: {
     id: string;
     name: string;
     authorId: string;

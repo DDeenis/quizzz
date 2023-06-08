@@ -1,3 +1,3 @@
 # step-quiz
 
-App for creating and conducting tests
+App for creating and conducting quizes

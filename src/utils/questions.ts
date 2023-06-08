@@ -3,7 +3,7 @@ import {
   QuestionComplexity,
   type QuestionCreateObject,
 } from "@/types/question";
-import { TestSession } from "@/types/testSession";
+import { QuizSession } from "@/types/quizSession";
 
 export const complexityToScoreMap = {
   [QuestionComplexity.Low]: 1,
@@ -34,11 +34,11 @@ export const shuffleArray = <T>(array: T[], seed?: number) => {
   return copy;
 };
 
-export const isTestSessionExpired = (testSession: TestSession) => {
+export const isQuizSessionExpired = (quizSession: QuizSession) => {
   const nowISO = getISOnow();
-  const expires = getISODate(testSession.expires);
+  const expires = getISODate(quizSession.expires);
 
-  if (nowISO >= expires || testSession.isFinished) {
+  if (nowISO >= expires || quizSession.isFinished) {
     return true;
   }
 
@@ -79,39 +79,39 @@ function mulberry32(seed: number) {
   };
 }
 
-export function shuffleQuestionsForTest({
+export function shuffleQuestionsForQuiz({
   questions,
   minimumScore,
   questionsCount,
-  testSessionId,
+  quizSessionId,
 }: {
   questions: Question[];
   questionsCount: number;
   minimumScore: number;
-  testSessionId: string;
+  quizSessionId: string;
 }) {
-  const randomSeed = hashFromString(testSessionId);
+  const randomSeed = hashFromString(quizSessionId);
   const questionsShuffled = shuffleArray(questions, randomSeed);
-  let questionsForTest: Question[] = [];
+  let questionsForQuiz: Question[] = [];
 
   let i = 0;
   while (
-    getTotalScore(questionsForTest) < minimumScore ||
-    questionsForTest.length < questionsCount
+    getTotalScore(questionsForQuiz) < minimumScore ||
+    questionsForQuiz.length < questionsCount
   ) {
     const question = questionsShuffled[i++];
     // this probably won't happen, but just in case return all questions
     if (!question) {
       console.error(
-        `Something went wrong while selecting questions for test session ${testSessionId}`
+        `Something went wrong while selecting questions for quiz session ${quizSessionId}`
       );
-      questionsForTest = questionsShuffled;
+      questionsForQuiz = questionsShuffled;
       break;
     }
-    questionsForTest.push(question);
+    questionsForQuiz.push(question);
   }
 
-  return questionsForTest.map((q) => ({
+  return questionsForQuiz.map((q) => ({
     ...q,
     questionData: {
       ...q.questionData,

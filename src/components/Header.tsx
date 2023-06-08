@@ -135,8 +135,8 @@ export default function Header() {
       <AppBar position="static">
         <Toolbar>
           <Box sx={{ flexGrow: 1 }}>
-            <Link href={"/test"}>
-              <Button sx={{ color: "white" }}>Tests</Button>
+            <Link href={"/quiz"}>
+              <Button sx={{ color: "white" }}>Quizes</Button>
             </Link>
           </Box>
           <Box sx={{ display: { xs: "none", md: "flex" } }}>

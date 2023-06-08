@@ -19,7 +19,7 @@ export default function Home() {
 
   useEffect(() => {
     if (status === "authenticated") {
-      push("/test");
+      push("/quiz");
     }
   }, [status]);
 
