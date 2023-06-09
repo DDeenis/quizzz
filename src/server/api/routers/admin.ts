@@ -3,11 +3,18 @@ import { adminProcedure, createTRPCRouter } from "../trpc";
 import { getQuizesAsOptions } from "@/server/database/quiz";
 import { getQuizResultsForAdmin } from "@/server/database/quizResult";
 import { deleteUser, getAllUsers, restoreUser } from "@/server/database/user";
+import { getFullQuizSessions } from "@/server/database/quizSession";
 
 export const adminRouter = createTRPCRouter({
   getQuizOptions: adminProcedure.query(async () => {
     return await getQuizesAsOptions();
   }),
+
+  getQuizSessions: adminProcedure
+    .input(z.object({ quizId: z.string() }))
+    .query(async ({ input }) => {
+      return await getFullQuizSessions(input.quizId);
+    }),
 
   getResultsForQuiz: adminProcedure
     .input(z.object({ quizId: z.string() }))

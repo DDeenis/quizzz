@@ -9,7 +9,10 @@ import {
   getQuizSessionsCount,
 } from "@/server/database/quizSession";
 import { TRPCError } from "@trpc/server";
-import { createQuizResult } from "@/server/database/quizResult";
+import {
+  createQuizResult,
+  getQuizResultBySession,
+} from "@/server/database/quizResult";
 import { isQuizSessionExpired, sortQuizSessions } from "@/utils/questions";
 
 export const studentQuizesRouter = createTRPCRouter({
@@ -103,7 +106,10 @@ export const studentQuizesRouter = createTRPCRouter({
         });
       }
 
-      if (quizSession.userId !== ctx.session.user.id) {
+      if (
+        quizSession.userId !== ctx.session.user.id &&
+        !ctx.session.user.isAdmin
+      ) {
         throw new TRPCError({
           code: "FORBIDDEN",
         });
@@ -144,6 +150,14 @@ export const studentQuizesRouter = createTRPCRouter({
       ) {
         throw new TRPCError({
           code: "FORBIDDEN",
+        });
+      }
+
+      const existingResult = await getQuizResultBySession(input.quizSessionId);
+
+      if (existingResult) {
+        throw new TRPCError({
+          code: "CONFLICT",
         });
       }
 

@@ -98,7 +98,8 @@ export default function QuizPage() {
     };
     submitQuiz
       .mutateAsync(quizResult)
-      .then((r) => r && router.push(`/result/${r.id}`));
+      .then((r) => r && router.push(`/result/${r.id}`))
+      .catch(console.error);
   });
 
   const onTimerEnd = () => {

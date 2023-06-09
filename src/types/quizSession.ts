@@ -1,10 +1,11 @@
+import { User } from "./user";
+
 export interface QuizSession {
   id: string;
   quizId: string;
   userId: string;
   createdAt: string;
   expires: string;
-  isFinished: boolean;
 }
 
 export interface QuizSessionWithQuiz {
@@ -13,10 +14,21 @@ export interface QuizSessionWithQuiz {
   userId: string;
   createdAt: string;
   expires: string;
-  isFinished: boolean;
   quizes: {
     name: string;
   };
+}
+
+export interface QuizSessionFull {
+  id: string;
+  quizId: string;
+  userId: string;
+  createdAt: string;
+  expires: string;
+  quizes: {
+    name: string;
+  };
+  users: User;
 }
 
 export interface QuizSessionCreateObject {

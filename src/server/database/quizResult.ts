@@ -44,6 +44,14 @@ export const getQuizResultsByUser = async (userId: string) => {
   return response.data as QuizResultPreview[] | null;
 };
 
+export const getQuizResultBySession = async (quizSessionId: string) => {
+  const response = await supabase
+    .from("quiz_results")
+    .select("*, quizes ( * )")
+    .eq("quizSessionId", quizSessionId);
+  return response.data?.[0] as QuizResultPreview | null;
+};
+
 export const getQuizResultById = async (id: string) => {
   const response = await supabase.from("quiz_results").select().eq("id", id);
   return response.data?.[0] as QuizResult | null;
