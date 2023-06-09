@@ -1,13 +1,53 @@
-import { QuizSession, QuizSessionCreateObject } from "@/types/quizSession";
+import {
+  QuizSession,
+  QuizSessionCreateObject,
+  QuizSessionWithQuiz,
+} from "@/types/quizSession";
 import { supabase } from "./supabase";
+import { getISODate, sortQuizSessions } from "@/utils/questions";
 
-export const getQuizSession = async (quizId: string, userId: string) => {
+export const getQuizSessions = async (quizId: string, userId: string) => {
   const response = await supabase
     .from("quiz_sessions")
     .select()
     .eq("quizId", quizId)
     .eq("userId", userId);
-  return response.data?.[0] as QuizSession | null;
+  return response.data as QuizSession[] | null;
+};
+
+export const getUserQuizSessions = async (userId: string) => {
+  const response = await supabase
+    .from("quiz_sessions")
+    .select("*, quizes ( name )")
+    .eq("userId", userId);
+  return response.data as QuizSessionWithQuiz[] | null;
+};
+
+export const getQuizSessionsCount = async (quizId: string, userId: string) => {
+  const response = await supabase
+    .from("quiz_sessions")
+    .select("*", { count: "exact", head: true })
+    .eq("quizId", quizId)
+    .eq("userId", userId);
+
+  return response.count;
+};
+
+export const getLatestQuizSession = async (quizId: string, userId: string) => {
+  const response = await supabase
+    .from("quiz_sessions")
+    .select()
+    .eq("quizId", quizId)
+    .eq("userId", userId);
+
+  if (!response.data) {
+    console.error(response.error);
+    return null;
+  }
+
+  const quizSessions = sortQuizSessions(response.data as QuizSession[]);
+
+  return quizSessions?.[0] as QuizSession | null;
 };
 
 export const getQuizSessionById = async (id: string) => {

@@ -29,6 +29,10 @@ export const QuizInfoCard = ({
           <Chip color="info" label={`${quizInfo.questionsCount} questions`} />
           <Chip color="info" label={`${quizInfo.time} minutes`} />
           <Chip
+            color="info"
+            label={`Attempts: ${quizInfo.attempts ?? "unlimited"}`}
+          />
+          <Chip
             color="warning"
             label={`Minimum ${quizInfo.minimumScore} points to pass`}
           />

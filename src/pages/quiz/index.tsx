@@ -118,6 +118,9 @@ const QuizCard = ({ quiz, isAdmin, onDelete, onRestore }: QuizCardProps) => {
           • {quiz.questionsCount} questions
         </Typography>
         <Typography variant="subtitle1">• {quiz.time} minutes</Typography>
+        <Typography variant="subtitle1">
+          • Attempts: {quiz.attempts ?? "unlimited"}
+        </Typography>
       </Box>
       {!isAdmin && (
         <Link href={`/quiz/${quiz.id}/start`}>

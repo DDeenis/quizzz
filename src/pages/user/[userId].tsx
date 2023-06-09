@@ -16,18 +16,20 @@ import { UserCreateObject } from "@/types/user";
 import FormHelperText from "@mui/material/FormHelperText";
 import Head from "next/head";
 import { formatDate } from "@/utils/questions";
+import { QuizSessionWithQuiz } from "@/types/quizSession";
 
 export default function ProfilePage() {
   const router = useRouter();
   const { userId } = router.query;
-  const userData = api.users.getById.useQuery(
+  const user = api.users.getById.useQuery(
     { userId: userId as string },
     { enabled: false, staleTime: Infinity }
   );
-  const quizResultsData = api.quizResults.getAllByUser.useQuery(
+  const quizResults = api.quizResults.getAllByUser.useQuery(
     { userId: userId as string },
     { enabled: false }
   );
+  const quizSessions = api.quizResults.getActiveQuizSessions.useQuery();
   const updateUserData = api.users.update.useMutation();
   const [modalOpen, setModalOpen] = useState(false);
   const session = useProtectedSession();
@@ -45,34 +47,32 @@ export default function ProfilePage() {
         userUpdateObject: obj,
       })
       .then(() => {
-        userData.refetch({ stale: false });
+        user.refetch({ stale: false });
         closeModal();
       })
-      .catch(console.log);
+      .catch(console.error);
   };
 
-  const avatarProps = userData.data
-    ? stringAvatar(userData.data.fullName)
-    : undefined;
+  const avatarProps = user.data ? stringAvatar(user.data.fullName) : undefined;
 
   useEffect(() => {
     if (!router.isReady) return;
-    userData.refetch();
+    user.refetch();
   }, [router.isReady]);
 
   useEffect(() => {
     if (!canViewDetailed) return;
-    quizResultsData.refetch();
+    quizResults.refetch();
   }, [canViewDetailed]);
 
   return (
     <>
       <Head>
-        <title>Profile: {userData.data?.fullName}</title>
+        <title>Profile: {user.data?.fullName}</title>
       </Head>
-      {userData.isLoading ? (
+      {user.isLoading ? (
         <Typography variant="body2">Loading...</Typography>
-      ) : userData.data ? (
+      ) : user.data ? (
         <>
           <Box
             display={"flex"}
@@ -84,7 +84,7 @@ export default function ProfilePage() {
             <Box maxWidth={"sm"} mb={2}>
               <Avatar
                 children={avatarProps?.children}
-                alt={userData.data.fullName}
+                alt={user.data.fullName}
                 sx={{
                   width: 164,
                   height: 164,
@@ -94,16 +94,16 @@ export default function ProfilePage() {
                 }}
               />
               <Typography variant="h4" textAlign={"center"} mt={2} mb={1}>
-                {userData.data.fullName}
+                {user.data.fullName}
               </Typography>
               {canViewDetailed && (
                 <Typography variant="body1" textAlign={"center"}>
-                  {userData.data.email}
+                  {user.data.email}
                 </Typography>
               )}
               <Typography variant="body1" textAlign={"center"}>
                 Member since{" "}
-                {new Date(userData.data.createdAt).toLocaleDateString()}
+                {new Date(user.data.createdAt).toLocaleDateString()}
               </Typography>
               {isPresonalProfile && (
                 <Button
@@ -115,17 +115,27 @@ export default function ProfilePage() {
                 </Button>
               )}
             </Box>
-            {canViewDetailed && Boolean(quizResultsData.data?.length) && (
-              <>
-                <Typography variant="h5" textAlign={"center"}>
+            {canViewDetailed && Boolean(quizSessions.data?.length) && (
+              <Box mb={2}>
+                <Typography variant="h5" textAlign={"center"} mb={1}>
+                  Active quiz sessions
+                </Typography>
+                {quizSessions.data?.map((qs) => (
+                  <ActiveSessionCard quizSession={qs} key={qs.id} />
+                ))}
+              </Box>
+            )}
+            {canViewDetailed && Boolean(quizResults.data?.length) && (
+              <Box>
+                <Typography variant="h5" textAlign={"center"} mb={1}>
                   Your results
                 </Typography>
                 <Box display={"flex"} flexWrap={"wrap"} gap={2}>
-                  {quizResultsData.data?.map((tr) => (
+                  {quizResults.data?.map((tr) => (
                     <ResultCard result={tr} key={tr.id} />
                   ))}
                 </Box>
-              </>
+              </Box>
             )}
             <Modal open={modalOpen} onClose={closeModal}>
               <Box
@@ -144,7 +154,7 @@ export default function ProfilePage() {
                 <EditProfileForm
                   onSubmit={updateUser}
                   onCancel={closeModal}
-                  defaultValues={userData.data}
+                  defaultValues={user.data}
                   emailError={updateUserData.error?.message}
                 />
               </Box>
@@ -205,6 +215,35 @@ const ResultCard = ({ result }: { result: QuizResultPreview }) => {
           fullWidth
         >
           See details
+        </Button>
+      </Link>
+    </Box>
+  );
+};
+
+const ActiveSessionCard = ({
+  quizSession,
+}: {
+  quizSession: QuizSessionWithQuiz;
+}) => {
+  return (
+    <Box
+      p={2}
+      width={320}
+      border={"1px solid rgba(25, 118, 210, 0.5)"}
+      borderRadius={2}
+    >
+      <Typography
+        variant="subtitle1"
+        textAlign={"center"}
+        mb={2}
+        fontSize={"1.25rem"}
+      >
+        {quizSession.quizes.name}
+      </Typography>
+      <Link href={`/quiz/${quizSession.quizId}/start/${quizSession.id}`}>
+        <Button variant="outlined" fullWidth>
+          Continue quiz
         </Button>
       </Link>
     </Box>

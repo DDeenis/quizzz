@@ -11,6 +11,8 @@ import {
   getQuizResultsByQuiz,
   getQuizResultsByUser,
 } from "@/server/database/quizResult";
+import { getUserQuizSessions } from "@/server/database/quizSession";
+import { isQuizSessionExpired } from "@/utils/questions";
 
 export const quizResultRouter = createTRPCRouter({
   getWithQuiz: protectedProcedure
@@ -71,4 +73,12 @@ export const quizResultRouter = createTRPCRouter({
       const result = await getQuizResultsByUser(input.userId);
       return result;
     }),
+
+  getActiveQuizSessions: protectedProcedure.query(async ({ ctx }) => {
+    const allSessions = await getUserQuizSessions(ctx.session.user.id);
+
+    if (!allSessions) return [];
+
+    return allSessions.filter((s) => !isQuizSessionExpired(s));
+  }),
 });

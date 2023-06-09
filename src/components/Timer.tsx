@@ -12,13 +12,12 @@ const formatTime = (timeInSeconds: number) => {
 
 export const Timer = memo(
   ({
-    timeInMinutes,
+    timeInSeconds: timeDefault,
     onTimerEnd,
   }: {
-    timeInMinutes: number;
+    timeInSeconds: number;
     onTimerEnd: () => void;
   }) => {
-    const targetSeconds = timeInMinutes * 60;
     const [timeInSeconds, setTimeInSeconds] = useState(0);
 
     useEffect(() => {
@@ -29,7 +28,7 @@ export const Timer = memo(
       const timeotId = setTimeout(() => {
         onTimerEnd();
         clearInterval(intervalId);
-      }, targetSeconds * 60 * 1000);
+      }, timeDefault * 60 * 1000);
 
       return () => {
         clearInterval(intervalId);
@@ -46,7 +45,7 @@ export const Timer = memo(
         fontWeight={"bold"}
       >
         <TimerIcon color="action" />
-        {formatTime(targetSeconds - timeInSeconds)}
+        {formatTime(timeDefault - timeInSeconds)}
       </Typography>
     );
   }

@@ -79,6 +79,15 @@ export const getQuizesAsOptions = async () => {
   return (result.data ?? []) as QuizOption[];
 };
 
+export const getQuizAttempts = async (quizId: string) => {
+  const result = await supabase
+    .from("quizes")
+    .select("attempts")
+    .eq("id", quizId);
+
+  return result.data?.[0]?.attempts as number | null;
+};
+
 export const createQuiz = async (quizCreateObj: QuizCreateObject) => {
   try {
     const resultQuiz = await supabase
@@ -91,6 +100,7 @@ export const createQuiz = async (quizCreateObj: QuizCreateObject) => {
         questionsCount: quizCreateObj.questionsCount,
         minimumScore: quizCreateObj.minimumScore,
         maximumScore: getTotalScore(quizCreateObj.questions),
+        attempts: quizCreateObj.attempts,
       })
       .select();
     const createdQuiz = resultQuiz.data?.[0];
@@ -105,7 +115,7 @@ export const createQuiz = async (quizCreateObj: QuizCreateObject) => {
 
     if (error) throw error;
   } catch (err) {
-    console.log(err);
+    console.error(err);
     return false;
   }
 
@@ -128,6 +138,7 @@ export const updateQuiz = async (
         questionsCount: quizUpdateObj.questionsCount,
         minimumScore: quizUpdateObj.minimumScore,
         maximumScore: getTotalScore(quizUpdateObj.questions),
+        attempts: quizUpdateObj.attempts,
       })
       .eq("id", id);
 
@@ -156,7 +167,7 @@ export const updateQuiz = async (
       });
     }
   } catch (err) {
-    console.log(err);
+    console.error(err);
     return false;
   }
 
@@ -174,7 +185,7 @@ export const deleteQuiz = async (id: string) => {
 
     if (error) throw error;
   } catch (err) {
-    console.log(err);
+    console.error(err);
     return false;
   }
 
@@ -192,7 +203,7 @@ export const restoreQuiz = async (id: string) => {
 
     if (error) throw error;
   } catch (err) {
-    console.log(err);
+    console.error(err);
     return false;
   }
 

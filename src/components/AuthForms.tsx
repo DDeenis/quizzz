@@ -21,7 +21,7 @@ export const RegisterForm = () => {
         u && signIn("email", { email: u.email });
       })
       .catch((err) => {
-        console.log(err.message);
+        console.error(err.message);
       });
   });
 
@@ -91,7 +91,7 @@ export const SignInForm = () => {
       .then(() => {
         signIn("email", { email: formData.email });
       })
-      .catch(console.log);
+      .catch(console.error);
   });
 
   return (

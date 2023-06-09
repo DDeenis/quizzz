@@ -20,6 +20,7 @@ export const quizFragment = `
     questionsCount,
     minimumScore,
     maximumScore,
+    attempts,
     questions ( 
         ${questionFragment}
     )

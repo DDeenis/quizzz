@@ -3,7 +3,7 @@ import {
   QuestionComplexity,
   type QuestionCreateObject,
 } from "@/types/question";
-import { QuizSession } from "@/types/quizSession";
+import type { QuizSession } from "@/types/quizSession";
 
 export const complexityToScoreMap = {
   [QuestionComplexity.Low]: 1,
@@ -51,7 +51,7 @@ function getISOnow() {
   return Date.parse(str);
 }
 
-function getISODate(dateISOStr: string) {
+export function getISODate(dateISOStr: string) {
   const str = dateISOStr.substring(0, 19);
   return Date.parse(str);
 }
@@ -127,4 +127,9 @@ export const formatDate = (dateStr: string) => {
     .getHours()
     .toString()
     .padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+};
+
+export const sortQuizSessions = (quizSessions: QuizSession[]) => {
+  const copy = [...quizSessions];
+  return copy.sort((a, b) => getISODate(b.expires) - getISODate(a.expires));
 };

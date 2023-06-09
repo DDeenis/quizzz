@@ -14,6 +14,7 @@ export interface Quiz {
   questionsCount: number;
   minimumScore: number;
   maximumScore: number;
+  attempts?: number;
   deletedAt?: string;
   questions?: Question[];
 }
@@ -24,6 +25,7 @@ export interface QuizCreateObject {
   time: number;
   questionsCount: number;
   minimumScore: number;
+  attempts?: number;
   description?: string;
   questions: QuestionCreateObject[];
 }
@@ -34,6 +36,7 @@ export interface QuizUpdateObject {
   time: number;
   questionsCount: number;
   minimumScore: number;
+  attempts?: number;
   description?: string;
   questions: QuestionUpdateObject[];
 }

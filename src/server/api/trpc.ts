@@ -30,7 +30,7 @@ type CreateContextOptions = {
  * it from here.
  *
  * Examples of things you may need it for:
- * - quizing, so we don't have to mock Next.js' req/res
+ * - testing, so we don't have to mock Next.js' req/res
  * - tRPC's `createSSGHelpers`, where we don't have req/res
  *
  * @see https://create.t3.gg/en/usage/trpc#-serverapitrpcts

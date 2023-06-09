@@ -18,6 +18,7 @@ const quizCreateScheme = z.object({
   questionsCount: z.number().min(1),
   minimumScore: z.number().min(1),
   description: z.string().optional().nullable(),
+  attempts: z.number().min(1).optional().nullable(),
   questions: z.array(
     z.object({
       questionType: z.enum([
@@ -42,6 +43,7 @@ const quizUpdateScheme = z.object({
   questionsCount: z.number().min(1),
   minimumScore: z.number().min(1),
   description: z.string().optional().nullable(),
+  attempts: z.number().min(1).optional().nullable(),
   questions: z.array(
     z.object({
       id: z.string().optional().nullable(),

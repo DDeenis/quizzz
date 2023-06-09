@@ -1,26 +1,40 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { getQuizWithSession } from "@/server/database/quiz";
+import { getQuizAttempts, getQuizWithSession } from "@/server/database/quiz";
 import {
   createQuizSession,
-  getQuizSession,
+  getQuizSessions,
   getQuizSessionById,
   removeQuizSession,
+  getQuizSessionsCount,
 } from "@/server/database/quizSession";
 import { TRPCError } from "@trpc/server";
 import { createQuizResult } from "@/server/database/quizResult";
+import { isQuizSessionExpired, sortQuizSessions } from "@/utils/questions";
 
 export const studentQuizesRouter = createTRPCRouter({
   createQuizSession: protectedProcedure
     .input(z.object({ quizId: z.string(), timeInMinutes: z.number() }))
     .mutation(async ({ input, ctx }) => {
-      const existingSession = await getQuizSession(
+      const quizAttempts = await getQuizAttempts(input.quizId);
+      const quizSessions = await getQuizSessions(
         input.quizId,
         ctx.session.user.id
       );
 
-      if (existingSession) {
-        await removeQuizSession(existingSession.id);
+      if (quizSessions) {
+        if (quizAttempts && quizSessions.length >= quizAttempts) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+          });
+        }
+
+        const sessionsSorted = sortQuizSessions(quizSessions);
+        const latestSession = sessionsSorted?.[0];
+
+        if (latestSession && !isQuizSessionExpired(latestSession)) {
+          return latestSession;
+        }
       }
 
       return await createQuizSession(
@@ -51,6 +65,31 @@ export const studentQuizesRouter = createTRPCRouter({
       }
 
       return result;
+    }),
+
+  getAttempts: protectedProcedure
+    .input(z.object({ quizId: z.string() }))
+    .query(async ({ input }) => {
+      return await getQuizAttempts(input.quizId);
+    }),
+
+  canStartQuiz: protectedProcedure
+    .input(z.object({ quizId: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const attempts = await getQuizAttempts(input.quizId);
+
+      if (!attempts)
+        return { attempts, currentAttemptsCount: null, canStart: true };
+
+      const currentAttemptsCount = await getQuizSessionsCount(
+        input.quizId,
+        ctx.session.user.id
+      );
+
+      if (!currentAttemptsCount || currentAttemptsCount < attempts)
+        return { attempts, currentAttemptsCount, canStart: true };
+
+      return { attempts, currentAttemptsCount, canStart: false };
     }),
 
   removeQuizSession: protectedProcedure
@@ -99,17 +138,16 @@ export const studentQuizesRouter = createTRPCRouter({
         });
       }
 
-      if (quizSession.userId !== ctx.session.user.id) {
+      if (
+        quizSession.userId !== ctx.session.user.id ||
+        isQuizSessionExpired(quizSession)
+      ) {
         throw new TRPCError({
           code: "FORBIDDEN",
         });
       }
 
       const quizResult = await createQuizResult(input);
-
-      if (quizResult) {
-        await removeQuizSession(input.quizSessionId);
-      }
 
       return quizResult;
     }),

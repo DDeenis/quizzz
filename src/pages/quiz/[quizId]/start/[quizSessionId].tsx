@@ -35,24 +35,21 @@ export default function QuizPage() {
       },
       { enabled: false, staleTime: Infinity }
     );
-  const { mutate } = api.studentQuizes.removeQuizSession.useMutation();
   const submitQuiz = api.studentQuizes.submitQuiz.useMutation();
   const form = useForm<QuestionAnswerCreateObject[]>({
     defaultValues: [],
   });
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const expiresInMinutes = useMemo(() => {
+  const expiresInSeconds = useMemo(() => {
     const expires = data?.quizSession.expires;
     if (!expires) return 0;
-    return Math.ceil(getISODistanceToInSeconds(expires) / 60);
+    return getISODistanceToInSeconds(expires);
   }, [isSuccess]);
 
   const quiz = data?.quiz;
   const currentQuestion = quiz?.questions?.[currentQuestionIndex];
   const hasPrev = currentQuestionIndex > 0;
   const hasNext = currentQuestionIndex < Number(quiz?.questions?.length) - 1;
-
-  const removeQuizSession = (id: string) => mutate({ quizSessionId: id });
 
   useEffect(() => {
     if (!router.isReady) {
@@ -67,7 +64,6 @@ export default function QuizPage() {
     if (!quizSession || !isSuccess) return;
     const isExpired = isQuizSessionExpired(quizSession);
     if (isExpired) {
-      removeQuizSession(quizSession.id);
       router.push(`/quiz/${quizId}/start`);
     }
   }, [isSuccess]);
@@ -110,13 +106,11 @@ export default function QuizPage() {
       onSubmit();
     }
 
-    removeQuizSession(quizSessionId as string);
     // TODO: show modal 'your session has expired'
     router.push(`/quiz/${quizId}/start`);
   };
 
   const onCancelQuiz = () => {
-    removeQuizSession(quizSessionId as string);
     router.push(`/quiz`);
   };
 
@@ -148,7 +142,7 @@ export default function QuizPage() {
                   Question {currentQuestionIndex + 1}
                 </Typography>
                 <Timer
-                  timeInMinutes={expiresInMinutes}
+                  timeInSeconds={expiresInSeconds}
                   onTimerEnd={onTimerEnd}
                 />
               </Box>

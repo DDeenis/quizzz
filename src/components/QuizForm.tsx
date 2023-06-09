@@ -206,6 +206,18 @@ export function QuizForm(props: QuizFormProps) {
               valueAsNumber: true,
             })}
           />
+          <TextField
+            type="number"
+            variant="outlined"
+            label="Attempts"
+            fullWidth
+            sx={{ mt: 2 }}
+            error={Boolean(errors.attempts)}
+            {...register("attempts", {
+              min: 1,
+              valueAsNumber: true,
+            })}
+          />
         </Box>
       </Box>
       <Box display={"flex"} flexDirection={"column"} gap={4}>

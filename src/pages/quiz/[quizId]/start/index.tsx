@@ -1,13 +1,8 @@
 import { QuizInfoCard } from "@/components/QuizInfoCard";
 import { useProtectedSession } from "@/hooks/session";
 import { api } from "@/utils/api";
-import { getTotalScore } from "@/utils/questions";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
-import CardContent from "@mui/material/CardContent";
-import Chip from "@mui/material/Chip";
 import Typography from "@mui/material/Typography";
 import Head from "next/head";
 import Link from "next/link";
@@ -18,38 +13,47 @@ export default function StartQuizPage() {
   const router = useRouter();
   const { quizId } = router.query;
   const { data } = useProtectedSession();
-  const {
-    data: quiz,
-    isLoading,
-    refetch,
-  } = api.quizes.getById.useQuery(
+  const quiz = api.quizes.getById.useQuery(
     { quizId: (quizId as string | undefined) ?? "" },
     { enabled: false }
   );
-  const { mutateAsync, isLoading: isLoadingStart } =
-    api.studentQuizes.createQuizSession.useMutation();
+  const createQuizSession = api.studentQuizes.createQuizSession.useMutation();
+  const canStartQuiz = api.studentQuizes.canStartQuiz.useQuery(
+    {
+      quizId: quizId as string,
+    },
+    { enabled: false }
+  );
 
   useEffect(() => {
     if (!router.isReady) {
       return;
     }
 
-    refetch();
+    quiz.refetch();
+    canStartQuiz.refetch();
   }, [quizId, router.isReady]);
 
-  const onStartQuiz = () =>
-    mutateAsync({ quizId: quizId as string, timeInMinutes: quiz?.time! }).then(
-      (s) => s && router.push(`/quiz/${quiz?.id}/start/${s.id}`)
-    );
+  const onStartQuiz = () => {
+    if (!canStartQuiz.data?.canStart) return;
+
+    createQuizSession
+      .mutateAsync({
+        quizId: quizId as string,
+        timeInMinutes: quiz.data?.time!,
+      })
+      .then((s) => s && router.push(`/quiz/${quiz.data?.id}/start/${s.id}`))
+      .catch(console.error);
+  };
 
   return (
     <>
       <Head>
-        <title>Start quiz {quiz?.name}</title>
+        <title>Start quiz {quiz.data?.name}</title>
       </Head>
-      {isLoading ? (
+      {quiz.isLoading ? (
         <Typography variant="body2">Loading...</Typography>
-      ) : quiz ? (
+      ) : quiz.data ? (
         <Box
           display={"flex"}
           justifyContent={"center"}
@@ -57,12 +61,27 @@ export default function StartQuizPage() {
           height={"100%"}
         >
           <QuizInfoCard
-            quizInfo={quiz}
+            quizInfo={quiz.data}
             contentSection={
-              <Typography variant="body2">
-                If you close this quiz before you have completed it, your
-                answers will not be saved.
-              </Typography>
+              canStartQuiz.data?.canStart ? (
+                <>
+                  <Typography variant="body2">
+                    Attempts left:{" "}
+                    {canStartQuiz.data.attempts === null
+                      ? "unlimited"
+                      : canStartQuiz.data.attempts -
+                        Number(canStartQuiz.data.currentAttemptsCount)}
+                  </Typography>
+                  <Typography variant="body2">
+                    If you close this quiz before you have completed it, your
+                    answers will not be saved.
+                  </Typography>
+                </>
+              ) : (
+                <Typography variant="body2" color={"red"}>
+                  You have used all attempts to pass the quiz
+                </Typography>
+              )
             }
             actionsSection={
               <>
@@ -73,8 +92,9 @@ export default function StartQuizPage() {
                   variant="contained"
                   sx={{ ml: 1 }}
                   onClick={onStartQuiz}
+                  disabled={!canStartQuiz.data?.canStart}
                 >
-                  {isLoadingStart ? "Loading..." : "Start quiz"}
+                  {createQuizSession.isLoading ? "Loading..." : "Start quiz"}
                 </Button>
               </>
             }
