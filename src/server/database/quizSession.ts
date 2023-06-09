@@ -115,3 +115,14 @@ export const removeQuizSession = async (id: string) => {
   const result = await supabase.from("quiz_sessions").delete().eq("id", id);
   return result.error ? false : true;
 };
+
+export const markQuizSessionAsExpired = async (quizSessionId: string) => {
+  const result = await supabase
+    .from("quiz_sessions")
+    .update({ expires: new Date().toISOString() })
+    .eq("id", quizSessionId)
+    .select();
+  const quizSession = result.data?.[0];
+
+  return quizSession as QuizSession | undefined;
+};

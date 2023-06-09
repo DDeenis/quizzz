@@ -7,6 +7,7 @@ import {
   getQuizSessionById,
   removeQuizSession,
   getQuizSessionsCount,
+  markQuizSessionAsExpired,
 } from "@/server/database/quizSession";
 import { TRPCError } from "@trpc/server";
 import {
@@ -153,15 +154,8 @@ export const studentQuizesRouter = createTRPCRouter({
         });
       }
 
-      const existingResult = await getQuizResultBySession(input.quizSessionId);
-
-      if (existingResult) {
-        throw new TRPCError({
-          code: "CONFLICT",
-        });
-      }
-
       const quizResult = await createQuizResult(input);
+      await markQuizSessionAsExpired(quizSession.id);
 
       return quizResult;
     }),
