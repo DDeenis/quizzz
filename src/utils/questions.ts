@@ -37,12 +37,7 @@ export const shuffleArray = <T>(array: T[], seed?: number) => {
 export const isQuizSessionExpired = (quizSession: QuizSession) => {
   const nowISO = getISOnow();
   const expires = getISODate(quizSession.expires);
-
-  if (nowISO >= expires || quizSession.isFinished) {
-    return true;
-  }
-
-  return false;
+  return nowISO >= expires;
 };
 
 function getISOnow() {

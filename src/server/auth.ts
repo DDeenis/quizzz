@@ -33,6 +33,7 @@ declare module "next-auth" {
  */
 export const authOptions: NextAuthOptions = {
   callbacks: {
+    // @ts-expect-error
     session: async ({ session, token }) => {
       if (session.user.email) {
         const user = await getUserByEmail(session.user.email);
