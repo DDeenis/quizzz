@@ -1,5 +1,6 @@
 import {
   Question,
+  QuestionClient,
   QuestionCreateObject,
   QuestionUpdateObject,
 } from "./question";
@@ -18,6 +19,10 @@ export interface Quiz {
   deletedAt?: string;
   questions?: Question[];
 }
+
+export type QuizClient = Omit<Quiz, "questions"> & {
+  questions?: QuestionClient[];
+};
 
 export interface QuizCreateObject {
   name: string;

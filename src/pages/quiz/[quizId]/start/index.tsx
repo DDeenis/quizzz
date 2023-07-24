@@ -13,7 +13,7 @@ export default function StartQuizPage() {
   const router = useRouter();
   const { quizId } = router.query;
   const { data } = useProtectedSession();
-  const quiz = api.quizes.getById.useQuery(
+  const quiz = api.quizes.getPreviewById.useQuery(
     { quizId: (quizId as string | undefined) ?? "" },
     { enabled: false }
   );

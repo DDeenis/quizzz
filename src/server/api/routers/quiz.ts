@@ -6,61 +6,56 @@ import {
   getAllQuizesPreview,
   getAllQuizesPreviewWithDeleted,
   getQuizById,
+  getQuizPreviewById,
   restoreQuiz,
   updateQuiz,
 } from "@/server/database/quiz";
 import { QuestionType, QuestionComplexity } from "@/types/question";
 import { TRPCError } from "@trpc/server";
 
+const questionsScheme = z.array(
+  z.object({
+    id: z.string().optional().nullable(),
+    questionType: z.enum([
+      QuestionType.SingleVariant,
+      QuestionType.MultipleVariants,
+    ]),
+    complexity: z.enum([
+      QuestionComplexity.Low,
+      QuestionComplexity.High,
+      QuestionComplexity.Medium,
+    ]),
+    questionData: z.object({
+      question: z.string().trim().nonempty(),
+      description: z.string().optional().nullable(),
+      variants: z
+        .object({
+          variant: z.string().trim().nonempty(),
+          isCorrect: z.boolean(),
+        })
+        .array(),
+    }),
+  })
+);
+
 const quizCreateScheme = z.object({
-  name: z.string(),
+  name: z.string().trim().nonempty(),
   time: z.number().min(1),
   questionsCount: z.number().min(1),
   minimumScore: z.number().min(1),
   description: z.string().optional().nullable(),
-  attempts: z.number().min(1).optional().nullable(),
-  questions: z.array(
-    z.object({
-      questionType: z.enum([
-        QuestionType.SingleVariant,
-        QuestionType.MultipleVariants,
-      ]),
-      complexity: z.enum([
-        QuestionComplexity.Low,
-        QuestionComplexity.High,
-        QuestionComplexity.Medium,
-      ]),
-      questionData: z.any(),
-      answerData: z.any(),
-      image: z.string().optional().nullable(),
-    })
-  ),
+  attempts: z.number().min(1).or(z.nan()).optional().nullable(),
+  questions: questionsScheme,
 });
 
 const quizUpdateScheme = z.object({
-  name: z.string(),
+  name: z.string().trim().nonempty(),
   time: z.number().min(1),
   questionsCount: z.number().min(1),
   minimumScore: z.number().min(1),
   description: z.string().optional().nullable(),
-  attempts: z.number().min(1).optional().nullable(),
-  questions: z.array(
-    z.object({
-      id: z.string().optional().nullable(),
-      questionType: z.enum([
-        QuestionType.SingleVariant,
-        QuestionType.MultipleVariants,
-      ]),
-      complexity: z.enum([
-        QuestionComplexity.Low,
-        QuestionComplexity.High,
-        QuestionComplexity.Medium,
-      ]),
-      questionData: z.any(),
-      answerData: z.any(),
-      image: z.string().optional().nullable(),
-    })
-  ),
+  attempts: z.number().min(1).or(z.nan()).optional().nullable(),
+  questions: questionsScheme,
 });
 
 export const quizesRouter = createTRPCRouter({
@@ -122,6 +117,24 @@ export const quizesRouter = createTRPCRouter({
     if (ctx.session.user.isAdmin) return await getAllQuizesPreviewWithDeleted();
     return await getAllQuizesPreview();
   }),
+
+  getPreviewById: protectedProcedure
+    .input(
+      z.object({
+        quizId: z.string(),
+      })
+    )
+    .query(async ({ input }) => {
+      const quiz = await getQuizPreviewById(input.quizId);
+
+      if (!quiz) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+        });
+      }
+
+      return quiz;
+    }),
 
   getById: protectedProcedure
     .input(

@@ -1,6 +1,6 @@
 import { Timer } from "@/components/Timer";
 import { useProtectedSession } from "@/hooks/session";
-import { Question, QuestionType } from "@/types/question";
+import { Question, QuestionClient, QuestionType } from "@/types/question";
 import { QuestionAnswerCreateObject } from "@/types/questionAnswer";
 import { QuizResultCreateObject } from "@/types/quizResult";
 import { api } from "@/utils/api";
@@ -35,6 +35,7 @@ export default function QuizPage() {
       },
       { enabled: false, staleTime: Infinity }
     );
+
   const submitQuiz = api.studentQuizes.submitQuiz.useMutation();
   const form = useForm<QuestionAnswerCreateObject[]>({
     defaultValues: [],
@@ -237,7 +238,7 @@ const QuestionForm = ({
   control,
   getValues,
 }: {
-  question: Question;
+  question: QuestionClient;
   questionIndex: number;
   control: Control<QuestionAnswerCreateObject[], any>;
   getValues: () => QuestionAnswerCreateObject[];

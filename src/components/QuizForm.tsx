@@ -3,6 +3,7 @@ import {
   QuestionCreateObject,
   QuestionType,
   QuestionUpdateObject,
+  QuestionVariant,
 } from "@/types/question";
 import type { Quiz, QuizCreateObject, QuizUpdateObject } from "@/types/quiz";
 import Box from "@mui/material/Box";
@@ -30,7 +31,6 @@ import InputLabel from "@mui/material/InputLabel";
 import Checkbox from "@mui/material/Checkbox";
 import Radio from "@mui/material/Radio";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { useEffect, useRef } from "react";
 import IconButton from "@mui/material/IconButton";
 import { getTotalScore } from "@/utils/questions";
 import FormHelperText from "@mui/material/FormHelperText";
@@ -51,7 +51,6 @@ export function QuizForm(props: QuizFormProps) {
   const {
     control,
     register,
-    unregister,
     getValues,
     setValue,
     handleSubmit,
@@ -59,6 +58,7 @@ export function QuizForm(props: QuizFormProps) {
   } = useForm<QuizCreateObject>({
     defaultValues: props.quiz,
   });
+
   const questionsErrorType = errors.questions?.root?.type;
   const isUpdate = Boolean(props.quiz);
 
@@ -72,14 +72,8 @@ export function QuizForm(props: QuizFormProps) {
           return !(minimumQuestions > value.length);
         },
         scoreMinimum: (value, formValues) => {
-          const totalScore = getTotalScore(value);
+          const totalScore = getTotalScore(value as QuestionCreateObject[]);
           return totalScore >= formValues.minimumScore;
-        },
-        variantsMinimum: (value) => {
-          return value.every((q) => q.questionData.variants.length >= 2);
-        },
-        answersMinimum: (value) => {
-          return value.every((q) => q.answerData.length > 0);
         },
       },
     },
@@ -90,8 +84,10 @@ export function QuizForm(props: QuizFormProps) {
     questionFieldsArray.append({
       questionType: QuestionType.SingleVariant,
       complexity: QuestionComplexity.Low,
-      questionData: { question: "", variants: [] },
-      answerData: [],
+      questionData: {
+        question: "",
+        variants: [],
+      },
     });
   const removeQuestion = (i: number) => () => {
     const question = getValues().questions[i];
@@ -101,12 +97,6 @@ export function QuizForm(props: QuizFormProps) {
   };
 
   const onSubmit = handleSubmit(props.onSubmit);
-
-  useEffect(() => {
-    if (props.quiz?.questions) {
-      setValue("questions", props.quiz.questions);
-    }
-  }, []);
 
   return (
     <Box
@@ -241,12 +231,6 @@ export function QuizForm(props: QuizFormProps) {
   );
 }
 
-type UseArrayHackType = {
-  variants: {
-    value: string;
-  }[];
-};
-
 const FormField = ({
   index,
   control,
@@ -264,65 +248,52 @@ const FormField = ({
   getValues: UseFormGetValues<QuizCreateObject>;
   setValue: UseFormSetValue<QuizCreateObject>;
 }) => {
-  const variantsForm = useForm<UseArrayHackType>({
-    defaultValues: {
-      variants: [{ value: "" }, { value: "" }],
+  const variantsFieldsArray = useFieldArray<QuizCreateObject>({
+    control,
+    name: `questions.${index}.questionData.variants`,
+    rules: {
+      validate: {
+        variantsMinimum: (value) => {
+          const variants = value as QuestionVariant[];
+          return variants.length >= 2;
+        },
+        answersMinimum: (value) => {
+          const variants = value as QuestionVariant[];
+          return variants.some((v) => v.isCorrect);
+        },
+      },
     },
-  });
-  const variantsFieldsArray = useFieldArray<UseArrayHackType>({
-    control: variantsForm.control,
-    name: "variants",
   });
   const questionType = useWatch({
     control,
     name: `questions.${index}.questionType`,
   });
-  const selectedIndexes = useRef(new Set<number>());
 
-  const appendVariant = () => variantsFieldsArray.append([{ value: "" }]);
-  const getVariant = (i: number) =>
-    getValues().questions[index]?.questionData.variants[i] ?? "";
+  const errorType =
+    errors.questions?.[index]?.questionData?.variants?.root?.type;
+
+  const appendVariant = () => {
+    variantsFieldsArray.append([{ variant: "", isCorrect: false }]);
+  };
 
   const removeVariant = (i: number) => () => {
     const question = getValues().questions[index];
     const variants = question?.questionData.variants ?? [];
-    const variant = variants[i] ?? "";
-    const answerData = question?.answerData ?? [];
 
     if (variants.length <= 2) return;
 
-    setValue(
-      `questions.${index}.answerData`,
-      answerData.filter((v) => v !== variant)
-    );
-    setValue(
-      `questions.${index}.questionData.variants`,
-      variants.filter((v) => v !== variant)
-    );
     variantsFieldsArray.remove(i);
   };
 
-  const defaultVariansSet = useRef(false);
-
-  useEffect(() => {
-    if (defaultVariansSet.current) return;
-
-    const existingVariants =
-      getValues().questions[index]?.questionData.variants;
-
-    if (!existingVariants) {
-      defaultVariansSet.current = true;
-      return;
-    }
-
-    for (let i = 0; i < existingVariants.length - 2; i++) {
-      appendVariant();
-    }
-    defaultVariansSet.current = true;
-  }, []);
-
   return (
     <Card sx={{ p: 2 }}>
+      {errorType && (
+        <FormHelperText error>
+          {errorType === "variantsMinimum"
+            ? "Question must have at least 2 variants"
+            : "Question must have at least 1 answer"}
+        </FormHelperText>
+      )}
       <Box
         display="flex"
         justifyContent={"space-between"}
@@ -400,7 +371,12 @@ const FormField = ({
                     inputProps={register(`questions.${index}.questionType`, {
                       required: true,
                       onChange() {
-                        setValue(`questions.${index}.answerData`, []);
+                        const question = getValues().questions[index];
+                        const variants = question?.questionData.variants ?? [];
+                        setValue(
+                          `questions.${index}.questionData.variants`,
+                          variants.map((v) => ({ ...v, isCorrect: false }))
+                        );
                       },
                     })}
                   >
@@ -428,42 +404,33 @@ const FormField = ({
                 error={Boolean(
                   errors.questions?.[index]?.questionData?.variants?.[i]
                 )}
-                {...register(`questions.${index}.questionData.variants.${i}`, {
-                  required: true,
-                  shouldUnregister: true,
-                  onChange() {
-                    setValue(
-                      `questions.${index}.answerData`,
-                      [...selectedIndexes.current].map((i) => getVariant(i))
-                    );
-                  },
-                })}
+                {...register(
+                  `questions.${index}.questionData.variants.${i}.variant`,
+                  {
+                    required: true,
+                  }
+                )}
               />
               <Controller
                 control={control}
-                name={`questions.${index}.answerData`}
-                render={({ field: { onBlur, value, ref } }) => {
-                  const variant = getVariant(i);
-                  const val = value.includes(variant);
-
-                  val && selectedIndexes.current.add(i);
+                name={`questions.${index}.questionData.variants`}
+                render={({ field: { onBlur, value, ref, onChange } }) => {
+                  const isChecked = value[i]?.isCorrect;
 
                   return questionType === QuestionType.SingleVariant ? (
                     <Radio
                       onBlur={onBlur}
                       onChange={(e, checked) => {
-                        const variant = getVariant(i);
-                        setValue(
-                          `questions.${index}.answerData`,
-                          checked
-                            ? [variant]
-                            : value.filter((v) => v !== variant)
+                        onChange(
+                          getValues().questions[
+                            index
+                          ]?.questionData.variants.map((v, vi) => ({
+                            ...v,
+                            isCorrect: i === vi,
+                          }))
                         );
-                        checked
-                          ? (selectedIndexes.current = new Set([i]))
-                          : selectedIndexes.current.delete(i);
                       }}
-                      checked={val}
+                      checked={isChecked}
                       inputRef={ref}
                       name="radio-buttons"
                     />
@@ -471,18 +438,16 @@ const FormField = ({
                     <Checkbox
                       onBlur={onBlur}
                       onChange={(e, checked) => {
-                        const variant = getVariant(i);
-                        setValue(
-                          `questions.${index}.answerData`,
-                          checked
-                            ? [...value, variant]
-                            : value.filter((v) => v !== variant)
+                        onChange(
+                          getValues().questions[
+                            index
+                          ]?.questionData.variants.map((v, vi) => ({
+                            ...v,
+                            isCorrect: i === vi ? checked : v.isCorrect,
+                          }))
                         );
-                        checked
-                          ? selectedIndexes.current.add(i)
-                          : selectedIndexes.current.delete(i);
                       }}
-                      checked={val}
+                      checked={isChecked}
                       inputRef={ref}
                     />
                   );

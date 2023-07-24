@@ -152,6 +152,10 @@ const QuestionComponent = ({
   questionIndex: number;
 }) => {
   const color = getAnswerTypeColor(answer.answerType);
+  const questionAnswerData = question.questionData.variants
+    .filter((v) => v.isCorrect)
+    .map((v) => v.variant);
+
   return (
     <Card
       sx={{
@@ -181,7 +185,7 @@ const QuestionComponent = ({
         </Typography>
         {" | "}
         <Typography variant={"caption"}>
-          Answers count: {question.answerData.length}
+          Answers count: {questionAnswerData.length}
         </Typography>
         <Typography variant="h6" mt={2} mb={1}>
           {question.questionData.question}
@@ -191,28 +195,27 @@ const QuestionComponent = ({
         </Typography>
         <Box display={"flex"} flexDirection={"column"}>
           {question.questionData.variants.map((v, i) => {
-            const answerData = answer.answerData.find((a) => a.variant === v);
+            const answerData = answer.answerData.find(
+              (a) => a.variant === v.variant
+            );
             const questionColor = answerData
               ? getAnswerTypeColor(answerData.answerType)
-              : question.answerData.includes(v)
+              : questionAnswerData.includes(v.variant)
               ? "green"
               : undefined;
             return (
               <Box display={"flex"} alignItems={"center"} gap={2} key={i}>
                 {question.questionType === QuestionType.SingleVariant ? (
-                  <Radio defaultChecked={answerData?.variant === v} disabled />
+                  <Radio defaultChecked={Boolean(answerData)} disabled />
                 ) : (
-                  <Checkbox
-                    defaultChecked={answerData?.variant === v}
-                    disabled
-                  />
+                  <Checkbox defaultChecked={Boolean(answerData)} disabled />
                 )}
                 <Typography
                   variant="body1"
                   color={questionColor}
                   fontWeight={questionColor ? "bold" : "inherit"}
                 >
-                  {v}
+                  {v.variant}
                 </Typography>
               </Box>
             );

@@ -10,10 +10,7 @@ import {
   markQuizSessionAsExpired,
 } from "@/server/database/quizSession";
 import { TRPCError } from "@trpc/server";
-import {
-  createQuizResult,
-  getQuizResultBySession,
-} from "@/server/database/quizResult";
+import { createQuizResult } from "@/server/database/quizResult";
 import { isQuizSessionExpired, sortQuizSessions } from "@/utils/questions";
 
 export const studentQuizesRouter = createTRPCRouter({

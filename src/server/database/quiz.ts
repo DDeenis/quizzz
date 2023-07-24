@@ -1,5 +1,6 @@
 import type {
   Quiz,
+  QuizClient,
   QuizCreateObject,
   QuizOption,
   QuizUpdateObject,
@@ -69,8 +70,14 @@ export const getQuizWithSession = async (id: string, quizSessionId: string) => {
     quizSession,
     quiz: {
       ...quiz,
-      questions: questionsForQuiz,
-    } as Quiz,
+      questions: questionsForQuiz.map((q) => ({
+        ...q,
+        questionData: {
+          ...q.questionData,
+          variants: q.questionData.variants.map((v) => v.variant),
+        },
+      })),
+    } as QuizClient,
   };
 };
 

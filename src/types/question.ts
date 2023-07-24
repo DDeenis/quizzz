@@ -4,28 +4,40 @@ export type Question =
       quizId: string;
       questionType: (typeof QuestionType)["SingleVariant"];
       complexity: QuestionComplexity;
-      questionData: SingleVariantData;
-      answerData: SingleVariantAnswerData;
+      questionData: QuestionData;
       createdAt?: string;
-      image?: string;
     }
   | {
       id: string;
       quizId: string;
       questionType: (typeof QuestionType)["MultipleVariants"];
       complexity: QuestionComplexity;
-      questionData: MultipleVariantsData;
-      answerData: MultipleVariantsAnswerData;
+      questionData: QuestionData;
       createdAt?: string;
-      image?: string;
+    };
+
+export type QuestionClient =
+  | {
+      id: string;
+      quizId: string;
+      questionType: (typeof QuestionType)["SingleVariant"];
+      complexity: QuestionComplexity;
+      questionData: QuestionDataClient;
+      createdAt?: string;
+    }
+  | {
+      id: string;
+      quizId: string;
+      questionType: (typeof QuestionType)["MultipleVariants"];
+      complexity: QuestionComplexity;
+      questionData: QuestionDataClient;
+      createdAt?: string;
     };
 
 export interface QuestionCreateObject {
   questionType: QuestionType;
   complexity: QuestionComplexity;
-  questionData: SingleVariantData | MultipleVariantsData;
-  answerData: SingleVariantAnswerData | MultipleVariantsAnswerData;
-  image?: string;
+  questionData: QuestionData;
 }
 
 export type QuestionUpdateObject = QuestionCreateObject & {
@@ -43,19 +55,21 @@ export enum QuestionComplexity {
   High = "high",
 }
 
-interface VariantData {
+export interface QuestionVariant {
+  variant: string;
+  isCorrect: boolean;
+}
+
+export type QuestionVariantClient = string;
+
+export interface QuestionData {
   question: string;
   description?: string;
+  variants: QuestionVariant[];
 }
 
-export interface SingleVariantData extends VariantData {
-  variants: string[];
+export interface QuestionDataClient {
+  question: string;
+  description?: string;
+  variants: QuestionVariantClient[];
 }
-
-export interface MultipleVariantsData extends VariantData {
-  variants: string[];
-}
-
-export type SingleVariantAnswerData = [string];
-
-export type MultipleVariantsAnswerData = string[];

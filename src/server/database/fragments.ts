@@ -4,9 +4,7 @@ export const questionFragment = `
     questionType,
     complexity,
     questionData,
-    answerData,
-    createdAt,
-    image
+    createdAt
 `;
 
 export const quizFragment = `

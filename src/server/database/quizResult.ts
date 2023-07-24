@@ -14,7 +14,7 @@ import {
   DetailedAnswerData,
   QuestionAnswer,
 } from "@/types/questionAnswer";
-import { QuestionComplexity } from "@/types/question";
+import { QuestionComplexity, QuestionData } from "@/types/question";
 import { questionAnswerFragment } from "./fragments";
 import { Quiz } from "@/types/quiz";
 import { getQuizById } from "./quiz";
@@ -111,7 +111,7 @@ export const createQuizResult = async (
   try {
     const questions = await supabase
       .from("questions")
-      .select("id, complexity, answerData, questionData")
+      .select("id, complexity, questionData")
       .filter(
         "id",
         "in",
@@ -123,16 +123,24 @@ export const createQuizResult = async (
     const questionAnswers: Omit<QuestionAnswer, "id">[] = [];
     let totalMaxScore = 0;
 
-    for (let question of questions.data) {
+    for (let question of questions.data as {
+      id: string;
+      complexity: QuestionComplexity;
+      questionData: QuestionData;
+    }[]) {
       const answer = answers.find((a) => a.questionId === question.id);
       if (!answer) throw `No answer for question ${question.id}`;
 
       const detailedAnswer: DetailedAnswerData[] = [];
       let countCorrect = 0;
       let countIncorrect = 0;
-      const totalAnswers = question.answerData.length;
+      const correctAnswers = question.questionData.variants.filter(
+        (v) => v.isCorrect
+      );
+      const totalAnswers = correctAnswers.length;
+
       for (let variant of answer.answerData.variants) {
-        const type = question.answerData.includes(variant)
+        const type = correctAnswers.some((v) => v.variant === variant)
           ? AnswerType.Correct
           : AnswerType.Incorrect;
         detailedAnswer.push({
