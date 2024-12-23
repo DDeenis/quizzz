@@ -1,19 +1,13 @@
 export interface User {
   id: string;
   email: string;
-  fullName: string;
-  createdAt: string;
-  deletedAt?: string;
-  isAdmin?: boolean;
+  name: string;
+  createdAt: Date;
+  deletedAt: Date | null;
+  isAdmin: boolean;
 }
 
 export interface UserCreateObject {
   email: string;
-  fullName: string;
-}
-
-export interface Admin {
-  id: string;
-  userId: string;
-  createdAt: string;
+  name: string;
 }

@@ -8,15 +8,15 @@ import { useEffect, useState } from "react";
 import { stringAvatar } from "@/utils/user";
 import Button from "@mui/material/Button";
 import Link from "next/link";
-import { QuizResultPreview } from "@/types/quizResult";
+import type { QuizResultWithQuizPreview } from "@/types/quizResult";
 import Modal from "@mui/material/Modal";
 import TextField from "@mui/material/TextField";
 import { useForm } from "react-hook-form";
-import { UserCreateObject } from "@/types/user";
+import type { UserCreateObject } from "@/types/user";
 import FormHelperText from "@mui/material/FormHelperText";
 import Head from "next/head";
 import { formatDate } from "@/utils/questions";
-import { QuizSessionWithQuiz } from "@/types/quizSession";
+import type { QuizSessionWithQuiz } from "@/types/quizSession";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -47,28 +47,28 @@ export default function ProfilePage() {
         userUpdateObject: obj,
       })
       .then(() => {
-        user.refetch({ stale: false });
+        void user.refetch();
         closeModal();
       })
       .catch(console.error);
   };
 
-  const avatarProps = user.data ? stringAvatar(user.data.fullName) : undefined;
+  const avatarProps = user.data ? stringAvatar(user.data.name) : undefined;
 
   useEffect(() => {
     if (!router.isReady) return;
-    user.refetch();
+    void user.refetch();
   }, [router.isReady]);
 
   useEffect(() => {
     if (!canViewDetailed) return;
-    quizResults.refetch();
+    void quizResults.refetch();
   }, [canViewDetailed]);
 
   return (
     <>
       <Head>
-        <title>Profile: {user.data?.fullName}</title>
+        <title>Profile: {user.data?.name}</title>
       </Head>
       {user.isLoading ? (
         <Typography variant="body2">Loading...</Typography>
@@ -83,8 +83,7 @@ export default function ProfilePage() {
           >
             <Box maxWidth={"sm"} mb={2}>
               <Avatar
-                children={avatarProps?.children}
-                alt={user.data.fullName}
+                alt={user.data.name}
                 sx={{
                   width: 164,
                   height: 164,
@@ -92,9 +91,11 @@ export default function ProfilePage() {
                   mx: "auto",
                   ...avatarProps!.sx,
                 }}
-              />
+              >
+                {avatarProps?.children}
+              </Avatar>
               <Typography variant="h4" textAlign={"center"} mt={2} mb={1}>
-                {user.data.fullName}
+                {user.data.name}
               </Typography>
               {canViewDetailed && (
                 <Typography variant="body1" textAlign={"center"}>
@@ -170,8 +171,8 @@ export default function ProfilePage() {
   );
 }
 
-const ResultCard = ({ result }: { result: QuizResultPreview }) => {
-  const isPassed = result.score >= result.quizes.minimumScore;
+const ResultCard = ({ result }: { result: QuizResultWithQuizPreview }) => {
+  const isPassed = result.score >= result.quiz.minimumScore;
   const color = isPassed ? "green" : "red";
   return (
     <Box
@@ -188,7 +189,7 @@ const ResultCard = ({ result }: { result: QuizResultPreview }) => {
         color={color}
         mb={2}
       >
-        {result.quizes.name}
+        {result.quiz.name}
       </Typography>
       <Box component={"ul"}>
         <Box component={"li"}>
@@ -198,7 +199,7 @@ const ResultCard = ({ result }: { result: QuizResultPreview }) => {
           </Typography>{" "}
           of{" "}
           <Typography fontWeight={"bold"} component={"span"}>
-            {result.quizes.minimumScore}
+            {result.quiz.minimumScore}
           </Typography>{" "}
           (maximum {result.maxScore})
         </Box>
@@ -239,7 +240,7 @@ const ActiveSessionCard = ({
         mb={2}
         fontSize={"1.25rem"}
       >
-        {quizSession.quizes.name}
+        {quizSession.quiz.name}
       </Typography>
       <Link href={`/quiz/${quizSession.quizId}/start/${quizSession.id}`}>
         <Button variant="outlined" fullWidth>
@@ -261,11 +262,10 @@ const EditProfileForm = ({
   onSubmit,
   onCancel,
   defaultValues,
-  emailError,
 }: EditProfileFormProps) => {
   const { register, handleSubmit, formState } = useForm<UserCreateObject>({
     defaultValues: {
-      fullName: defaultValues?.fullName,
+      name: defaultValues?.name,
     },
   });
 
@@ -284,15 +284,13 @@ const EditProfileForm = ({
           variant="outlined"
           fullWidth
           required
-          error={!!formState.errors.fullName}
-          {...register("fullName", {
+          error={!!formState.errors.name}
+          {...register("name", {
             required: { value: true, message: "Full Name is required" },
           })}
         />
-        {formState.errors.fullName && (
-          <FormHelperText error>
-            {formState.errors.fullName.message}
-          </FormHelperText>
+        {formState.errors.name && (
+          <FormHelperText error>{formState.errors.name.message}</FormHelperText>
         )}
         {/* <TextField
           type="email"

@@ -13,7 +13,8 @@ import Button from "@mui/material/Button";
 import { formatDate } from "@/utils/questions";
 import React from "react";
 import { api } from "@/utils/api";
-import { QuizResultAdminData } from "@/types/quizResult";
+import type { QuizResultAdminData } from "@/types/quizResult";
+import { findLastIndex } from "@/utils/general";
 
 export const AdminQuizTab = () => {
   const [selectedQuizId, setSelectedQuizId] = React.useState<string>("");
@@ -31,16 +32,16 @@ export const AdminQuizTab = () => {
     return selectedUserId
       ? quizResults.data?.filter((tr) => tr.userId === selectedUserId)
       : quizResults.data;
-  }, [quizResults.dataUpdatedAt, selectedUserId]);
+  }, [quizResults.data, selectedUserId]);
 
   const userOptions = React.useMemo(() => {
     return quizResults.data
       ?.map((tr) => ({
         id: tr.userId,
-        name: tr.users.fullName,
+        name: tr.user.name,
       }))
-      .filter((o, i, arr) => arr.findLastIndex((t) => t.id === o.id) === i);
-  }, [quizResults.dataUpdatedAt]);
+      .filter((o, i, arr) => findLastIndex(arr, (t) => t.id === o.id) === i);
+  }, [quizResults.data]);
 
   const handleQuizChange = (event: SelectChangeEvent<string>) => {
     setSelectedQuizId(event.target.value);
@@ -52,7 +53,7 @@ export const AdminQuizTab = () => {
   React.useEffect(() => {
     if (selectedQuizId) {
       setSelectedUserId("");
-      quizResults.refetch();
+      void quizResults.refetch();
     }
   }, [selectedQuizId]);
 
@@ -90,14 +91,15 @@ export const AdminQuizTab = () => {
                 <MenuItem value={o.id} key={o.id}>
                   <Box display={"flex"} alignItems={"center"} gap={1}>
                     <Avatar
-                      children={avatarProps.children}
                       sx={{
                         width: 24,
                         height: 24,
                         fontSize: "0.75rem",
                         ...avatarProps.sx,
                       }}
-                    />
+                    >
+                      {avatarProps.children}
+                    </Avatar>
                     {o.name}
                   </Box>
                 </MenuItem>
@@ -133,7 +135,7 @@ export const AdminQuizTab = () => {
 };
 
 const ResultCard = ({ quizResult }: { quizResult: QuizResultAdminData }) => {
-  const isPassed = quizResult.score >= quizResult.quizes.minimumScore;
+  const isPassed = quizResult.score >= quizResult.quiz.minimumScore;
   const color = isPassed ? "green" : "red";
 
   return (
@@ -148,20 +150,20 @@ const ResultCard = ({ quizResult }: { quizResult: QuizResultAdminData }) => {
       alignItems={"center"}
       gap={2}
     >
-      <UserInfo user={quizResult.users} />
+      <UserInfo user={quizResult.user} />
       <Divider orientation="vertical" flexItem />
       <Box textAlign={{ xs: "center", lg: "start" }}>
         <Typography color={color} variant="subtitle1" fontWeight={"bold"}>
           {isPassed ? "Quiz passed" : "Quiz failed"}
         </Typography>
         <Typography variant="body2">
-          {quizResult.score} points out of {quizResult.quizes.minimumScore}{" "}
+          {quizResult.score} points out of {quizResult.quiz.minimumScore}{" "}
           minimum
         </Typography>
       </Box>
       <Box ml={{ lg: 1 }}>
         <Typography variant="body2">
-          • {quizResult.quizes.minimumScore} minimum points
+          • {quizResult.quiz.minimumScore} minimum points
         </Typography>
         <Typography variant="body2">
           • {quizResult.maxScore} maximum points

@@ -1,39 +1,21 @@
-import { User } from "./user";
+import { type User } from "./user";
 
 export interface QuizSession {
   id: string;
   quizId: string;
   userId: string;
-  createdAt: string;
-  expires: string;
+  createdAt: Date;
+  expires: Date;
 }
 
-export interface QuizSessionWithQuiz {
-  id: string;
-  quizId: string;
-  userId: string;
-  createdAt: string;
-  expires: string;
-  quizes: {
+export interface QuizSessionWithQuiz extends QuizSession {
+  quiz: {
     name: string;
   };
 }
 
-export interface QuizSessionFull {
-  id: string;
-  quizId: string;
-  userId: string;
-  createdAt: string;
-  expires: string;
-  quizes: {
-    name: string;
-  };
-  users: User;
+export interface QuizSessionFull extends QuizSessionWithQuiz {
+  user: User;
 }
 
-export interface QuizSessionCreateObject {
-  quizId: string;
-  userId: string;
-  createdAt: string;
-  expires: string;
-}
+export type QuizSessionCreateObject = Exclude<QuizSession, "id">;

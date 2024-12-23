@@ -10,8 +10,8 @@ import {
   getQuizResults,
   getQuizResultsByQuiz,
   getQuizResultsByUser,
-} from "@/server/database/quizResult";
-import { getUserQuizSessions } from "@/server/database/quizSession";
+} from "@/server/db/quizResult";
+import { getUserQuizSessions } from "@/server/db/quizSession";
 import { isQuizSessionExpired } from "@/utils/questions";
 
 export const quizResultRouter = createTRPCRouter({
@@ -26,10 +26,7 @@ export const quizResultRouter = createTRPCRouter({
         });
       }
 
-      if (
-        result?.quizResult.userId !== ctx.session.user.id &&
-        !ctx.session.user.isAdmin
-      ) {
+      if (result?.userId !== ctx.session.user.id && !ctx.session.user.isAdmin) {
         throw new TRPCError({
           code: "FORBIDDEN",
         });

@@ -8,7 +8,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import RestoreIcon from "@mui/icons-material/Restore";
 import React from "react";
 import { api } from "@/utils/api";
-import { User } from "@/types/user";
+import { type User } from "@/types/user";
 
 export const AdminUsersTab = () => {
   const users = api.admin.getAllUsers.useQuery(undefined, {
@@ -19,21 +19,25 @@ export const AdminUsersTab = () => {
   const restoreUser = api.admin.restoreUser.useMutation();
 
   const onDelete = (userId: string) => {
-    deleteUser.mutateAsync({ userId }).then((isDeleted) => {
-      isDeleted && users.refetch();
+    void deleteUser.mutateAsync({ userId }).then((isDeleted) => {
+      if (isDeleted) {
+        void users.refetch();
+      }
     });
   };
   const onRestore = (userId: string) => {
-    restoreUser.mutateAsync({ userId }).then((isRestored) => {
-      isRestored && users.refetch();
+    void restoreUser.mutateAsync({ userId }).then((isRestored) => {
+      if (isRestored) {
+        void users.refetch();
+      }
     });
   };
 
   React.useEffect(() => {
     if (!users.isSuccess) {
-      users.refetch();
+      void users.refetch();
     }
-  }, []);
+  }, [users]);
 
   return (
     <>
@@ -70,13 +74,17 @@ const UserCard = ({
   onDelete: (userId: string) => void;
   onRestore: (userId: string) => void;
 }) => {
-  const isDeleted = Boolean(user.deletedAt);
+  const isDeleted = !!user.deletedAt;
 
   const handleDelete = () => {
-    !user.isAdmin && onDelete(user.id);
+    if (!user.isAdmin) {
+      onDelete(user.id);
+    }
   };
   const handleRestore = () => {
-    !user.isAdmin && onRestore(user.id);
+    if (!user.isAdmin) {
+      onRestore(user.id);
+    }
   };
 
   return (

@@ -1,9 +1,9 @@
 import { z } from "zod";
 import { adminProcedure, createTRPCRouter } from "../trpc";
-import { getQuizesAsOptions } from "@/server/database/quiz";
-import { getQuizResultsForAdmin } from "@/server/database/quizResult";
-import { deleteUser, getAllUsers, restoreUser } from "@/server/database/user";
-import { getFullQuizSessions } from "@/server/database/quizSession";
+import { getQuizesAsOptions } from "@/server/db/quiz";
+import { getQuizResultsForAdmin } from "@/server/db/quizResult";
+import { deleteUser, getAllUsers, restoreUser } from "@/server/db/user";
+import { getFullQuizSessions } from "@/server/db/quizSession";
 
 export const adminRouter = createTRPCRouter({
   getQuizOptions: adminProcedure.query(async () => {

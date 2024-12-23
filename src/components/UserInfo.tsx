@@ -1,4 +1,4 @@
-import { User } from "@/types/user";
+import { type User } from "@/types/user";
 import { stringAvatar } from "@/utils/user";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
@@ -16,11 +16,11 @@ export const UserInfo = ({ user }: { user: User }) => {
       width={"100%"}
     >
       <Link href={`/user/${user.id}`}>
-        <Avatar {...stringAvatar(user.fullName)} />
+        <Avatar {...stringAvatar(user.name)} />
       </Link>
       <div>
         <Link href={`/user/${user.id}`}>
-          <Typography variant="body1">{user.fullName}</Typography>
+          <Typography variant="body1">{user.name}</Typography>
         </Link>
         <Typography variant="caption">{user.email}</Typography>
       </div>

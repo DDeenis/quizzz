@@ -1,5 +1,5 @@
 import { useProtectedSession } from "@/hooks/session";
-import { Quiz } from "@/types/quiz";
+import type { Quiz, QuizPreview } from "@/types/quiz";
 import { api } from "@/utils/api";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -8,6 +8,9 @@ import Head from "next/head";
 import Link from "next/link";
 import DeleteIcon from "@mui/icons-material/Delete";
 import RestoreIcon from "@mui/icons-material/Restore";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
+import BalanceIcon from "@mui/icons-material/Balance";
 import { useMemo } from "react";
 
 export default function QuizesListPage() {
@@ -27,12 +30,12 @@ export default function QuizesListPage() {
   }, [dataUpdatedAt]);
 
   const createOnDelete = (quizId: string) => () => {
-    deleteQuiz
+    void deleteQuiz
       .mutateAsync({ quizId })
       .then((isDeleted) => isDeleted && void refetch());
   };
   const createOnRestore = (quizId: string) => () => {
-    restoreQuiz
+    void restoreQuiz
       .mutateAsync({ quizId })
       .then((isRestored) => isRestored && void refetch());
   };
@@ -92,7 +95,7 @@ export default function QuizesListPage() {
 }
 
 interface QuizCardProps {
-  quiz: Quiz;
+  quiz: QuizPreview;
   isAdmin?: boolean;
   onDelete?: () => void;
   onRestore?: () => void;
@@ -115,11 +118,13 @@ const QuizCard = ({ quiz, isAdmin, onDelete, onRestore }: QuizCardProps) => {
       </Typography>
       <Box mb={2}>
         <Typography variant="subtitle1">
-          • {quiz.questionsCount} questions
+          <HelpOutlineIcon /> {quiz.questionsCount} questions
         </Typography>
-        <Typography variant="subtitle1">• {quiz.time} minutes</Typography>
         <Typography variant="subtitle1">
-          • Attempts: {quiz.attempts ?? "unlimited"}
+          <HourglassEmptyIcon /> {quiz.time} minutes
+        </Typography>
+        <Typography variant="subtitle1">
+          <BalanceIcon /> Attempts: {quiz.attempts ?? "unlimited"}
         </Typography>
       </Box>
       {!isAdmin && (

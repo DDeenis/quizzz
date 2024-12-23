@@ -50,3 +50,4 @@ export const Timer = memo(
     );
   }
 );
+Timer.displayName = "Timer";

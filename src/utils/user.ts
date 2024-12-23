@@ -17,10 +17,10 @@ function stringToColor(string: string) {
 }
 
 export function stringAvatar(name: string) {
-  const words = name.split(" ");
+  const words = name.split(" ").slice(0, 2);
   let letters = "";
 
-  for (let word of words) {
+  for (const word of words) {
     letters += word[0];
   }
 

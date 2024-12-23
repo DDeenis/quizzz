@@ -1,3 +1,5 @@
+import { type QuestionAnswer } from "./questionAnswer";
+
 export type Question =
   | {
       id: string;
@@ -5,7 +7,8 @@ export type Question =
       questionType: (typeof QuestionType)["SingleVariant"];
       complexity: QuestionComplexity;
       questionData: QuestionData;
-      createdAt?: string;
+      createdAt: Date;
+      answers?: QuestionAnswer[];
     }
   | {
       id: string;
@@ -13,7 +16,8 @@ export type Question =
       questionType: (typeof QuestionType)["MultipleVariants"];
       complexity: QuestionComplexity;
       questionData: QuestionData;
-      createdAt?: string;
+      createdAt: Date;
+      answers?: QuestionAnswer[];
     };
 
 export type QuestionClient =
@@ -23,7 +27,7 @@ export type QuestionClient =
       questionType: (typeof QuestionType)["SingleVariant"];
       complexity: QuestionComplexity;
       questionData: QuestionDataClient;
-      createdAt?: string;
+      createdAt: Date;
     }
   | {
       id: string;
@@ -31,7 +35,7 @@ export type QuestionClient =
       questionType: (typeof QuestionType)["MultipleVariants"];
       complexity: QuestionComplexity;
       questionData: QuestionDataClient;
-      createdAt?: string;
+      createdAt: Date;
     };
 
 export interface QuestionCreateObject {

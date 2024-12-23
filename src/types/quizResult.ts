@@ -1,8 +1,12 @@
-import { QuestionAnswer, QuestionAnswerCreateObject } from "./questionAnswer";
-import { Quiz } from "./quiz";
-import { User } from "./user";
+import type {
+  QuestionAnswer,
+  QuestionAnswerCreateObject,
+  QuestionAnswerUpdateObject,
+} from "./questionAnswer";
+import type { Quiz } from "./quiz";
+import type { User } from "./user";
 
-export interface QuizResult {
+interface QuizResultBase {
   id: string;
   quizId: string;
   userId: string;
@@ -11,8 +15,11 @@ export interface QuizResult {
   maxScore?: number;
   countCorrect: number;
   countIncorrect: number;
-  createdAt: string;
-  answers?: QuestionAnswer[];
+  createdAt: Date;
+}
+
+export interface QuizResult extends QuizResultBase {
+  answers: QuestionAnswer[];
 }
 
 export interface QuizResultCreateObject {
@@ -22,26 +29,29 @@ export interface QuizResultCreateObject {
   answers: QuestionAnswerCreateObject[];
 }
 
-export interface QuizResultPreview {
-  id: string;
+export interface QuizResultUpdateObject {
   quizId: string;
   userId: string;
   quizSessionId: string;
-  score: number;
-  maxScore?: number;
-  countCorrect: number;
-  countIncorrect: number;
-  createdAt: string;
-  quizes: Omit<Quiz, "questions">;
+  answers: QuestionAnswerUpdateObject[];
 }
 
-export interface QuizResultAdminData extends Omit<QuizResult, "answers"> {
-  quizes: {
+export interface QuizResultWithQuizPreview extends QuizResultBase {
+  quiz: Omit<Quiz, "questions">;
+}
+
+export interface QuizResultFull extends QuizResultBase {
+  answers: QuestionAnswer[];
+  quiz: Quiz;
+}
+
+export interface QuizResultAdminData extends QuizResultBase {
+  quiz: {
     id: string;
     name: string;
     authorId: string;
     questionsCount: number;
     minimumScore: number;
   };
-  users: User;
+  user: User;
 }

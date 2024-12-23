@@ -12,8 +12,9 @@ import Button from "@mui/material/Button";
 import { formatDate, isQuizSessionExpired } from "@/utils/questions";
 import React from "react";
 import { api } from "@/utils/api";
-import { QuizSessionFull } from "@/types/quizSession";
+import type { QuizSessionFull } from "@/types/quizSession";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { findLastIndex } from "@/utils/general";
 
 export const AdminSessionsTab = () => {
   const [selectedQuizId, setSelectedQuizId] = React.useState<string>("");
@@ -32,16 +33,16 @@ export const AdminSessionsTab = () => {
     return selectedUserId
       ? quizResults.data?.filter((tr) => tr.userId === selectedUserId)
       : quizResults.data;
-  }, [quizResults.dataUpdatedAt, selectedUserId]);
+  }, [selectedUserId, quizResults.data]);
 
   const userOptions = React.useMemo(() => {
     return quizResults.data
       ?.map((tr) => ({
         id: tr.userId,
-        name: tr.users.fullName,
+        name: tr.user.name,
       }))
-      .filter((o, i, arr) => arr.findLastIndex((t) => t.id === o.id) === i);
-  }, [quizResults.dataUpdatedAt]);
+      .filter((o, i, arr) => findLastIndex(arr, (t) => t.id === o.id) === i);
+  }, [quizResults.data]);
 
   const handleQuizChange = (event: SelectChangeEvent<string>) => {
     setSelectedQuizId(event.target.value);
@@ -50,7 +51,7 @@ export const AdminSessionsTab = () => {
     setSelectedUserId(event.target.value);
   };
   const onDelete = (quizSessionId: string) => {
-    deleteSession
+    void deleteSession
       .mutateAsync({ quizSessionId })
       .then((isDeleted) => isDeleted && void quizResults.refetch());
   };
@@ -58,7 +59,7 @@ export const AdminSessionsTab = () => {
   React.useEffect(() => {
     if (selectedQuizId) {
       setSelectedUserId("");
-      quizResults.refetch();
+      void quizResults.refetch();
     }
   }, [selectedQuizId]);
 
@@ -96,14 +97,15 @@ export const AdminSessionsTab = () => {
                 <MenuItem value={o.id} key={o.id}>
                   <Box display={"flex"} alignItems={"center"} gap={1}>
                     <Avatar
-                      children={avatarProps.children}
                       sx={{
                         width: 24,
                         height: 24,
                         fontSize: "0.75rem",
                         ...avatarProps.sx,
                       }}
-                    />
+                    >
+                      {avatarProps.children}
+                    </Avatar>
                     {o.name}
                   </Box>
                 </MenuItem>
@@ -163,11 +165,11 @@ const SessionCard = ({
       gap={2}
       bgcolor={isExpired ? "lightgray" : "transparent"}
     >
-      <UserInfo user={quizSession.users} />
+      <UserInfo user={quizSession.user} />
       <Divider orientation="vertical" flexItem />
       <Box textAlign={{ xs: "center", lg: "start" }}>
         <Typography variant="subtitle1" fontWeight={"bold"}>
-          {quizSession.quizes.name}
+          {quizSession.quiz.name}
         </Typography>
         <Typography variant="body2" color={color}>
           {isExpired ? "Session expired" : "Session is life"}

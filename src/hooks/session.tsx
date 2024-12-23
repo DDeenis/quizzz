@@ -7,7 +7,7 @@ export const useProtectedSession = () => {
   const session = useSession({
     required: true,
     onUnauthenticated() {
-      push("/");
+      void push("/");
     },
   });
   return session;
@@ -18,13 +18,13 @@ export const useAdminSession = () => {
   const session = useSession({
     required: true,
     onUnauthenticated() {
-      push("/");
+      void push("/");
     },
   });
 
   useEffect(() => {
     if (!session.data?.user.isAdmin) {
-      push("/");
+      void push("/");
     }
   }, []);
 

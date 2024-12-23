@@ -6,7 +6,7 @@ import FormHelperText from "@mui/material/FormHelperText";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { api } from "@/utils/api";
-import { UserCreateObject } from "@/types/user";
+import type { UserCreateObject } from "@/types/user";
 import { signIn } from "next-auth/react";
 
 export const RegisterForm = () => {
@@ -18,9 +18,10 @@ export const RegisterForm = () => {
   const onSubmit = handleSubmit((formData) => {
     mutateAsync(formData)
       .then((u) => {
-        u && signIn("email", { email: u.email });
+        if (!u) throw new Error("Failed to register");
+        return signIn("email", { email: u.email });
       })
-      .catch((err) => {
+      .catch((err: Error) => {
         console.error(err.message);
       });
   });
@@ -40,15 +41,13 @@ export const RegisterForm = () => {
           variant="outlined"
           fullWidth
           required
-          error={!!formState.errors.fullName}
-          {...register("fullName", {
+          error={!!formState.errors.name}
+          {...register("name", {
             required: { value: true, message: "Full Name is required" },
           })}
         />
-        {formState.errors.fullName && (
-          <FormHelperText error>
-            {formState.errors.fullName.message}
-          </FormHelperText>
+        {formState.errors.name && (
+          <FormHelperText error>{formState.errors.name.message}</FormHelperText>
         )}
         <TextField
           type="email"
@@ -70,7 +69,7 @@ export const RegisterForm = () => {
         {error && (
           <FormHelperText error>
             {error.data?.zodError?.fieldErrors.email?.[0] ??
-              error.data?.zodError?.fieldErrors.fullName?.[0] ??
+              error.data?.zodError?.fieldErrors.name?.[0] ??
               error.message}
           </FormHelperText>
         )}
@@ -84,13 +83,11 @@ export const RegisterForm = () => {
 
 export const SignInForm = () => {
   const { register, handleSubmit, formState } = useForm<{ email: string }>();
-  const { mutateAsync, isLoading, error } = api.auth.signIn.useMutation();
+  const { mutateAsync, isPending, error } = api.auth.signIn.useMutation();
 
   const onSubmit = handleSubmit((formData) => {
     mutateAsync(formData)
-      .then(() => {
-        signIn("email", { email: formData.email });
-      })
+      .then(() => signIn("email", { email: formData.email }))
       .catch(console.error);
   });
 
@@ -125,7 +122,7 @@ export const SignInForm = () => {
           </FormHelperText>
         )}
         <Button type="submit" variant="contained">
-          {isLoading ? "Loading" : "Sign in"}
+          {isPending ? "Loading" : "Sign in"}
         </Button>
       </Box>
     </form>

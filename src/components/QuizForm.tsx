@@ -1,9 +1,9 @@
 import {
   QuestionComplexity,
-  QuestionCreateObject,
+  type QuestionCreateObject,
   QuestionType,
-  QuestionUpdateObject,
-  QuestionVariant,
+  type QuestionUpdateObject,
+  type QuestionVariant,
 } from "@/types/question";
 import type { Quiz, QuizCreateObject, QuizUpdateObject } from "@/types/quiz";
 import Box from "@mui/material/Box";
@@ -77,7 +77,7 @@ export function QuizForm(props: QuizFormProps) {
         },
       },
     },
-    shouldUnregister: true,
+    // shouldUnregister: true,
   });
 
   const appendQuestion = () =>
@@ -91,8 +91,9 @@ export function QuizForm(props: QuizFormProps) {
     });
   const removeQuestion = (i: number) => () => {
     const question = getValues().questions[i];
+    if (!question) return;
+
     questionFieldsArray.remove(i);
-    // @ts-expect-error
     props.onRemoveQuestion?.(question);
   };
 
@@ -211,18 +212,20 @@ export function QuizForm(props: QuizFormProps) {
         </Box>
       </Box>
       <Box display={"flex"} flexDirection={"column"} gap={4}>
-        {questionFieldsArray.fields.map((field, index) => (
-          <FormField
-            index={index}
-            control={control}
-            errors={errors}
-            onRemove={removeQuestion(index)}
-            register={register}
-            getValues={getValues}
-            setValue={setValue}
-            key={field.id}
-          />
-        ))}
+        {questionFieldsArray.fields.map((field, index) => {
+          return (
+            <FormField
+              index={index}
+              control={control}
+              errors={errors}
+              onRemove={removeQuestion(index)}
+              register={register}
+              getValues={getValues}
+              setValue={setValue}
+              key={field.id}
+            />
+          );
+        })}
         <Button variant="outlined" onClick={appendQuestion}>
           Add question
         </Button>
@@ -241,7 +244,7 @@ const FormField = ({
   setValue,
 }: {
   index: number;
-  control: Control<QuizCreateObject, any>;
+  control: Control<QuizCreateObject, unknown>;
   errors: FieldErrors<QuizCreateObject>;
   onRemove: () => void;
   register: UseFormRegister<QuizCreateObject>;
@@ -420,7 +423,7 @@ const FormField = ({
                   return questionType === QuestionType.SingleVariant ? (
                     <Radio
                       onBlur={onBlur}
-                      onChange={(e, checked) => {
+                      onChange={() => {
                         onChange(
                           getValues().questions[
                             index

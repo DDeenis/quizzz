@@ -1,4 +1,4 @@
-import {
+import type {
   Question,
   QuestionClient,
   QuestionCreateObject,
@@ -8,16 +8,27 @@ import {
 export interface Quiz {
   id: string;
   name: string;
-  description?: string;
+  description: string | null;
   authorId: string;
-  createdAt?: string;
   time: number;
   questionsCount: number;
   minimumScore: number;
   maximumScore: number;
-  attempts?: number;
-  deletedAt?: string;
-  questions?: Question[];
+  attempts: number | null;
+  createdAt: Date | null;
+  deletedAt: Date | null;
+  questions: Question[];
+}
+
+export interface QuizPreview {
+  id: string;
+  name: string;
+  time: number;
+  description: string | null;
+  questionsCount: number;
+  minimumScore: number;
+  attempts: number | null;
+  deletedAt: Date | null;
 }
 
 export type QuizClient = Omit<Quiz, "questions"> & {
@@ -30,8 +41,8 @@ export interface QuizCreateObject {
   time: number;
   questionsCount: number;
   minimumScore: number;
-  attempts?: number;
-  description?: string;
+  attempts: number | null;
+  description: string | null;
   questions: QuestionCreateObject[];
 }
 
@@ -41,8 +52,8 @@ export interface QuizUpdateObject {
   time: number;
   questionsCount: number;
   minimumScore: number;
-  attempts?: number;
-  description?: string;
+  attempts: number | null;
+  description: string | null;
   questions: QuestionUpdateObject[];
 }
 

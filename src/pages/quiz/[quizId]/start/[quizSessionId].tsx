@@ -1,8 +1,8 @@
 import { Timer } from "@/components/Timer";
 import { useProtectedSession } from "@/hooks/session";
-import { Question, QuestionClient, QuestionType } from "@/types/question";
-import { QuestionAnswerCreateObject } from "@/types/questionAnswer";
-import { QuizResultCreateObject } from "@/types/quizResult";
+import { type QuestionClient, QuestionType } from "@/types/question";
+import { type QuestionAnswerCreateObject } from "@/types/questionAnswer";
+import { type QuizResultCreateObject } from "@/types/quizResult";
 import { api } from "@/utils/api";
 import {
   getISODistanceToInSeconds,
@@ -21,7 +21,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useMemo } from "react";
 import { useEffect, useState } from "react";
-import { Control, Controller, useForm } from "react-hook-form";
+import { type Control, Controller, useForm } from "react-hook-form";
 
 export default function QuizPage() {
   const router = useRouter();
@@ -45,7 +45,7 @@ export default function QuizPage() {
     const expires = data?.quizSession.expires;
     if (!expires) return 0;
     return getISODistanceToInSeconds(expires);
-  }, [isSuccess]);
+  }, [isSuccess, data?.quizSession.expires]);
 
   const quiz = data?.quiz;
   const currentQuestion = quiz?.questions?.[currentQuestionIndex];
@@ -53,21 +53,21 @@ export default function QuizPage() {
   const hasNext = currentQuestionIndex < Number(quiz?.questions?.length) - 1;
 
   useEffect(() => {
-    if (!router.isReady) {
+    if (!router.isReady || !quizId || !quizSessionId) {
       return;
     }
 
-    refetch();
-  }, [router.isReady]);
+    void refetch();
+  }, [router.isReady, quizId, quizSessionId]);
 
   useEffect(() => {
     const quizSession = data?.quizSession;
     if (!quizSession || !isSuccess) return;
     const isExpired = isQuizSessionExpired(quizSession);
     if (isExpired) {
-      router.push(`/quiz/${quizId}/start`);
+      void router.push(`/quiz/${quizId as string}/start`);
     }
-  }, [isSuccess]);
+  }, [isSuccess, data?.quizSession, quizId]);
 
   const toNextQuestion = () =>
     setCurrentQuestionIndex(currentQuestionIndex + 1);
@@ -82,11 +82,12 @@ export default function QuizPage() {
     const answers: QuestionAnswerCreateObject[] = [];
     for (let i = 0; i < quiz.questions.length; i++) {
       const answerData = formValues[i]?.answerData;
-      if (!answerData) return;
+      const questionId = quiz.questions?.[i]?.id;
+      if (!answerData || !questionId) return;
 
       answers.push({
-        userId: session!.user.id,
-        questionId: quiz.questions?.[i]?.id!,
+        userId: session.user.id,
+        questionId,
         answerData,
       });
     }
@@ -94,7 +95,7 @@ export default function QuizPage() {
     const quizResult: QuizResultCreateObject = {
       quizId: quizId as string,
       quizSessionId: quizSessionId as string,
-      userId: session!.user.id,
+      userId: session.user.id,
       answers,
     };
     submitQuiz
@@ -105,15 +106,15 @@ export default function QuizPage() {
 
   const onTimerEnd = () => {
     if (form.formState.isValid) {
-      onSubmit();
+      void onSubmit();
     }
 
     // TODO: show modal 'your session has expired'
-    router.push(`/quiz/${quizId}/start`);
+    void router.push(`/quiz/${quizId as string}/start`);
   };
 
   const onCancelQuiz = () => {
-    router.push(`/quiz`);
+    void router.push(`/quiz`);
   };
 
   return (
@@ -190,7 +191,7 @@ export default function QuizPage() {
                 disabled={!form.formState.isValid}
                 sx={{ display: hasNext ? "none" : "inline" }}
               >
-                {submitQuiz.isLoading ? "Loading..." : "Finish quiz"}
+                {submitQuiz.isPending ? "Loading..." : "Finish quiz"}
               </Button>
               <Button
                 variant="text"
@@ -240,7 +241,7 @@ const QuestionForm = ({
 }: {
   question: QuestionClient;
   questionIndex: number;
-  control: Control<QuestionAnswerCreateObject[], any>;
+  control: Control<QuestionAnswerCreateObject[], unknown>;
   getValues: () => QuestionAnswerCreateObject[];
 }) => {
   return (
@@ -266,9 +267,11 @@ const QuestionForm = ({
                   ref={ref}
                   checked={isChecked}
                   onChange={(e, checked) => {
-                    checked
-                      ? onChange([variant])
-                      : onChange(valueSafe.filter((v) => v !== variant));
+                    if (checked) {
+                      onChange([variant]);
+                    } else {
+                      onChange(valueSafe.filter((v) => v !== variant));
+                    }
                   }}
                 />
               ) : (
@@ -277,9 +280,11 @@ const QuestionForm = ({
                   ref={ref}
                   checked={isChecked}
                   onChange={(e, checked) => {
-                    checked
-                      ? onChange([...valueSafe, variant])
-                      : onChange(valueSafe.filter((v) => v !== variant));
+                    if (checked) {
+                      onChange([...valueSafe, variant]);
+                    } else {
+                      onChange(valueSafe.filter((v) => v !== variant));
+                    }
                   }}
                 />
               );

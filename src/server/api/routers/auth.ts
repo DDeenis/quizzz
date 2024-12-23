@@ -1,13 +1,13 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
-import { createUser, getUserByEmail } from "@/server/database/user";
+import { createUser, getUserByEmail } from "@/server/db/user";
 import { TRPCError } from "@trpc/server";
 
 export const authRouter = createTRPCRouter({
   register: publicProcedure
     .input(
       z.object({
-        fullName: z.string(),
+        name: z.string(),
         email: z.string().email(),
       })
     )

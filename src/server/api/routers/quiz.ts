@@ -9,25 +9,18 @@ import {
   getQuizPreviewById,
   restoreQuiz,
   updateQuiz,
-} from "@/server/database/quiz";
+} from "@/server/db/quiz";
 import { QuestionType, QuestionComplexity } from "@/types/question";
 import { TRPCError } from "@trpc/server";
 
 const questionsScheme = z.array(
   z.object({
-    id: z.string().optional().nullable(),
-    questionType: z.enum([
-      QuestionType.SingleVariant,
-      QuestionType.MultipleVariants,
-    ]),
-    complexity: z.enum([
-      QuestionComplexity.Low,
-      QuestionComplexity.High,
-      QuestionComplexity.Medium,
-    ]),
+    id: z.string().optional(),
+    questionType: z.nativeEnum(QuestionType),
+    complexity: z.nativeEnum(QuestionComplexity),
     questionData: z.object({
       question: z.string().trim().nonempty(),
-      description: z.string().optional().nullable(),
+      description: z.string().optional(),
       variants: z
         .object({
           variant: z.string().trim().nonempty(),
@@ -43,8 +36,8 @@ const quizCreateScheme = z.object({
   time: z.number().min(1),
   questionsCount: z.number().min(1),
   minimumScore: z.number().min(1),
-  description: z.string().optional().nullable(),
-  attempts: z.number().min(1).or(z.nan()).optional().nullable(),
+  description: z.string().nullable(),
+  attempts: z.number().min(1).or(z.nan()).nullable(),
   questions: questionsScheme,
 });
 
@@ -53,8 +46,8 @@ const quizUpdateScheme = z.object({
   time: z.number().min(1),
   questionsCount: z.number().min(1),
   minimumScore: z.number().min(1),
-  description: z.string().optional().nullable(),
-  attempts: z.number().min(1).or(z.nan()).optional().nullable(),
+  description: z.string().nullable(),
+  attempts: z.number().min(1).or(z.nan()).nullable(),
   questions: questionsScheme,
 });
 
@@ -66,7 +59,6 @@ export const quizesRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      // @ts-ignore
       return await createQuiz({
         ...input.quizCreateObject,
         authorId: ctx.session.user.id,
@@ -84,7 +76,6 @@ export const quizesRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       return await updateQuiz(
         input.quizId,
-        // @ts-expect-error
         {
           ...input.quizUpdateObject,
           authorId: ctx.session.user.id,

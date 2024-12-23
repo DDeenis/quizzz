@@ -11,9 +11,11 @@ export default function CreateQuiz() {
   useAdminSession();
 
   const onSubmit = (formValues: QuizCreateObject) => {
-    mutateAsync({ quizCreateObject: formValues }).then(
+    void mutateAsync({ quizCreateObject: formValues }).then(
       (createdSuccessfully) => {
-        createdSuccessfully && push("/quiz");
+        if (createdSuccessfully) {
+          void push("/quiz");
+        }
       }
     );
   };

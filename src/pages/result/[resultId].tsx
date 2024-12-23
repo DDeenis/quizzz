@@ -1,15 +1,14 @@
 import { QuizInfoCard } from "@/components/QuizInfoCard";
 import { useProtectedSession } from "@/hooks/session";
-import { Question, QuestionType } from "@/types/question";
+import { type Question, QuestionType } from "@/types/question";
 import { AnswerType } from "@/types/questionAnswer";
-import { QuestionAnswer } from "@/types/questionAnswer";
+import type { QuestionAnswer } from "@/types/questionAnswer";
 import { api } from "@/utils/api";
 import { formatDate } from "@/utils/questions";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Checkbox from "@mui/material/Checkbox";
-import Chip from "@mui/material/Chip";
 import Radio from "@mui/material/Radio";
 import Typography from "@mui/material/Typography";
 import Head from "next/head";
@@ -27,16 +26,15 @@ export default function QuizPage() {
   );
   useProtectedSession();
 
-  const isQuizPassed =
-    (data?.quizResult.score ?? 0) >= (data?.quiz.minimumScore ?? 0);
+  const isQuizPassed = (data?.score ?? 0) >= (data?.quiz.minimumScore ?? 0);
   const passedColor = isQuizPassed ? "green" : "red";
 
   useEffect(() => {
-    if (!router.isReady) {
+    if (!router.isReady || !resultId) {
       return;
     }
 
-    refetch();
+    void refetch();
   }, [resultId, router.isReady]);
 
   return (
@@ -91,23 +89,23 @@ export default function QuizPage() {
                         fontWeight={"bold"}
                         component={"span"}
                       >
-                        {data.quizResult.score}
+                        {data.score}
                       </Typography>{" "}
                       of{" "}
                       <Typography fontWeight={"bold"} component={"span"}>
                         {data.quiz.minimumScore}
                       </Typography>{" "}
-                      (maximum {data.quizResult.maxScore})
+                      (maximum {data.maxScore})
                     </Box>
                     <Box component={"li"}>
-                      {data.quizResult.countCorrect} correct answers
+                      {data.countCorrect} correct answers
                     </Box>
                     <Box component={"li"}>
-                      {data.quizResult.countIncorrect} incorrect or partially
-                      correct answers
+                      {data.countIncorrect} incorrect or partially correct
+                      answers
                     </Box>
                     <Box component={"li"}>
-                      Passed at {formatDate(data.quizResult.createdAt)}
+                      Passed at {formatDate(data.createdAt)}
                     </Box>
                   </Box>
                 </Box>
@@ -115,12 +113,12 @@ export default function QuizPage() {
             />
           </Box>
           {data.quiz.questions?.map((q, i) => {
-            const answer = data.quizResult.answers?.find(
-              (a) => a.questionId === q.id
-            );
+            const answer = data.answers?.find((a) => a.questionId === q.id);
             if (!answer) {
               return (
-                <Typography color={"red"}>Failed to load answer</Typography>
+                <Typography color={"red"} key={"error"}>
+                  Failed to load answer
+                </Typography>
               );
             }
             return (

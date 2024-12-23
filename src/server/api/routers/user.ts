@@ -1,10 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import {
-  getUserByEmail,
-  getUserById,
-  updateUser,
-} from "@/server/database/user";
+import { getUserByEmail, getUserById, updateUser } from "@/server/db/user";
 import { TRPCError } from "@trpc/server";
 
 export const userRouter = createTRPCRouter({
@@ -27,11 +23,12 @@ export const userRouter = createTRPCRouter({
       z.object({
         userId: z.string(),
         userUpdateObject: z
-          .object({ email: z.string().email(), fullName: z.string() })
+          .object({ email: z.string().email(), name: z.string() })
           .partial(),
       })
     )
     .mutation(async ({ input, ctx }) => {
+      console.log(input);
       if (input.userId !== ctx.session.user.id) {
         throw new TRPCError({
           code: "FORBIDDEN",

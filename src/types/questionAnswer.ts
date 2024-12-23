@@ -2,7 +2,7 @@ export interface QuestionAnswer {
   id: string;
   questionId: string;
   userId: string;
-  quizSessionId: string;
+  quizResultId: string;
   score: number;
   answerType: AnswerType;
   answerData: DetailedAnswerData[];
@@ -12,6 +12,10 @@ export interface QuestionAnswerCreateObject {
   questionId: string;
   userId: string;
   answerData: AnswerData;
+}
+
+export interface QuestionAnswerUpdateObject extends Omit<QuestionAnswer, "id"> {
+  id?: string;
 }
 
 export enum AnswerType {

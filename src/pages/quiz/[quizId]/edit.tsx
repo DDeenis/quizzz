@@ -3,7 +3,10 @@ import { useRouter } from "next/router";
 import { api } from "@/utils/api";
 import { QuizForm } from "@/components/QuizForm";
 import { useEffect, useRef } from "react";
-import { QuestionCreateObject, QuestionUpdateObject } from "@/types/question";
+import type {
+  QuestionCreateObject,
+  QuestionUpdateObject,
+} from "@/types/question";
 import { useAdminSession } from "@/hooks/session";
 import Head from "next/head";
 
@@ -12,27 +15,29 @@ export default function EditQuiz() {
   const { quizId } = router.query;
   const { data: quiz, refetch } = api.quizes.getById.useQuery(
     { quizId: (quizId as string | undefined) ?? "" },
-    { enabled: false, cacheTime: 0, staleTime: 0 }
+    { enabled: false, staleTime: 0 }
   );
   useAdminSession();
   const { mutateAsync } = api.quizes.updateQuiz.useMutation();
   const deletedQuestionsRef = useRef<string[]>([]);
 
   useEffect(() => {
-    if (!router.isReady) {
+    if (!router.isReady || !quizId) {
       return;
     }
 
-    refetch();
+    void refetch();
   }, [quizId, router.isReady]);
 
   const onSubmit = (formValues: QuizUpdateObject) => {
-    mutateAsync({
+    void mutateAsync({
       quizId: quizId as string,
       quizUpdateObject: formValues,
       deletedQuestionIds: deletedQuestionsRef.current,
     }).then((createdSuccessfully) => {
-      createdSuccessfully && router.push("/quiz");
+      if (createdSuccessfully) {
+        void router.push("/quiz");
+      }
     });
   };
 

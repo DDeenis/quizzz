@@ -150,7 +150,7 @@ export default function Header() {
                 onClick={handleProfileMenuOpen}
                 color="inherit"
               >
-                <Avatar {...stringAvatar(session.data.user.fullName)} />
+                <Avatar {...stringAvatar(session.data.user.name)} />
               </IconButton>
             ) : (
               <Button

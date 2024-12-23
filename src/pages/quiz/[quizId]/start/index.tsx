@@ -30,17 +30,17 @@ export default function StartQuizPage() {
       return;
     }
 
-    quiz.refetch();
-    canStartQuiz.refetch();
+    void quiz.refetch();
+    void canStartQuiz.refetch();
   }, [quizId, router.isReady]);
 
   const onStartQuiz = () => {
-    if (!canStartQuiz.data?.canStart) return;
+    if (!canStartQuiz.data?.canStart || !quiz.data) return;
 
     createQuizSession
       .mutateAsync({
         quizId: quizId as string,
-        timeInMinutes: quiz.data?.time!,
+        timeInMinutes: quiz.data.time,
       })
       .then((s) => s && router.push(`/quiz/${quiz.data?.id}/start/${s.id}`))
       .catch(console.error);
@@ -94,7 +94,7 @@ export default function StartQuizPage() {
                   onClick={onStartQuiz}
                   disabled={!canStartQuiz.data?.canStart}
                 >
-                  {createQuizSession.isLoading ? "Loading..." : "Start quiz"}
+                  {createQuizSession.isPending ? "Loading..." : "Start quiz"}
                 </Button>
               </>
             }

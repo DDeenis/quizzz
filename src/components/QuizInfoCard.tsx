@@ -1,4 +1,4 @@
-import { Quiz } from "@/types/quiz";
+import { Quiz, type QuizPreview } from "@/types/quiz";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
@@ -8,7 +8,7 @@ import Typography from "@mui/material/Typography";
 
 interface QuizInfoCardProps {
   borderColor?: string;
-  quizInfo: Omit<Quiz, "questions">;
+  quizInfo: QuizPreview;
   contentSection?: React.ReactNode;
   actionsSection?: React.ReactNode;
 }

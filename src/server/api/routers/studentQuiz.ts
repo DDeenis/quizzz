@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { getQuizAttempts, getQuizWithSession } from "@/server/database/quiz";
+import { getQuizAttempts, getQuizWithSession } from "@/server/db/quiz";
 import {
   createQuizSession,
   getQuizSessions,
@@ -8,10 +8,10 @@ import {
   removeQuizSession,
   getQuizSessionsCount,
   markQuizSessionAsExpired,
-} from "@/server/database/quizSession";
+} from "@/server/db/quizSession";
 import { TRPCError } from "@trpc/server";
-import { createQuizResult } from "@/server/database/quizResult";
-import { isQuizSessionExpired, sortQuizSessions } from "@/utils/questions";
+import { createQuizResult } from "@/server/db/quizResult";
+import { isQuizSessionExpired } from "@/utils/questions";
 
 export const studentQuizesRouter = createTRPCRouter({
   createQuizSession: protectedProcedure
@@ -30,8 +30,7 @@ export const studentQuizesRouter = createTRPCRouter({
           });
         }
 
-        const sessionsSorted = sortQuizSessions(quizSessions);
-        const latestSession = sessionsSorted?.[0];
+        const latestSession = quizSessions[0];
 
         if (latestSession && !isQuizSessionExpired(latestSession)) {
           return latestSession;

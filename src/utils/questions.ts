@@ -16,7 +16,7 @@ export const getTotalScore = (
 ) => {
   let totalScore = 0;
 
-  for (let q of questions) {
+  for (const q of questions) {
     totalScore += complexityToScoreMap[q.complexity];
   }
   return totalScore;
@@ -46,12 +46,12 @@ function getISOnow() {
   return Date.parse(str);
 }
 
-export function getISODate(dateISOStr: string) {
-  const str = dateISOStr.substring(0, 19);
+export function getISODate(dateISOStr: Date) {
+  const str = dateISOStr.toISOString();
   return Date.parse(str);
 }
 
-export function getISODistanceToInSeconds(date: string) {
+export function getISODistanceToInSeconds(date: Date) {
   const dateMs = getISODate(date);
   const now = getISOnow();
   return (dateMs - now) / 1000;
@@ -115,16 +115,9 @@ export function shuffleQuestionsForQuiz({
   }));
 }
 
-export const formatDate = (dateStr: string) => {
-  const date = new Date(dateStr);
-
+export const formatDate = (date: Date) => {
   return `${date.toLocaleDateString()} ${date
     .getHours()
     .toString()
     .padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
-};
-
-export const sortQuizSessions = (quizSessions: QuizSession[]) => {
-  const copy = [...quizSessions];
-  return copy.sort((a, b) => getISODate(b.expires) - getISODate(a.expires));
 };
