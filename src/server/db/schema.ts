@@ -8,20 +8,18 @@ import { relations, sql } from "drizzle-orm";
 import {
   index,
   int,
-  primaryKey,
   real,
   sqliteTableCreator,
   text,
   uniqueIndex,
 } from "drizzle-orm/sqlite-core";
-import { type AdapterAccount } from "next-auth/adapters";
 import { sqlNow } from "./utils";
 
 const timestamps = {
   createdAt: int("created_at", { mode: "timestamp" })
     .notNull()
     .default(sqlNow()),
-  updatedAt: int("deleted_at", { mode: "timestamp" })
+  updatedAt: int("updated_at", { mode: "timestamp" })
     .notNull()
     .default(sqlNow())
     .$onUpdate(() => sqlNow()),
@@ -40,21 +38,21 @@ export const users = createTable(
   "user",
   {
     id: text("id", { length: 255 })
-      .notNull()
       .primaryKey()
       .$defaultFn(() => crypto.randomUUID()),
     name: text("full_name", { length: 255 }).notNull(),
     email: text("email", { length: 255 }).notNull(),
-    emailVerified: int("email_verified", {
-      mode: "timestamp",
-    }).default(sql`(unixepoch())`),
+    emailVerified: int("emailVerified", { mode: "boolean" }).notNull(),
+    image: text("image"),
     createdAt: timestamps.createdAt,
+    updatedAt: timestamps.updatedAt,
     deletedAt: timestamps.deletedAt,
-    image: text("image", { length: 255 }),
     isAdmin: int("is_admin", { mode: "boolean" }).notNull().default(false),
   },
   (user) => ({
-    emailIdx: uniqueIndex("user_unique_email_idx").on(user.email),
+    emailIdx: uniqueIndex("user_unique_email_idx").on(
+      sql`lower(${user.email})`
+    ),
   })
 );
 
@@ -65,32 +63,25 @@ export const usersRelations = relations(users, ({ many }) => ({
   results: many(quizResults),
 }));
 
-export const accounts = createTable(
-  "account",
-  {
-    userId: text("user_id", { length: 255 })
-      .notNull()
-      .references(() => users.id),
-    type: text("type", { length: 255 })
-      .$type<AdapterAccount["type"]>()
-      .notNull(),
-    provider: text("provider", { length: 255 }).notNull(),
-    providerAccountId: text("provider_account_id", { length: 255 }).notNull(),
-    refresh_token: text("refresh_token"),
-    access_token: text("access_token"),
-    expires_at: int("expires_at"),
-    token_type: text("token_type", { length: 255 }),
-    scope: text("scope", { length: 255 }),
-    id_token: text("id_token"),
-    session_state: text("session_state", { length: 255 }),
-  },
-  (account) => ({
-    compoundKey: primaryKey({
-      columns: [account.provider, account.providerAccountId],
-    }),
-    userIdIdx: index("account_user_id_idx").on(account.userId),
-  })
-);
+export const accounts = createTable("account", {
+  id: text("id", { length: 255 }).primaryKey(),
+  accountId: text("accountId", { length: 255 }).notNull(),
+  providerId: text("providerId", { length: 255 }).notNull(),
+  userId: text("userId", { length: 255 })
+    .notNull()
+    .references(() => users.id),
+  accessToken: text("accessToken", { length: 255 }),
+  refreshToken: text("refreshToken", { length: 255 }),
+  idToken: text("idToken", { length: 255 }),
+  accessTokenExpiresAt: int("accessTokenExpiresAt", { mode: "timestamp" }),
+  refreshTokenExpiresAt: int("refreshTokenExpiresAt", {
+    mode: "timestamp",
+  }),
+  scope: text("scope", { length: 255 }),
+  password: text("password", { length: 255 }),
+  createdAt: int("createdAt", { mode: "timestamp" }).notNull(),
+  updatedAt: int("updatedAt", { mode: "timestamp" }).notNull(),
+});
 
 export const accountsRelations = relations(accounts, ({ one }) => ({
   user: one(users, { fields: [accounts.userId], references: [users.id] }),
@@ -99,13 +90,19 @@ export const accountsRelations = relations(accounts, ({ one }) => ({
 export const sessions = createTable(
   "session",
   {
-    sessionToken: text("session_token", { length: 255 }).notNull().primaryKey(),
-    userId: text("userId", { length: 255 })
+    id: text("id").primaryKey(),
+    expiresAt: int("expiresAt", { mode: "timestamp" }).notNull(),
+    token: text("token").notNull(),
+    createdAt: int("createdAt", { mode: "timestamp" }).notNull(),
+    updatedAt: int("updatedAt", { mode: "timestamp" }).notNull(),
+    ipAddress: text("ipAddress"),
+    userAgent: text("userAgent"),
+    userId: text("userId")
       .notNull()
       .references(() => users.id),
-    expires: int("expires", { mode: "timestamp" }).notNull(),
   },
   (session) => ({
+    tokenIdx: uniqueIndex("session_unique_token_idx").on(session.token),
     userIdIdx: index("session_userId_idx").on(session.userId),
   })
 );
@@ -114,17 +111,14 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
   user: one(users, { fields: [sessions.userId], references: [users.id] }),
 }));
 
-export const verificationTokens = createTable(
-  "verification_token",
-  {
-    identifier: text("identifier", { length: 255 }).notNull(),
-    token: text("token", { length: 255 }).notNull(),
-    expires: int("expires", { mode: "timestamp" }).notNull(),
-  },
-  (vt) => ({
-    compoundKey: primaryKey({ columns: [vt.identifier, vt.token] }),
-  })
-);
+export const verifications = createTable("verification", {
+  id: text("id", { length: 255 }).primaryKey(),
+  identifier: text("identifier").notNull(),
+  value: text("value").notNull(),
+  expiresAt: int("expiresAt", { mode: "timestamp" }).notNull(),
+  createdAt: int("createdAt", { mode: "timestamp" }),
+  updatedAt: int("updatedAt", { mode: "timestamp" }),
+});
 
 export const quizes = createTable("quizes", {
   id: text("id", { length: 255 })

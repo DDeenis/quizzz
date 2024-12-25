@@ -34,7 +34,7 @@ export const Timer = memo(
         clearInterval(intervalId);
         clearTimeout(timeotId);
       };
-    }, []);
+    }, [timeDefault]);
 
     return (
       <Typography

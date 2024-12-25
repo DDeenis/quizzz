@@ -16,7 +16,10 @@ export const getUserByEmail = async (email: string) => {
 };
 
 export const createUser = async (userCreateObj: UserCreateObject) => {
-  const createdUsers = await db.insert(users).values(userCreateObj).returning();
+  const createdUsers = await db
+    .insert(users)
+    .values({ ...userCreateObj, emailVerified: false })
+    .returning();
   return createdUsers[0];
 };
 
