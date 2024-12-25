@@ -1,30 +1,10 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
-import { createUser, getUserByEmail } from "@/server/db/user";
+import { getUserByEmail } from "@/server/db/user";
 import { TRPCError } from "@trpc/server";
 
 export const authRouter = createTRPCRouter({
-  register: publicProcedure
-    .input(
-      z.object({
-        name: z.string(),
-        email: z.string().email(),
-      })
-    )
-    .mutation(async ({ input }) => {
-      const existingUser = await getUserByEmail(input.email);
-
-      if (existingUser) {
-        throw new TRPCError({
-          code: "CONFLICT",
-          message: `User with email ${input.email} already exist`,
-        });
-      }
-
-      return await createUser(input);
-    }),
-
-  signIn: publicProcedure
+  canSignIn: publicProcedure
     .input(
       z.object({
         email: z.string().email(),

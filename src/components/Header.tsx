@@ -3,22 +3,20 @@ import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
-import MenuIcon from "@mui/icons-material/Menu";
 import MoreIcon from "@mui/icons-material/More";
 import AccountCircle from "@mui/icons-material/AccountCircle";
-import { useSession, signIn, signOut } from "next-auth/react";
 import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
-import { RegisterForm, SignInForm } from "./AuthForms";
+import { SignInForm } from "./AuthForms";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Link from "next/link";
 import Avatar from "@mui/material/Avatar";
 import { stringAvatar } from "@/utils/user";
 import { TabPanel } from "./TabPanel";
+import { signOut, useSession } from "@/server/auth/client";
 
 export default function Header() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -28,7 +26,7 @@ export default function Header() {
   const [currentTab, setCurrentTab] = React.useState(0);
   const session = useSession();
 
-  const isAuthenticated = session.status === "authenticated";
+  const isAuthenticated = session.data && !session.isPending;
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -150,7 +148,7 @@ export default function Header() {
                 onClick={handleProfileMenuOpen}
                 color="inherit"
               >
-                <Avatar {...stringAvatar(session.data.user.name)} />
+                <Avatar {...stringAvatar(session.data!.user.name)} />
               </IconButton>
             ) : (
               <Button
@@ -212,7 +210,7 @@ export default function Header() {
             <SignInForm />
           </TabPanel>
           <TabPanel value={currentTab} index={1}>
-            <RegisterForm />
+            <SignInForm />
           </TabPanel>
         </Box>
       </Modal>

@@ -9,12 +9,11 @@
 
 import { initTRPC, TRPCError } from "@trpc/server";
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
-import { type Session } from "next-auth";
 import superjson from "superjson";
 import { ZodError } from "zod";
 
-import { auth } from "@/server/auth";
 import { db } from "@/server/db";
+import { auth, type Session } from "@/utils/auth";
 
 /**
  * 1. CONTEXT
@@ -52,10 +51,12 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
  * @see https://trpc.io/docs/context
  */
 export const createTRPCContext = async (opts: CreateNextContextOptions) => {
-  const { req, res } = opts;
+  const { req } = opts;
 
-  // Get the session from the server using the getServerSession wrapper function
-  const session = await auth(req, res);
+  const session = await auth.api.getSession({
+    // @ts-expect-error convert next headers to normal Headers object
+    headers: new Headers(req.headers),
+  });
 
   return createInnerTRPCContext({
     session,
@@ -148,7 +149,7 @@ export const publicProcedure = t.procedure.use(timingMiddleware);
 export const protectedProcedure = t.procedure
   .use(timingMiddleware)
   .use(({ ctx, next }) => {
-    if (!ctx.session || !ctx.session.user) {
+    if (!ctx.session?.user) {
       throw new TRPCError({ code: "UNAUTHORIZED" });
     }
     return next({
@@ -160,7 +161,7 @@ export const protectedProcedure = t.procedure
   });
 
 const enforceUserIsAdmin = t.middleware(async ({ ctx, next }) => {
-  if (!ctx.session || !ctx.session.user) {
+  if (!ctx.session?.user) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
 

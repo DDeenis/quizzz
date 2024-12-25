@@ -17,7 +17,8 @@ const config = {
     locales: ["en"],
     defaultLocale: "en",
   },
-  transpilePackages: ["geist", "next-auth"],
+  transpilePackages: ["geist", "better-auth"],
+  serverExternalPackages: ["mjml"],
 };
 
 export default config;

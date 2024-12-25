@@ -1,5 +1,5 @@
 import { useProtectedSession } from "@/hooks/session";
-import type { Quiz, QuizPreview } from "@/types/quiz";
+import type { QuizPreview } from "@/types/quiz";
 import { api } from "@/utils/api";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
