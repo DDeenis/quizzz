@@ -1,4 +1,3 @@
-import { useProtectedSession } from "@/hooks/session";
 import type { QuizPreview } from "@/types/quiz";
 import { api } from "@/utils/api";
 import Box from "@mui/material/Box";
@@ -12,13 +11,20 @@ import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
 import BalanceIcon from "@mui/icons-material/Balance";
 import { useMemo } from "react";
+import type { InferGetServerSidePropsType } from "next";
+import { type User } from "@/types/user";
+import { useServerSerializedValue } from "@/hooks/useServerSerializedValue";
+import { getServerSidePropsProtectedPreset } from "@/server/auth/ssrPresets";
 
-export default function QuizesListPage() {
-  const { data, isLoading, dataUpdatedAt, refetch } =
-    api.quizes.getAll.useQuery();
+export const getServerSideProps = getServerSidePropsProtectedPreset;
+
+export default function QuizesListPage(
+  params: InferGetServerSidePropsType<typeof getServerSideProps>
+) {
+  const user = useServerSerializedValue<User>(params.serializedUser);
+  const { data, isLoading, refetch } = api.quizes.getAll.useQuery();
   const deleteQuiz = api.quizes.deleteQuiz.useMutation();
   const restoreQuiz = api.quizes.restoreQuiz.useMutation();
-  const { data: session } = useProtectedSession();
 
   const quizes = useMemo(() => {
     const existing = data?.filter((t) => !t.deletedAt);
@@ -27,7 +33,7 @@ export default function QuizesListPage() {
       existing,
       deleted,
     };
-  }, [dataUpdatedAt]);
+  }, [data]);
 
   const createOnDelete = (quizId: string) => () => {
     void deleteQuiz
@@ -49,7 +55,7 @@ export default function QuizesListPage() {
         <Typography variant="body2">Loading...</Typography>
       ) : (
         <>
-          {session?.user.isAdmin && (
+          {user.isAdmin && (
             <Link href={`quiz/create`}>
               <Button variant="contained" sx={{ mb: 3 }}>
                 Create new quiz
@@ -64,7 +70,7 @@ export default function QuizesListPage() {
             {quizes.existing?.map((quiz) => (
               <QuizCard
                 quiz={quiz}
-                isAdmin={session?.user.isAdmin}
+                isAdmin={user.isAdmin}
                 onDelete={createOnDelete(quiz.id)}
                 key={quiz.id}
               />
@@ -79,7 +85,7 @@ export default function QuizesListPage() {
                 {quizes.deleted?.map((quiz) => (
                   <QuizCard
                     quiz={quiz}
-                    isAdmin={session?.user.isAdmin}
+                    isAdmin={user.isAdmin}
                     onDelete={createOnDelete(quiz.id)}
                     onRestore={createOnRestore(quiz.id)}
                     key={quiz.id}

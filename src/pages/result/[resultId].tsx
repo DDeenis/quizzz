@@ -1,5 +1,5 @@
 import { QuizInfoCard } from "@/components/QuizInfoCard";
-import { useProtectedSession } from "@/hooks/session";
+import { getServerSidePropsProtectedPreset } from "@/server/auth/ssrPresets";
 import { type Question, QuestionType } from "@/types/question";
 import { AnswerType } from "@/types/questionAnswer";
 import type { QuestionAnswer } from "@/types/questionAnswer";
@@ -15,6 +15,8 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 
+export const getServerSideProps = getServerSidePropsProtectedPreset;
+
 export default function QuizPage() {
   const router = useRouter();
   const { resultId } = router.query;
@@ -24,7 +26,6 @@ export default function QuizPage() {
     },
     { enabled: false, staleTime: Infinity, retry: false }
   );
-  useProtectedSession();
 
   const isQuizPassed = (data?.score ?? 0) >= (data?.quiz.minimumScore ?? 0);
   const passedColor = isQuizPassed ? "green" : "red";

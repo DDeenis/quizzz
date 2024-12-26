@@ -1,5 +1,5 @@
 import { QuizInfoCard } from "@/components/QuizInfoCard";
-import { useProtectedSession } from "@/hooks/session";
+import { getServerSidePropsProtectedPreset } from "@/server/auth/ssrPresets";
 import { api } from "@/utils/api";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -9,10 +9,11 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 
+export const getServerSideProps = getServerSidePropsProtectedPreset;
+
 export default function StartQuizPage() {
   const router = useRouter();
   const { quizId } = router.query;
-  const { data } = useProtectedSession();
   const quiz = api.quizes.getPreviewById.useQuery(
     { quizId: (quizId as string | undefined) ?? "" },
     { enabled: false }

@@ -1,8 +1,10 @@
 import { Timer } from "@/components/Timer";
-import { useProtectedSession } from "@/hooks/session";
+import { useServerSerializedValue } from "@/hooks/useServerSerializedValue";
+import { getServerSidePropsProtectedPreset } from "@/server/auth/ssrPresets";
 import { type QuestionClient, QuestionType } from "@/types/question";
 import { type QuestionAnswerCreateObject } from "@/types/questionAnswer";
 import { type QuizResultCreateObject } from "@/types/quizResult";
+import type { User } from "@/types/user";
 import { api } from "@/utils/api";
 import {
   getISODistanceToInSeconds,
@@ -17,15 +19,20 @@ import Checkbox from "@mui/material/Checkbox";
 import Chip from "@mui/material/Chip";
 import Radio from "@mui/material/Radio";
 import Typography from "@mui/material/Typography";
+import type { InferGetServerSidePropsType } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useMemo } from "react";
 import { useEffect, useState } from "react";
 import { type Control, Controller, useForm } from "react-hook-form";
 
-export default function QuizPage() {
+export const getServerSideProps = getServerSidePropsProtectedPreset;
+
+export default function QuizPage(
+  params: InferGetServerSidePropsType<typeof getServerSideProps>
+) {
   const router = useRouter();
-  const { data: session } = useProtectedSession();
+  const user = useServerSerializedValue<User>(params.serializedUser);
   const { quizId, quizSessionId } = router.query;
   const { data, refetch, isSuccess, isLoading } =
     api.studentQuizes.getQuizWithSession.useQuery(
@@ -76,7 +83,7 @@ export default function QuizPage() {
   const toQuestion = (index: number) => setCurrentQuestionIndex(index);
 
   const onSubmit = form.handleSubmit((formValues) => {
-    const userId = session?.user.id;
+    const userId = user.id;
     if (!userId || !quiz?.questions) return;
 
     const answers: QuestionAnswerCreateObject[] = [];
@@ -86,7 +93,7 @@ export default function QuizPage() {
       if (!answerData || !questionId) return;
 
       answers.push({
-        userId: session.user.id,
+        userId: user.id,
         questionId,
         answerData,
       });
@@ -95,7 +102,7 @@ export default function QuizPage() {
     const quizResult: QuizResultCreateObject = {
       quizId: quizId as string,
       quizSessionId: quizSessionId as string,
-      userId: session.user.id,
+      userId: user.id,
       answers,
     };
     submitQuiz

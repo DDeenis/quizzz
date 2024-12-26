@@ -1,10 +1,13 @@
 export interface User {
   id: string;
   email: string;
+  emailVerified: boolean;
   name: string;
   createdAt: Date;
-  deletedAt: Date | null;
+  updatedAt: Date;
+  image: string | null;
   isAdmin: boolean;
+  deletedAt: Date | null;
 }
 
 export interface UserCreateObject {

@@ -1,4 +1,3 @@
-import { useProtectedSession } from "@/hooks/session";
 import { api } from "@/utils/api";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
@@ -12,18 +11,30 @@ import type { QuizResultWithQuizPreview } from "@/types/quizResult";
 import Modal from "@mui/material/Modal";
 import TextField from "@mui/material/TextField";
 import { useForm } from "react-hook-form";
-import type { UserCreateObject } from "@/types/user";
+import type { User, UserCreateObject } from "@/types/user";
 import FormHelperText from "@mui/material/FormHelperText";
 import Head from "next/head";
 import { formatDate } from "@/utils/questions";
 import type { QuizSessionWithQuiz } from "@/types/quizSession";
+import { useServerSerializedValue } from "@/hooks/useServerSerializedValue";
+import type { InferGetServerSidePropsType } from "next";
+import { getServerSidePropsProtectedPreset } from "@/server/auth/ssrPresets";
 
-export default function ProfilePage() {
+export const getServerSideProps = getServerSidePropsProtectedPreset;
+
+export default function ProfilePage(
+  params: InferGetServerSidePropsType<typeof getServerSideProps>
+) {
+  const userFromServer = useServerSerializedValue<User>(params.serializedUser);
   const router = useRouter();
   const { userId } = router.query;
   const user = api.users.getById.useQuery(
     { userId: userId as string },
-    { enabled: false, staleTime: Infinity }
+    {
+      initialData: userFromServer,
+      enabled: false,
+      staleTime: Infinity,
+    }
   );
   const quizResults = api.quizResults.getAllByUser.useQuery(
     { userId: userId as string },
@@ -32,10 +43,9 @@ export default function ProfilePage() {
   const quizSessions = api.quizResults.getActiveQuizSessions.useQuery();
   const updateUserData = api.users.update.useMutation();
   const [modalOpen, setModalOpen] = useState(false);
-  const session = useProtectedSession();
 
-  const isPresonalProfile = session.data?.user.id === userId;
-  const canViewDetailed = isPresonalProfile || session.data?.user.isAdmin;
+  const isPresonalProfile = user.data.id === userId;
+  const canViewDetailed = isPresonalProfile || user.data.isAdmin;
 
   const openModal = () => setModalOpen(true);
   const closeModal = () => setModalOpen(false);

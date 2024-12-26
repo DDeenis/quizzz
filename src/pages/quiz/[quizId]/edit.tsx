@@ -7,8 +7,10 @@ import type {
   QuestionCreateObject,
   QuestionUpdateObject,
 } from "@/types/question";
-import { useAdminSession } from "@/hooks/session";
 import Head from "next/head";
+import { getServerSidePropsAdminPreset } from "@/server/auth/ssrPresets";
+
+export const getServerSideProps = getServerSidePropsAdminPreset;
 
 export default function EditQuiz() {
   const router = useRouter();
@@ -17,7 +19,6 @@ export default function EditQuiz() {
     { quizId: (quizId as string | undefined) ?? "" },
     { enabled: false, staleTime: 0 }
   );
-  useAdminSession();
   const { mutateAsync } = api.quizes.updateQuiz.useMutation();
   const deletedQuestionsRef = useRef<string[]>([]);
 

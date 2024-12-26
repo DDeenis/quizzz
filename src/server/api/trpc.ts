@@ -54,8 +54,7 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
   const { req } = opts;
 
   const session = await auth.api.getSession({
-    // @ts-expect-error convert next headers to normal Headers object
-    headers: new Headers(req.headers),
+    headers: new Headers(req.headers as Record<string, string>),
   });
 
   return createInnerTRPCContext({
