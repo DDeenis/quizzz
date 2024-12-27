@@ -12,9 +12,9 @@ import Link from "next/link";
 import Button from "@mui/material/Button";
 import { formatDate } from "@/utils/questions";
 import React from "react";
-import { api } from "@/utils/api";
 import type { QuizResultAdminData } from "@/types/quizResult";
 import { findLastIndex } from "@/utils/general";
+import { api } from "@/utils/trpc/client";
 
 export const AdminQuizTab = () => {
   const [selectedQuizId, setSelectedQuizId] = React.useState<string>("");

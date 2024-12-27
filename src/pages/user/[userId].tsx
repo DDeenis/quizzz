@@ -1,4 +1,4 @@
-import { api } from "@/utils/api";
+import { api } from "@/utils/trpc/client";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";

@@ -1,6 +1,6 @@
 import type { QuizUpdateObject } from "@/types/quiz";
 import { useRouter } from "next/router";
-import { api } from "@/utils/api";
+import { api } from "@/utils/trpc/client";
 import { QuizForm } from "@/components/QuizForm";
 import { useEffect, useRef } from "react";
 import type {

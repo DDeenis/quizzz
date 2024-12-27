@@ -1,6 +1,6 @@
 import { QuizInfoCard } from "@/components/QuizInfoCard";
 import { getServerSidePropsProtectedPreset } from "@/server/auth/ssrPresets";
-import { api } from "@/utils/api";
+import { api } from "@/utils/trpc/client";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";

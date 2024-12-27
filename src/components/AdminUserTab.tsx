@@ -7,7 +7,7 @@ import Button from "@mui/material/Button";
 import DeleteIcon from "@mui/icons-material/Delete";
 import RestoreIcon from "@mui/icons-material/Restore";
 import React from "react";
-import { api } from "@/utils/api";
+import { api } from "@/utils/trpc/client";
 import { type User } from "@/types/user";
 
 export const AdminUsersTab = () => {

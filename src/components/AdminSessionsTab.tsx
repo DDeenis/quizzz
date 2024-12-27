@@ -11,10 +11,10 @@ import Divider from "@mui/material/Divider";
 import Button from "@mui/material/Button";
 import { formatDate, isQuizSessionExpired } from "@/utils/questions";
 import React from "react";
-import { api } from "@/utils/api";
 import type { QuizSessionFull } from "@/types/quizSession";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { findLastIndex } from "@/utils/general";
+import { api } from "@/utils/trpc/client";
 
 export const AdminSessionsTab = () => {
   const [selectedQuizId, setSelectedQuizId] = React.useState<string>("");

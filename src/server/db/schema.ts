@@ -49,11 +49,7 @@ export const users = createTable(
     deletedAt: timestamps.deletedAt,
     isAdmin: int("is_admin", { mode: "boolean" }).notNull().default(false),
   },
-  (user) => ({
-    emailIdx: uniqueIndex("user_unique_email_idx").on(
-      sql`lower(${user.email})`
-    ),
-  })
+  (user) => [uniqueIndex("user_unique_email_idx").on(sql`lower(${user.email})`)]
 );
 
 export const usersRelations = relations(users, ({ many }) => ({
@@ -101,10 +97,10 @@ export const sessions = createTable(
       .notNull()
       .references(() => users.id),
   },
-  (session) => ({
-    tokenIdx: uniqueIndex("session_unique_token_idx").on(session.token),
-    userIdIdx: index("session_userId_idx").on(session.userId),
-  })
+  (session) => [
+    uniqueIndex("session_unique_token_idx").on(session.token),
+    index("session_userId_idx").on(session.userId),
+  ]
 );
 
 export const sessionsRelations = relations(sessions, ({ one }) => ({

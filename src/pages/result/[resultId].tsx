@@ -3,7 +3,7 @@ import { getServerSidePropsProtectedPreset } from "@/server/auth/ssrPresets";
 import { type Question, QuestionType } from "@/types/question";
 import { AnswerType } from "@/types/questionAnswer";
 import type { QuestionAnswer } from "@/types/questionAnswer";
-import { api } from "@/utils/api";
+import { api } from "@/utils/trpc/client";
 import { formatDate } from "@/utils/questions";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";

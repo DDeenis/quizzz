@@ -17,6 +17,7 @@ import Avatar from "@mui/material/Avatar";
 import { stringAvatar } from "@/utils/user";
 import { TabPanel } from "./TabPanel";
 import { signOut, useSession } from "@/server/auth/client";
+import { useRouter } from "next/router";
 
 export default function Header() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -25,6 +26,7 @@ export default function Header() {
   const [open, setOpen] = React.useState(false);
   const [currentTab, setCurrentTab] = React.useState(0);
   const session = useSession();
+  const { push: redirect } = useRouter();
 
   const isAuthenticated = session.data && !session.isPending;
 
@@ -81,7 +83,9 @@ export default function Header() {
         </Link>
       )}
       <MenuItem onClick={handleMenuClose}>
-        <Button onClick={() => void signOut()}>Sign Out</Button>
+        <Button onClick={() => void signOut().then(() => redirect("/"))}>
+          Sign Out
+        </Button>
       </MenuItem>
     </Menu>
   );
@@ -123,7 +127,9 @@ export default function Header() {
         </Link>
       )}
       <MenuItem onClick={handleMenuClose}>
-        <Button onClick={() => void signOut()}>Sign Out</Button>
+        <Button onClick={() => void signOut().then(() => redirect("/"))}>
+          Sign Out
+        </Button>
       </MenuItem>
     </Menu>
   );

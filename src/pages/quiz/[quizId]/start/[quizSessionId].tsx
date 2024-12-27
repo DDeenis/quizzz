@@ -5,7 +5,7 @@ import { type QuestionClient, QuestionType } from "@/types/question";
 import { type QuestionAnswerCreateObject } from "@/types/questionAnswer";
 import { type QuizResultCreateObject } from "@/types/quizResult";
 import type { User } from "@/types/user";
-import { api } from "@/utils/api";
+import { api } from "@/utils/trpc/client";
 import {
   getISODistanceToInSeconds,
   isQuizSessionExpired,

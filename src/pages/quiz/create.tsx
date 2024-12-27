@@ -1,6 +1,6 @@
 import type { QuizCreateObject } from "@/types/quiz";
 import { useRouter } from "next/router";
-import { api } from "@/utils/api";
+import { api } from "@/utils/trpc/client";
 import { QuizForm } from "@/components/QuizForm";
 import Head from "next/head";
 import { getServerSidePropsAdminPreset } from "@/server/auth/ssrPresets";
