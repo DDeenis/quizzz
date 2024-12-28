@@ -14,7 +14,11 @@ export default function SignInPage() {
   function sendEmail() {
     void signIn
       .magicLink({ email, callbackURL: "/quiz" })
-      .then(() => setEmailSent(true));
+      .then(() => setEmailSent(true))
+      .catch((err) => {
+        console.log(err);
+        setError("Something went wrong. Please, try again later.");
+      });
   }
 
   function handleEmailChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -40,9 +44,9 @@ export default function SignInPage() {
         <div className="w-full max-w-[512px] flex flex-col gap-4 p-4 xl:p-0">
           {!emailSent ? (
             <>
-              <h1 className="font-fancy text-3xl leading-[3rem] text-sky-950 text-center xl:text-5xl xl:leading-[4.625rem] xl:text-left">
+              <h1 className="font-fancy text-3xl text-sky-950 text-center xl:text-5xl xl:leading-tight xl:text-left">
                 Welcome, <br />
-                knowledge seeker
+                quizzing champion
               </h1>
               <form
                 className="px-6 py-5 xl:px-8 xl:py-7 flex flex-col justify-center gap-4 bg-sky-200 rounded-lg"
@@ -140,14 +144,14 @@ export default function SignInPage() {
 
 function SocialSignIn() {
   return (
-    <div className="bg-sky-100/0 rounded-lg p-4 flex flex-col gap-4">
+    <div className="bg-transparent rounded-lg p-4 flex flex-col gap-4">
       <h2 className="text-sm text-center text-sky-700">
         Alternatively, you can sign in through
       </h2>
       <div className="flex justify-center items-center gap-4">
         <button
           aria-label="Sign In with Google"
-          className="p-1 rounded-full bg-sky-50"
+          className="p-1 rounded-full bg-sky-100"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -163,7 +167,7 @@ function SocialSignIn() {
         </button>
         <button
           aria-label="Sign In with Facebook"
-          className="p-1 rounded-full bg-sky-50"
+          className="p-1 rounded-full bg-sky-100"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -179,7 +183,7 @@ function SocialSignIn() {
         </button>
         <button
           aria-label="Sign In with Discord"
-          className="p-1 rounded-full bg-sky-50"
+          className="p-1 rounded-full bg-sky-100"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
