@@ -6,10 +6,21 @@ import clsx from "clsx";
 
 const emailSchema = z.string().email();
 
+function* retryTimeGenerator() {
+  yield 30;
+  yield 60;
+  yield 60;
+  while (true) {
+    yield 90;
+  }
+}
+const getRetryTimeInSeconds = retryTimeGenerator();
+
 export default function SignInPage() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string>();
   const [emailSent, setEmailSent] = useState(false);
+  const [currentRetryTime, setCurrentRetryTime] = useState(0);
 
   function sendEmail() {
     void signIn
@@ -38,11 +49,33 @@ export default function SignInPage() {
     sendEmail();
   }
 
+  function handleRetry() {
+    if (currentRetryTime !== 0) return;
+
+    sendEmail();
+
+    const next = getRetryTimeInSeconds.next();
+
+    if (!next.done) {
+      setCurrentRetryTime(next.value);
+      let retryTimeValue = next.value;
+
+      const intervalId = setInterval(() => {
+        if (retryTimeValue <= 0) {
+          return clearInterval(intervalId);
+        }
+
+        retryTimeValue -= 1;
+        setCurrentRetryTime(retryTimeValue);
+      }, 1000);
+    }
+  }
+
   return (
     <div className="w-full h-screen flex">
       <div className="basis-full xl:basis-8/12 bg-sky-50 flex justify-center items-center">
         <div className="w-full max-w-[512px] flex flex-col gap-4 p-4 xl:p-0">
-          {!emailSent ? (
+          {emailSent ? (
             <>
               <h1 className="font-fancy text-3xl text-sky-950 text-center xl:text-5xl xl:leading-tight xl:text-left">
                 Welcome, <br />
@@ -110,19 +143,26 @@ export default function SignInPage() {
                   We sent you an email with a sign-in link.
                 </p>
                 <hr className="border-sky-600 border-dashed" />
-                <p className="text-sky-700">
-                  Didn’t receive it?{" "}
-                  <a
-                    href="#"
-                    role="button"
-                    aria-label="resend email"
-                    onClick={sendEmail}
-                    className="font-bold text-sky-800"
-                  >
-                    Click here
-                  </a>{" "}
-                  to resend.
-                </p>
+                <div>
+                  <p className="text-sky-700">
+                    Didn’t receive it?{" "}
+                    <button
+                      role="button"
+                      aria-label="resend email"
+                      onClick={handleRetry}
+                      className="inline font-bold text-sky-800"
+                    >
+                      Click here
+                    </button>{" "}
+                    to resend.
+                  </p>
+                  {currentRetryTime > 0 && (
+                    <p className="text-sky-600 mt-2">
+                      Email sent! You can retry after {currentRetryTime}{" "}
+                      seconds.
+                    </p>
+                  )}
+                </div>
               </div>
             </>
           )}
@@ -131,10 +171,10 @@ export default function SignInPage() {
       <div
         role="presentation"
         aria-label="topography pattern"
-        className={`hidden xl:block basis-4/12 bg-indigo-50`}
+        className={`hidden xl:block basis-4/12 bg-teal-50`}
       >
         <div
-          className="w-full h-full bg-indigo-200"
+          className="w-full h-full bg-sky-200"
           style={{ maskImage: "url('/topography.svg')" }}
         />
       </div>
