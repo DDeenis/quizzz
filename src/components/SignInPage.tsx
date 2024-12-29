@@ -75,7 +75,7 @@ export default function SignInPage() {
     <div className="w-full h-screen flex">
       <div className="basis-full xl:basis-8/12 bg-sky-50 flex justify-center items-center">
         <div className="w-full max-w-[512px] flex flex-col gap-4 p-4 xl:p-0">
-          {emailSent ? (
+          {!emailSent ? (
             <>
               <h1 className="font-fancy text-3xl text-sky-950 text-center xl:text-5xl xl:leading-tight xl:text-left">
                 Welcome, <br />
