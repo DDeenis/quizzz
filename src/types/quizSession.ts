@@ -5,7 +5,7 @@ export interface QuizSession {
   quizId: string;
   userId: string;
   createdAt: Date;
-  expires: Date;
+  expires: Date | null;
 }
 
 export interface QuizSessionWithQuiz extends QuizSession {

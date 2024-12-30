@@ -35,6 +35,7 @@ export const shuffleArray = <T>(array: T[], seed?: number) => {
 };
 
 export const isQuizSessionExpired = (quizSession: QuizSession) => {
+  if (!quizSession.expires) return false;
   const nowISO = getISOnow();
   const expires = getISODate(quizSession.expires);
   return nowISO >= expires;

@@ -33,7 +33,7 @@ const questionsScheme = z.array(
 
 const quizCreateScheme = z.object({
   name: z.string().trim().nonempty(),
-  time: z.number().min(1),
+  time: z.number().min(5).nullable(),
   questionsCount: z.number().min(1),
   minimumScore: z.number().min(1),
   description: z.string().nullable(),
@@ -43,7 +43,7 @@ const quizCreateScheme = z.object({
 
 const quizUpdateScheme = z.object({
   name: z.string().trim().nonempty(),
-  time: z.number().min(1),
+  time: z.number().min(5).nullable(),
   questionsCount: z.number().min(1),
   minimumScore: z.number().min(1),
   description: z.string().nullable(),

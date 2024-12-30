@@ -23,7 +23,7 @@ export default function SignInPage() {
   const [currentRetryTime, setCurrentRetryTime] = useState(0);
 
   function sendEmail() {
-    void signIn
+    return signIn
       .magicLink({ email, callbackURL: "/quiz" })
       .then(() => setEmailSent(true))
       .catch((err) => {
@@ -46,29 +46,29 @@ export default function SignInPage() {
       return setError("Email is invalid, please try again");
     }
 
-    sendEmail();
+    void sendEmail();
   }
 
   function handleRetry() {
     if (currentRetryTime !== 0) return;
 
-    sendEmail();
+    void sendEmail().then(() => {
+      const next = getRetryTimeInSeconds.next();
 
-    const next = getRetryTimeInSeconds.next();
+      if (!next.done) {
+        setCurrentRetryTime(next.value);
+        let retryTimeValue = next.value;
 
-    if (!next.done) {
-      setCurrentRetryTime(next.value);
-      let retryTimeValue = next.value;
+        const intervalId = setInterval(() => {
+          if (retryTimeValue <= 0) {
+            return clearInterval(intervalId);
+          }
 
-      const intervalId = setInterval(() => {
-        if (retryTimeValue <= 0) {
-          return clearInterval(intervalId);
-        }
-
-        retryTimeValue -= 1;
-        setCurrentRetryTime(retryTimeValue);
-      }, 1000);
-    }
+          retryTimeValue -= 1;
+          setCurrentRetryTime(retryTimeValue);
+        }, 1000);
+      }
+    });
   }
 
   return (
@@ -148,9 +148,14 @@ export default function SignInPage() {
                     Didn’t receive it?{" "}
                     <button
                       role="button"
-                      aria-label="resend email"
+                      aria-label={
+                        currentRetryTime > 0
+                          ? `resend email - available in ${currentRetryTime} seconds`
+                          : "resend email"
+                      }
                       onClick={handleRetry}
                       className="inline font-bold text-sky-800"
+                      disabled={currentRetryTime > 0}
                     >
                       Click here
                     </button>{" "}

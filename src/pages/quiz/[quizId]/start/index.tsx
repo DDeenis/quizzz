@@ -41,7 +41,6 @@ export default function StartQuizPage() {
     createQuizSession
       .mutateAsync({
         quizId: quizId as string,
-        timeInMinutes: quiz.data.time,
       })
       .then((s) => s && router.push(`/quiz/${quiz.data?.id}/start/${s.id}`))
       .catch(console.error);

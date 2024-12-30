@@ -126,7 +126,7 @@ export const quizes = createTable("quizes", {
   authorId: text("author_id", { length: 255 })
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  time: int("time").notNull(),
+  time: int("time"),
   questionsCount: int("questions_count").notNull(),
   minimumScore: int("minimun_score").notNull(),
   maximumScore: int("maximum_score").notNull(),
@@ -156,7 +156,7 @@ export const quizSessions = createTable("quiz_sessions", {
   userId: text("user_id", { length: 255 })
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  expires: int("expires_at", { mode: "timestamp" }).notNull(),
+  expires: int("expires_at", { mode: "timestamp" }),
   createdAt: timestamps.createdAt,
 });
 

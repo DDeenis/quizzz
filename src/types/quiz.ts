@@ -10,7 +10,7 @@ export interface Quiz {
   name: string;
   description: string | null;
   authorId: string;
-  time: number;
+  time: number | null;
   questionsCount: number;
   minimumScore: number;
   maximumScore: number;
@@ -23,7 +23,7 @@ export interface Quiz {
 export interface QuizPreview {
   id: string;
   name: string;
-  time: number;
+  time: number | null;
   description: string | null;
   questionsCount: number;
   minimumScore: number;
@@ -38,7 +38,7 @@ export type QuizClient = Omit<Quiz, "questions"> & {
 export interface QuizCreateObject {
   name: string;
   authorId: string;
-  time: number;
+  time: number | null;
   questionsCount: number;
   minimumScore: number;
   attempts: number | null;
@@ -49,7 +49,7 @@ export interface QuizCreateObject {
 export interface QuizUpdateObject {
   name: string;
   authorId: string;
-  time: number;
+  time: number | null;
   questionsCount: number;
   minimumScore: number;
   attempts: number | null;

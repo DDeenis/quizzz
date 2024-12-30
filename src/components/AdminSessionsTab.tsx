@@ -180,12 +180,14 @@ const SessionCard = ({
           Started at {formatDate(quizSession.createdAt)}
         </Typography>
         <Typography variant="body2">
-          Expires at {formatDate(quizSession.expires)}
+          Expires at{" "}
+          {quizSession.expires ? formatDate(quizSession.expires) : "never"}
         </Typography>
       </Box>
       {isExpired && (
         <Typography variant="body2" ml={{ lg: "auto" }}>
-          Expired at {formatDate(quizSession.expires)}
+          Expired at{" "}
+          {quizSession.expires ? formatDate(quizSession.expires) : "never"}
         </Typography>
       )}
       <Divider

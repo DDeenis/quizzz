@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { getQuizAttempts, getQuizWithSession } from "@/server/db/quiz";
+import {
+  getQuizAttempts,
+  getQuizTime,
+  getQuizWithSession,
+} from "@/server/db/quiz";
 import {
   createQuizSession,
   getQuizSessions,
@@ -15,15 +19,16 @@ import { isQuizSessionExpired } from "@/utils/questions";
 
 export const studentQuizesRouter = createTRPCRouter({
   createQuizSession: protectedProcedure
-    .input(z.object({ quizId: z.string(), timeInMinutes: z.number() }))
+    .input(z.object({ quizId: z.string() }))
     .mutation(async ({ input, ctx }) => {
+      const quizTime = await getQuizTime(input.quizId);
       const quizAttempts = await getQuizAttempts(input.quizId);
       const quizSessions = await getQuizSessions(
         input.quizId,
         ctx.session.user.id
       );
 
-      if (quizSessions) {
+      if (quizSessions.length) {
         if (quizAttempts && quizSessions.length >= quizAttempts) {
           throw new TRPCError({
             code: "FORBIDDEN",
@@ -40,7 +45,7 @@ export const studentQuizesRouter = createTRPCRouter({
       return await createQuizSession(
         input.quizId,
         ctx.session.user.id,
-        input.timeInMinutes
+        quizTime
       );
     }),
 

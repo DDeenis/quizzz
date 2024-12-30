@@ -145,6 +145,19 @@ export const getQuizAttempts = async (
   return result?.attempts;
 };
 
+export const getQuizTime = async (quizId: string): Promise<number | null> => {
+  const result = await db.query.quizes.findFirst({
+    columns: {
+      time: true,
+    },
+    where: eq(quizes.id, quizId),
+  });
+
+  if (!result) return null;
+
+  return result?.time;
+};
+
 export const createQuiz = async (
   quizCreateObj: QuizCreateObject
 ): Promise<boolean> => {

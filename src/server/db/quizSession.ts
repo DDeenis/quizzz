@@ -94,13 +94,17 @@ export const getQuizSessionById = async (
 export const createQuizSession = async (
   quizId: string,
   userId: string,
-  timeInMinutes: number
+  timeInMinutes: number | null
 ): Promise<QuizSession | undefined> => {
   const utcString = new Date().toUTCString();
 
   const createdAt = new Date(utcString);
-  const expires = new Date(utcString);
-  expires.setMinutes(expires.getMinutes() + timeInMinutes);
+  let expires: Date | null = null;
+
+  if (timeInMinutes) {
+    expires = new Date(utcString);
+    expires.setMinutes(expires.getMinutes() + timeInMinutes);
+  }
 
   const result = await db
     .insert(quizSessions)
