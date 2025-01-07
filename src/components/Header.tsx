@@ -9,7 +9,6 @@ import MoreIcon from "@mui/icons-material/More";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
-import { SignInForm } from "./AuthForms";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Link from "next/link";
@@ -140,7 +139,7 @@ export default function Header() {
         <Toolbar>
           <Box sx={{ flexGrow: 1 }}>
             <Link href={"/quiz"}>
-              <Button sx={{ color: "white" }}>Quizes</Button>
+              <Button sx={{ color: "white" }}>Quizzes</Button>
             </Link>
           </Box>
           <Box sx={{ display: { xs: "none", md: "flex" } }}>
@@ -212,12 +211,6 @@ export default function Header() {
               <Tab label="Register" />
             </Tabs>
           </Box>
-          <TabPanel value={currentTab} index={0}>
-            <SignInForm />
-          </TabPanel>
-          <TabPanel value={currentTab} index={1}>
-            <SignInForm />
-          </TabPanel>
         </Box>
       </Modal>
     </Box>

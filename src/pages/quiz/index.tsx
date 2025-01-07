@@ -18,15 +18,15 @@ import { getServerSidePropsProtectedPreset } from "@/server/auth/ssrPresets";
 
 export const getServerSideProps = getServerSidePropsProtectedPreset;
 
-export default function QuizesListPage(
+export default function QuizzesListPage(
   params: InferGetServerSidePropsType<typeof getServerSideProps>
 ) {
   const user = useServerSerializedValue<User>(params.serializedUser);
-  const { data, isLoading, refetch } = api.quizes.getAll.useQuery();
-  const deleteQuiz = api.quizes.deleteQuiz.useMutation();
-  const restoreQuiz = api.quizes.restoreQuiz.useMutation();
+  const { data, isLoading, refetch } = api.quizzes.getAll.useQuery();
+  const deleteQuiz = api.quizzes.deleteQuiz.useMutation();
+  const restoreQuiz = api.quizzes.restoreQuiz.useMutation();
 
-  const quizes = useMemo(() => {
+  const quizzes = useMemo(() => {
     const existing = data?.filter((t) => !t.deletedAt);
     const deleted = data?.filter((t) => t.deletedAt);
     return {
@@ -49,7 +49,7 @@ export default function QuizesListPage(
   return (
     <>
       <Head>
-        <title>Quizes</title>
+        <title>Quizzes</title>
       </Head>
       {isLoading ? (
         <Typography variant="body2">Loading...</Typography>
@@ -64,10 +64,10 @@ export default function QuizesListPage(
           )}
 
           <Typography variant="h4" my={2}>
-            Available quizes
+            Available quizzes
           </Typography>
           <Box display={"flex"} flexWrap={"wrap"} gap={4}>
-            {quizes.existing?.map((quiz) => (
+            {quizzes.existing?.map((quiz) => (
               <QuizCard
                 quiz={quiz}
                 isAdmin={user.isAdmin}
@@ -76,13 +76,13 @@ export default function QuizesListPage(
               />
             ))}
           </Box>
-          {!!quizes.deleted?.length && (
+          {!!quizzes.deleted?.length && (
             <>
               <Typography variant="h4" my={2}>
-                Deleted quizes
+                Deleted quizzes
               </Typography>
               <Box display={"flex"} flexWrap={"wrap"} gap={4}>
-                {quizes.deleted?.map((quiz) => (
+                {quizzes.deleted?.map((quiz) => (
                   <QuizCard
                     quiz={quiz}
                     isAdmin={user.isAdmin}

@@ -17,7 +17,7 @@ import { TRPCError } from "@trpc/server";
 import { createQuizResult } from "@/server/db/quizResult";
 import { isQuizSessionExpired } from "@/utils/questions";
 
-export const studentQuizesRouter = createTRPCRouter({
+export const studentQuizzesRouter = createTRPCRouter({
   createQuizSession: protectedProcedure
     .input(z.object({ quizId: z.string() }))
     .mutation(async ({ input, ctx }) => {

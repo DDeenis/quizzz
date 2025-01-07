@@ -15,11 +15,11 @@ export const getServerSideProps = getServerSidePropsAdminPreset;
 export default function EditQuiz() {
   const router = useRouter();
   const { quizId } = router.query;
-  const { data: quiz, refetch } = api.quizes.getById.useQuery(
+  const { data: quiz, refetch } = api.quizzes.getById.useQuery(
     { quizId: (quizId as string | undefined) ?? "" },
     { enabled: false, staleTime: 0 }
   );
-  const { mutateAsync } = api.quizes.updateQuiz.useMutation();
+  const { mutateAsync } = api.quizzes.updateQuiz.useMutation();
   const deletedQuestionsRef = useRef<string[]>([]);
 
   useEffect(() => {

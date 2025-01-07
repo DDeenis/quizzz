@@ -27,7 +27,7 @@ export const AdminSessionsTab = () => {
     },
     { enabled: false }
   );
-  const deleteSession = api.studentQuizes.removeQuizSession.useMutation();
+  const deleteSession = api.studentQuizzes.removeQuizSession.useMutation();
 
   const filteredData = React.useMemo(() => {
     return selectedUserId

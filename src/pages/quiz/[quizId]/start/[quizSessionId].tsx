@@ -35,7 +35,7 @@ export default function QuizPage(
   const user = useServerSerializedValue<User>(params.serializedUser);
   const { quizId, quizSessionId } = router.query;
   const { data, refetch, isSuccess, isLoading } =
-    api.studentQuizes.getQuizWithSession.useQuery(
+    api.studentQuizzes.getQuizWithSession.useQuery(
       {
         quizId: quizId as string,
         quizSessionId: quizSessionId as string,
@@ -43,7 +43,7 @@ export default function QuizPage(
       { enabled: false, staleTime: Infinity }
     );
 
-  const submitQuiz = api.studentQuizes.submitQuiz.useMutation();
+  const submitQuiz = api.studentQuizzes.submitQuiz.useMutation();
   const form = useForm<QuestionAnswerCreateObject[]>({
     defaultValues: [],
   });

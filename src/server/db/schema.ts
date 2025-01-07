@@ -54,7 +54,7 @@ export const users = createTable(
 
 export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
-  quizes: many(quizes),
+  quizzes: many(quizzes),
   sessions: many(quizSessions),
   results: many(quizResults),
 }));
@@ -116,7 +116,7 @@ export const verifications = createTable("verification", {
   updatedAt: int("updatedAt", { mode: "timestamp" }),
 });
 
-export const quizes = createTable("quizes", {
+export const quizzes = createTable("quizzes", {
   id: text("id", { length: 255 })
     .notNull()
     .primaryKey()
@@ -135,12 +135,12 @@ export const quizes = createTable("quizes", {
   deletedAt: timestamps.deletedAt,
 });
 
-export const quizesRelations = relations(quizes, ({ one, many }) => ({
+export const quizzesRelations = relations(quizzes, ({ one, many }) => ({
   sessions: many(quizSessions),
   results: many(quizResults),
   questions: many(questions),
   author: one(users, {
-    fields: [quizes.authorId],
+    fields: [quizzes.authorId],
     references: [users.id],
   }),
 }));
@@ -152,7 +152,7 @@ export const quizSessions = createTable("quiz_sessions", {
     .$defaultFn(() => crypto.randomUUID()),
   quizId: text("quiz_id", { length: 255 })
     .notNull()
-    .references(() => quizes.id, { onDelete: "cascade" }),
+    .references(() => quizzes.id, { onDelete: "cascade" }),
   userId: text("user_id", { length: 255 })
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
@@ -165,9 +165,9 @@ export const quizSessionsRelations = relations(quizSessions, ({ one }) => ({
     fields: [quizSessions.userId],
     references: [users.id],
   }),
-  quiz: one(quizes, {
+  quiz: one(quizzes, {
     fields: [quizSessions.quizId],
-    references: [quizes.id],
+    references: [quizzes.id],
   }),
   result: one(quizResults),
 }));
@@ -182,7 +182,7 @@ export const quizResults = createTable("quiz_results", {
     .references(() => users.id, { onDelete: "cascade" }),
   quizId: text("quiz_id", { length: 255 })
     .notNull()
-    .references(() => quizes.id, { onDelete: "cascade" }),
+    .references(() => quizzes.id, { onDelete: "cascade" }),
   quizSessionId: text("quiz_session_id", { length: 255 })
     .notNull()
     .references(() => quizSessions.id, { onDelete: "cascade" }),
@@ -199,9 +199,9 @@ export const quizResultsRelations = relations(quizResults, ({ one, many }) => ({
     fields: [quizResults.userId],
     references: [users.id],
   }),
-  quiz: one(quizes, {
+  quiz: one(quizzes, {
     fields: [quizResults.quizId],
-    references: [quizes.id],
+    references: [quizzes.id],
   }),
   session: one(quizSessions, {
     fields: [quizResults.quizSessionId],
@@ -217,7 +217,7 @@ export const questions = createTable("questions", {
     .$defaultFn(() => crypto.randomUUID()),
   quizId: text("quiz_id", { length: 255 })
     .notNull()
-    .references(() => quizes.id, { onDelete: "cascade" }),
+    .references(() => quizzes.id, { onDelete: "cascade" }),
   questionType: text("question_type", {
     length: 255,
     enum: [QuestionType.SingleVariant, QuestionType.MultipleVariants],
@@ -243,9 +243,9 @@ export const questions = createTable("questions", {
 });
 
 export const questionsRelations = relations(questions, ({ one, many }) => ({
-  quiz: one(quizes, {
+  quiz: one(quizzes, {
     fields: [questions.quizId],
-    references: [quizes.id],
+    references: [quizzes.id],
   }),
   answers: many(questionAnswers),
 }));

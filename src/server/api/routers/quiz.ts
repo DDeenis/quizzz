@@ -3,8 +3,8 @@ import { adminProcedure, createTRPCRouter, protectedProcedure } from "../trpc";
 import {
   createQuiz,
   deleteQuiz,
-  getAllQuizesPreview,
-  getAllQuizesPreviewWithDeleted,
+  getAllQuizzesPreview,
+  getAllQuizzesPreviewWithDeleted,
   getQuizById,
   getQuizPreviewById,
   restoreQuiz,
@@ -51,7 +51,7 @@ const quizUpdateScheme = z.object({
   questions: questionsScheme,
 });
 
-export const quizesRouter = createTRPCRouter({
+export const quizzesRouter = createTRPCRouter({
   createQuiz: adminProcedure
     .input(
       z.object({
@@ -105,8 +105,9 @@ export const quizesRouter = createTRPCRouter({
     }),
 
   getAll: protectedProcedure.query(async ({ ctx }) => {
-    if (ctx.session.user.isAdmin) return await getAllQuizesPreviewWithDeleted();
-    return await getAllQuizesPreview();
+    if (ctx.session.user.isAdmin)
+      return await getAllQuizzesPreviewWithDeleted();
+    return await getAllQuizzesPreview();
   }),
 
   getPreviewById: protectedProcedure

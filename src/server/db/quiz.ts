@@ -9,12 +9,12 @@ import type {
 import { getTotalScore, shuffleQuestionsForQuiz } from "@/utils/questions";
 import { db } from ".";
 import { eq, inArray, isNull } from "drizzle-orm";
-import { questions, quizes, quizSessions } from "./schema";
+import { questions, quizzes, quizSessions } from "./schema";
 import { conflictUpdateAllExcept, sqlNow } from "./utils";
 import { type QuizSession } from "@/types/quizSession";
 
-export const getAllQuizesPreview = async (): Promise<QuizPreview[]> => {
-  return await db.query.quizes.findMany({
+export const getAllQuizzesPreview = async (): Promise<QuizPreview[]> => {
+  return await db.query.quizzes.findMany({
     columns: {
       id: true,
       name: true,
@@ -25,14 +25,14 @@ export const getAllQuizesPreview = async (): Promise<QuizPreview[]> => {
       attempts: true,
       deletedAt: true,
     },
-    where: isNull(quizes.deletedAt),
+    where: isNull(quizzes.deletedAt),
   });
 };
 
-export const getAllQuizesPreviewWithDeleted = async (): Promise<
+export const getAllQuizzesPreviewWithDeleted = async (): Promise<
   QuizPreview[]
 > => {
-  return await db.query.quizes.findMany({
+  return await db.query.quizzes.findMany({
     columns: {
       id: true,
       name: true,
@@ -46,9 +46,9 @@ export const getAllQuizesPreviewWithDeleted = async (): Promise<
   });
 };
 
-export const getQuizesByAuthor = async (authorId: string): Promise<Quiz[]> => {
-  return await db.query.quizes.findMany({
-    where: eq(quizes.authorId, authorId),
+export const getQuizzesByAuthor = async (authorId: string): Promise<Quiz[]> => {
+  return await db.query.quizzes.findMany({
+    where: eq(quizzes.authorId, authorId),
     with: {
       questions: true,
     },
@@ -56,8 +56,8 @@ export const getQuizesByAuthor = async (authorId: string): Promise<Quiz[]> => {
 };
 
 export const getQuizById = async (id: string): Promise<Quiz | undefined> => {
-  return await db.query.quizes.findFirst({
-    where: eq(quizes.id, id),
+  return await db.query.quizzes.findFirst({
+    where: eq(quizzes.id, id),
     with: { questions: true },
   });
 };
@@ -65,7 +65,7 @@ export const getQuizById = async (id: string): Promise<Quiz | undefined> => {
 export const getQuizPreviewById = async (
   id: string
 ): Promise<QuizPreview | undefined> => {
-  return await db.query.quizes.findFirst({
+  return await db.query.quizzes.findFirst({
     columns: {
       id: true,
       name: true,
@@ -76,7 +76,7 @@ export const getQuizPreviewById = async (
       attempts: true,
       deletedAt: true,
     },
-    where: eq(quizes.id, id),
+    where: eq(quizzes.id, id),
   });
 };
 
@@ -121,8 +121,8 @@ export const getQuizWithSession = async (
   };
 };
 
-export const getQuizesAsOptions = async (): Promise<QuizOption[]> => {
-  return await db.query.quizes.findMany({
+export const getQuizzesAsOptions = async (): Promise<QuizOption[]> => {
+  return await db.query.quizzes.findMany({
     columns: {
       id: true,
       name: true,
@@ -133,11 +133,11 @@ export const getQuizesAsOptions = async (): Promise<QuizOption[]> => {
 export const getQuizAttempts = async (
   quizId: string
 ): Promise<number | null> => {
-  const result = await db.query.quizes.findFirst({
+  const result = await db.query.quizzes.findFirst({
     columns: {
       attempts: true,
     },
-    where: eq(quizes.id, quizId),
+    where: eq(quizzes.id, quizId),
   });
 
   if (!result) return null;
@@ -146,11 +146,11 @@ export const getQuizAttempts = async (
 };
 
 export const getQuizTime = async (quizId: string): Promise<number | null> => {
-  const result = await db.query.quizes.findFirst({
+  const result = await db.query.quizzes.findFirst({
     columns: {
       time: true,
     },
-    where: eq(quizes.id, quizId),
+    where: eq(quizzes.id, quizId),
   });
 
   if (!result) return null;
@@ -164,7 +164,7 @@ export const createQuiz = async (
   try {
     await db.transaction(async (tx) => {
       const result = await tx
-        .insert(quizes)
+        .insert(quizzes)
         .values({
           name: quizCreateObj.name,
           description: quizCreateObj.description,
@@ -202,7 +202,7 @@ export const updateQuiz = async (
   try {
     await db.transaction(async (tx) => {
       await tx
-        .update(quizes)
+        .update(quizzes)
         .set({
           name: quizUpdateObj.name,
           description: quizUpdateObj.description,
@@ -213,7 +213,7 @@ export const updateQuiz = async (
           maximumScore: getTotalScore(quizUpdateObj.questions),
           attempts: quizUpdateObj.attempts,
         })
-        .where(eq(quizes.id, id));
+        .where(eq(quizzes.id, id));
 
       const questionsToUpsert = quizUpdateObj.questions.map((q) => ({
         ...q,
@@ -245,11 +245,11 @@ export const updateQuiz = async (
 export const deleteQuiz = async (id: string): Promise<boolean> => {
   try {
     await db
-      .update(quizes)
+      .update(quizzes)
       .set({
         deletedAt: sqlNow(),
       })
-      .where(eq(quizes.id, id));
+      .where(eq(quizzes.id, id));
   } catch (err) {
     console.error(err);
     return false;
@@ -261,11 +261,11 @@ export const deleteQuiz = async (id: string): Promise<boolean> => {
 export const restoreQuiz = async (id: string): Promise<boolean> => {
   try {
     await db
-      .update(quizes)
+      .update(quizzes)
       .set({
         deletedAt: null,
       })
-      .where(eq(quizes.id, id));
+      .where(eq(quizzes.id, id));
   } catch (err) {
     console.error(err);
     return false;

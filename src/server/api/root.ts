@@ -1,7 +1,7 @@
 import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
 import { authRouter } from "./routers/auth";
-import { quizesRouter } from "./routers/quiz";
-import { studentQuizesRouter } from "./routers/studentQuiz";
+import { quizzesRouter } from "./routers/quiz";
+import { studentQuizzesRouter } from "./routers/studentQuiz";
 import { quizResultRouter } from "./routers/quizResult";
 import { userRouter } from "./routers/user";
 import { adminRouter } from "./routers/admin";
@@ -13,8 +13,8 @@ import { adminRouter } from "./routers/admin";
  */
 export const appRouter = createTRPCRouter({
   auth: authRouter,
-  quizes: quizesRouter,
-  studentQuizes: studentQuizesRouter,
+  quizzes: quizzesRouter,
+  studentQuizzes: studentQuizzesRouter,
   quizResults: quizResultRouter,
   users: userRouter,
   admin: adminRouter,

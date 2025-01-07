@@ -8,7 +8,7 @@ import { getServerSidePropsAdminPreset } from "@/server/auth/ssrPresets";
 export const getServerSideProps = getServerSidePropsAdminPreset;
 
 export default function CreateQuiz() {
-  const { mutateAsync } = api.quizes.createQuiz.useMutation();
+  const { mutateAsync } = api.quizzes.createQuiz.useMutation();
   const { push } = useRouter();
 
   const onSubmit = (formValues: QuizCreateObject) => {

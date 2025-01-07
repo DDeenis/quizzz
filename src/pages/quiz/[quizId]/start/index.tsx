@@ -14,12 +14,12 @@ export const getServerSideProps = getServerSidePropsProtectedPreset;
 export default function StartQuizPage() {
   const router = useRouter();
   const { quizId } = router.query;
-  const quiz = api.quizes.getPreviewById.useQuery(
+  const quiz = api.quizzes.getPreviewById.useQuery(
     { quizId: (quizId as string | undefined) ?? "" },
     { enabled: false }
   );
-  const createQuizSession = api.studentQuizes.createQuizSession.useMutation();
-  const canStartQuiz = api.studentQuizes.canStartQuiz.useQuery(
+  const createQuizSession = api.studentQuizzes.createQuizSession.useMutation();
+  const canStartQuiz = api.studentQuizzes.canStartQuiz.useQuery(
     {
       quizId: quizId as string,
     },

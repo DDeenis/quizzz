@@ -97,10 +97,10 @@ export default function SignInPage() {
                     value={email}
                     onChange={handleEmailChange}
                     className={clsx(
-                      "w-full border-2 rounded-md bg-sky-50 px-2.5 py-2 placeholder:text-sky-300/85 text-sky-900 focus:outline-sky-900",
+                      "w-full border-2 rounded-md bg-sky-50 px-2.5 py-2 placeholder:text-slate-400 text-sky-900 focus:outline-sky-900",
                       {
                         "border-sky-600": error === undefined,
-                        "border-rose-700": error !== undefined,
+                        "border-red-700": error !== undefined,
                       }
                     )}
                   />
@@ -127,9 +127,7 @@ export default function SignInPage() {
                     </button>
                   )}
                 </div>
-                {error && (
-                  <span className="text-sm text-rose-700">{error}</span>
-                )}
+                {error && <span className="text-sm text-red-700">{error}</span>}
               </form>
               <SocialSignIn />
             </>
