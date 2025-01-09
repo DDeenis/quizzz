@@ -24,7 +24,7 @@ export default function SignInPage() {
 
   function sendEmail() {
     return signIn
-      .magicLink({ email, callbackURL: "/quiz" })
+      .magicLink({ email, callbackURL: "/home" })
       .then(() => setEmailSent(true))
       .catch((err) => {
         console.log(err);
@@ -72,7 +72,7 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="w-full h-screen flex">
+    <main className="w-full h-screen flex">
       <div className="basis-full xl:basis-8/12 bg-sky-50 flex justify-center items-center">
         <div className="w-full max-w-[512px] flex flex-col gap-4 p-4 xl:p-0">
           {!emailSent ? (
@@ -181,7 +181,7 @@ export default function SignInPage() {
           style={{ maskImage: "url('/topography.svg')" }}
         />
       </div>
-    </div>
+    </main>
   );
 }
 
