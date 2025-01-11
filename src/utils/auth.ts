@@ -6,6 +6,8 @@ import { magicLink } from "better-auth/plugins";
 import { sendMagicLinkEmail } from "./mail";
 import { nextCookies } from "better-auth/next-js";
 
+const __map = new Map();
+
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "sqlite",
@@ -32,9 +34,21 @@ export const auth = betterAuth({
       },
     },
   },
-  // session: {
-  //   cookieCache: { enabled: true },
-  // },
+  rateLimit: {
+    window: 60,
+    max: 15,
+    storage: "database",
+    modelName: "rateLimit",
+    customRules: {
+      "/sign-in/magic-link/*": async (req) => {
+        console.log(new URL(req.url).searchParams.get("token"));
+        return {
+          max: 1,
+          window: 60,
+        };
+      },
+    },
+  },
   plugins: [
     magicLink({
       sendMagicLink: async (params, req) => {

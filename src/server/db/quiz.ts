@@ -12,6 +12,7 @@ import { eq, inArray, isNull } from "drizzle-orm";
 import { questions, quizzes, quizSessions } from "./schema";
 import { conflictUpdateAllExcept, sqlNow } from "./utils";
 import { type QuizSession } from "@/types/quizSession";
+import slug from "slug";
 
 export const getAllQuizzesPreview = async (): Promise<QuizPreview[]> => {
   return await db.query.quizzes.findMany({
@@ -166,6 +167,9 @@ export const createQuiz = async (
       const result = await tx
         .insert(quizzes)
         .values({
+          slug:
+            slug(quizCreateObj.name.slice(0, 255)) +
+            Math.floor(Math.random() * 10000),
           name: quizCreateObj.name,
           description: quizCreateObj.description,
           authorId: quizCreateObj.authorId,

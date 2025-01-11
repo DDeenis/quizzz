@@ -1,15 +1,11 @@
 "use server";
-import HomePage from "@/components/HomePage";
-import { auth } from "@/utils/auth";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
+import HomePage from "@/components/pages/home/HomePage";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 export default async function Page() {
-  const session = await auth.api.getSession({ headers: await headers() });
-
-  if (!session) {
-    return redirect("/");
-  }
-
-  return <HomePage />;
+  return (
+    <ProtectedRoute>
+      <HomePage />
+    </ProtectedRoute>
+  );
 }

@@ -6,6 +6,7 @@ import {
   BookText,
   ChartNoAxesCombined,
   ChevronDown,
+  ChevronRight,
 } from "lucide-react";
 import React from "react";
 
@@ -79,8 +80,65 @@ export default function HomePage() {
               </div>
             </div>
           </section>
+          <HomeSection
+            title="Explore latest quizzes"
+            description="See the most recent and popular quizzes and choose the one you like the most"
+            linkText="Browse more"
+            linkUrl="/quizzes/popular"
+          >
+            <div className="px-3 flex gap-4"></div>
+          </HomeSection>
         </div>
       </main>
     </div>
   );
 }
+
+interface HomeSectionProps {
+  title: string;
+  description?: string;
+  linkText: string;
+  linkUrl: string;
+  children: React.ReactNode;
+}
+
+function HomeSection({
+  title,
+  description,
+  linkText,
+  linkUrl,
+  children,
+}: HomeSectionProps) {
+  return (
+    <section>
+      <div className="flex justify-center items-end">
+        <div>
+          <h2 className="font-fancy font-semibold text-3xl text-gray-950">
+            {title}
+          </h2>
+          {!!description && <p className="mt-1 text-gray-600">{description}</p>}
+        </div>
+        <Link
+          href={linkUrl}
+          className="p-2 flex items-center gap-3 text-gray-600"
+        >
+          {linkText}
+          <ChevronRight className="w-4 h-4" />
+        </Link>
+      </div>
+
+      <div className="mt-5">{children}</div>
+    </section>
+  );
+}
+
+interface QuizCardShortProps {
+  title: string;
+  time: number | null;
+  questionsCount: number | null;
+  slug: string;
+}
+
+// function QuizCardShort() {
+
+// }

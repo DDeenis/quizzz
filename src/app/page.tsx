@@ -1,5 +1,5 @@
 "use server";
-import SignInPage from "@/components/SignInPage";
+import SignInPage from "@/components/pages/auth/SignInPage";
 import { auth } from "@/utils/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";

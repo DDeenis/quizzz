@@ -116,24 +116,35 @@ export const verifications = createTable("verification", {
   updatedAt: int("updatedAt", { mode: "timestamp" }),
 });
 
-export const quizzes = createTable("quizzes", {
-  id: text("id", { length: 255 })
-    .notNull()
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  name: text("name", { length: 255 }).notNull(),
-  description: text("name", { length: 4096 }),
-  authorId: text("author_id", { length: 255 })
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  time: int("time"),
-  questionsCount: int("questions_count").notNull(),
-  minimumScore: int("minimun_score").notNull(),
-  maximumScore: int("maximum_score").notNull(),
-  attempts: int("attempts"),
-  createdAt: timestamps.createdAt,
-  deletedAt: timestamps.deletedAt,
+export const rateLimit = createTable("rate_limit", {
+  key: text("key", { length: 255 }).primaryKey(),
+  count: int("count").notNull(),
+  lastRequest: int("last_request").notNull(),
 });
+
+export const quizzes = createTable(
+  "quizzes",
+  {
+    id: text("id", { length: 255 })
+      .notNull()
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    slug: text("slug", { length: 255 }).notNull(),
+    name: text("name", { length: 255 }).notNull(),
+    description: text("name", { length: 4096 }),
+    authorId: text("author_id", { length: 255 })
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    time: int("time"),
+    questionsCount: int("questions_count").notNull(),
+    minimumScore: int("minimun_score").notNull(),
+    maximumScore: int("maximum_score").notNull(),
+    attempts: int("attempts"),
+    createdAt: timestamps.createdAt,
+    deletedAt: timestamps.deletedAt,
+  },
+  (quiz) => [uniqueIndex("quiz_slug_unique_idx").on(quiz.slug)]
+);
 
 export const quizzesRelations = relations(quizzes, ({ one, many }) => ({
   sessions: many(quizSessions),
