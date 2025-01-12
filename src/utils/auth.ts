@@ -5,8 +5,7 @@ import { betterAuth } from "better-auth";
 import { magicLink } from "better-auth/plugins";
 import { sendMagicLinkEmail } from "./mail";
 import { nextCookies } from "better-auth/next-js";
-
-const __map = new Map();
+import { getBaseUrl } from "./trpc/utils";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -34,27 +33,12 @@ export const auth = betterAuth({
       },
     },
   },
-  rateLimit: {
-    window: 60,
-    max: 15,
-    storage: "database",
-    modelName: "rateLimit",
-    customRules: {
-      "/sign-in/magic-link/*": async (req) => {
-        console.log(new URL(req.url).searchParams.get("token"));
-        return {
-          max: 1,
-          window: 60,
-        };
-      },
-    },
-  },
   plugins: [
     magicLink({
-      sendMagicLink: async (params, req) => {
+      sendMagicLink: async (params) => {
         await sendMagicLinkEmail({
           ...params,
-          origin: new URL(req!.url).origin,
+          origin: new URL(getBaseUrl()).origin,
         });
       },
     }),

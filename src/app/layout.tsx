@@ -1,6 +1,7 @@
 import { Spectral, Noto_Sans } from "next/font/google";
 
 import "@/styles/globals.css";
+import { TRPCReactProvider } from "@/utils/trpc/client";
 
 const NotoSansFont = Noto_Sans({
   weight: ["400", "600"],
@@ -28,7 +29,7 @@ export default function RootLayout({
         <div
           className={`${NotoSansFont.variable} ${SpectralFont.variable} font-body`}
         >
-          {children}
+          <TRPCReactProvider>{children}</TRPCReactProvider>
         </div>
       </body>
     </html>

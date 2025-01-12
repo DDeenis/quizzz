@@ -13,7 +13,6 @@ import { ZodError } from "zod";
 
 import { db } from "@/server/db";
 import { auth, type Session } from "@/utils/auth";
-import { headers } from "next/headers";
 
 /**
  * 1. CONTEXT
@@ -25,6 +24,7 @@ import { headers } from "next/headers";
 
 interface CreateContextOptions {
   session: Session | null;
+  headers: Headers;
 }
 
 /**
@@ -40,6 +40,7 @@ interface CreateContextOptions {
 const createInnerTRPCContext = (opts: CreateContextOptions) => {
   return {
     session: opts.session,
+    headers: opts.headers,
     db,
   };
 };
@@ -50,24 +51,14 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
  *
  * @see https://trpc.io/docs/context
  */
-// export const createTRPCContext = async (opts: CreateNextContextOptions) => {
-//   const { req } = opts;
-
-//   const session = await auth.api.getSession({
-//     headers: new Headers(req.headers as Record<string, string>),
-//   });
-
-//   return createInnerTRPCContext({
-//     session,
-//   });
-// };
-export const createTRPCContext = async () => {
+export const createTRPCContext = async (opts: { headers: Headers }) => {
   const session = await auth.api.getSession({
-    headers: await headers(),
+    headers: opts.headers,
   });
 
   return createInnerTRPCContext({
     session,
+    headers: opts.headers,
   });
 };
 

@@ -41,7 +41,7 @@ export async function sendMagicLinkEmail({
             <mj-text font-size="16px" color="#555555" font-family="Helvetica, Arial, sans-serif" line-height="1.5">
               Welcome to Quiz App! Click the button below to sign in to your account:
             </mj-text>
-            <mj-button background-color="#007BFF" color="#ffffff" font-family="Helvetica, Arial, sans-serif" href="${url}">
+            <mj-button background-color="#007BFF" color="#ffffff" font-family="Helvetica, Arial, sans-serif" href="${origin}/sign-in/magic-link/${token}">
               Sign In
             </mj-button>
             <mj-text font-size="16px" color="#555555" font-family="Helvetica, Arial, sans-serif" line-height="1.5">

@@ -88,6 +88,7 @@ export default function HomePage() {
           >
             <div className="px-3 flex gap-4"></div>
           </HomeSection>
+          1
         </div>
       </main>
     </div>

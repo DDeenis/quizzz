@@ -1,8 +1,8 @@
 "use client";
 import React, { useState } from "react";
-import { signIn } from "@/server/auth/client";
 import { z } from "zod";
 import clsx from "clsx";
+import { signIn } from "@/server/auth/client";
 
 const emailSchema = z.string().email();
 
@@ -26,9 +26,11 @@ export default function SignInPage() {
     return signIn
       .magicLink({ email, callbackURL: "/home" })
       .then(() => setEmailSent(true))
-      .catch((err) => {
-        console.log(err);
-        setError("Something went wrong. Please, try again later.");
+      .catch((err: Error) => {
+        console.error(err);
+        setError(
+          err.message ?? "Something went wrong. Please, try again later."
+        );
       });
   }
 
