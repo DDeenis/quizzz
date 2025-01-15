@@ -8,13 +8,14 @@ export const env = createEnv({
    */
   server: {
     BETTER_AUTH_SECRET: z.string(),
-    BETTER_AUTH_URL: z.string(),
+    BETTER_AUTH_URL: z.string().url(),
     SMTP_USER: z.string(),
     SMTP_PASSWORD: z.string(),
     SMTP_HOST: z.string(),
     SMTP_PORT: z.coerce.number(),
     EMAIL_FROM: z.string(),
     DATABASE_URL: z.string().url(),
+    DATABASE_AUTH_TOKEN: z.string(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
@@ -26,7 +27,7 @@ export const env = createEnv({
    * `NEXT_PUBLIC_`.
    */
   client: {
-    NEXT_PUBLIC_BETTER_AUTH_URL: z.string(),
+    NEXT_PUBLIC_BETTER_AUTH_URL: z.string().url(),
   },
 
   /**
@@ -43,6 +44,7 @@ export const env = createEnv({
     BETTER_AUTH_URL: process.env.BETTER_AUTH_URL,
     NEXT_PUBLIC_BETTER_AUTH_URL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL,
     DATABASE_URL: process.env.DATABASE_URL,
+    DATABASE_AUTH_TOKEN: process.env.DATABASE_AUTH_TOKEN,
     NODE_ENV: process.env.NODE_ENV,
   },
   /**
