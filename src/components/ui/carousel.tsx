@@ -184,7 +184,7 @@ const CarouselItem = React.forwardRef<
       role="group"
       aria-roledescription="slide"
       className={cn(
-        "min-w-0 shrink-0 grow-0 basis-full",
+        "min-w-0 shrink-0 grow-0",
         orientation === "horizontal" ? "pl-4" : "pt-4",
         className
       )}
@@ -200,7 +200,7 @@ const CarouselPrevious = React.forwardRef<
 >(({ className, variant = "outline", size = "icon", ...props }, ref) => {
   const { orientation, scrollPrev, canScrollPrev } = useCarousel();
 
-  return (
+  return canScrollPrev ? (
     <Button
       ref={ref}
       variant={variant}
@@ -216,10 +216,10 @@ const CarouselPrevious = React.forwardRef<
       onClick={scrollPrev}
       {...props}
     >
-      <ChevronLeft className="h-4 w-4" />
+      <ChevronLeft className="h-4 w-4 mx-auto" />
       <span className="sr-only">Previous slide</span>
     </Button>
-  );
+  ) : null;
 });
 CarouselPrevious.displayName = "CarouselPrevious";
 
@@ -229,7 +229,7 @@ const CarouselNext = React.forwardRef<
 >(({ className, variant = "outline", size = "icon", ...props }, ref) => {
   const { orientation, scrollNext, canScrollNext } = useCarousel();
 
-  return (
+  return canScrollNext ? (
     <Button
       ref={ref}
       variant={variant}
@@ -245,10 +245,10 @@ const CarouselNext = React.forwardRef<
       onClick={scrollNext}
       {...props}
     >
-      <ChevronRight className="h-4 w-4" />
+      <ChevronRight className="h-4 w-4 mx-auto" />
       <span className="sr-only">Next slide</span>
     </Button>
-  );
+  ) : null;
 });
 CarouselNext.displayName = "CarouselNext";
 
