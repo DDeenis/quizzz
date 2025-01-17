@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { cn } from "@/utils/cn";
 import { type ButtonHTMLAttributes, type DetailedHTMLProps } from "react";
 
 interface ButtonProps
@@ -21,14 +21,18 @@ export function Button({
 }: ButtonProps) {
   return (
     <button
-      className={clsx("rounded-md", className, {
-        "py-3 px-8 font-medium": size === "lg",
-        "py-2 px-3 text-sm font-semibold": size === "md",
-        "w-6 h-6 border": size === "icon",
-        "": variant === "primary",
-        "": variant === "secondary",
-        "": variant === "outline",
-      })}
+      className={cn(
+        "rounded-md",
+        {
+          "py-3 px-8 font-medium": size === "lg",
+          "py-2 px-3 text-sm font-semibold": size === "md",
+          "w-6 h-6 border": size === "icon",
+          "": variant === "primary",
+          "": variant === "secondary",
+          "": variant === "outline",
+        },
+        className
+      )}
       {...props}
     >
       {children}

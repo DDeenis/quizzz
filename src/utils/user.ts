@@ -17,6 +17,17 @@ function stringToColor(string: string) {
 }
 
 export function stringAvatar(name: string) {
+  const { text, bg } = textAvatarWithBg(name);
+
+  return {
+    sx: {
+      bgcolor: bg,
+    },
+    children: text,
+  };
+}
+
+export function textAvatarWithBg(name: string) {
   const words = name.split(" ").slice(0, 2);
   let letters = "";
 
@@ -25,9 +36,7 @@ export function stringAvatar(name: string) {
   }
 
   return {
-    sx: {
-      bgcolor: stringToColor(name),
-    },
-    children: letters,
+    text: letters,
+    bg: stringToColor(name),
   };
 }

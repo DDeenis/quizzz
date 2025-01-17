@@ -1,9 +1,9 @@
 import { Moment } from "./moment";
-import type { RateLimiterStorage } from "./types";
+import type { RateLimiterImpl, RateLimiterStorage } from "./types";
 
 const RESET_AFTER = Moment.from("1h");
 
-export class Throttler {
+export class Throttler implements RateLimiterImpl {
   private timeoutSeconds: number[];
   private storage: RateLimiterStorage;
 
@@ -38,27 +38,5 @@ export class Throttler {
 
   async reset(key: string) {
     await this.storage.delete(key);
-  }
-}
-
-export class ThrottlerRateLimiter {
-  private impl: Throttler;
-  private getKey: (req: Request) => string;
-
-  constructor(opts: {
-    storage: RateLimiterStorage;
-    timeoutSeconds: number[];
-    getKey: (req: Request) => string;
-  }) {
-    this.impl = new Throttler(opts.storage, opts.timeoutSeconds);
-    this.getKey = opts.getKey;
-  }
-
-  public async rateLimitRequest(req: Request) {
-    return await this.impl.consume(this.getKey(req));
-  }
-
-  public async resetRequest(req: Request) {
-    await this.impl.reset(this.getKey(req));
   }
 }

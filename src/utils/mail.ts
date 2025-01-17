@@ -69,7 +69,7 @@ export async function sendMagicLinkEmail({
     );
 
   return await transporter.sendMail({
-    from: `"Quiz App 💡" <${env.SMTP_USER}>`,
+    from: env.EMAIL_FROM,
     to: email,
     subject: "Your Magic Link ✨",
     // html: `Click <a href="${url}" target="_blank">this link<a> to log in`, // html body

@@ -15,7 +15,7 @@ export function CategoryCard({ title, image, slug }: CategoryCardProps) {
       <div className="absolute inset-0 bg-gray-900/50 flex justify-center items-center">
         <Link
           href={`/categories/${slug}`}
-          className="text-gray-50 text-xl font-semibold"
+          className="text-gray-50 md:text-lg font-semibold"
           aria-label={`open category '${title}'`}
         >
           {title}

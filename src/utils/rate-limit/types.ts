@@ -9,7 +9,7 @@ export interface RateLimiterStorage {
   delete: (key: string) => Promise<void>;
 }
 
-// export interface RateLimiterImpl {
-//   consume: (key: string) => Promise<boolean>;
-//   reset: (key: string) => Promise<void>;
-// }
+export interface RateLimiterImpl<Params = void> {
+  consume: (key: string, params: Params) => Promise<boolean>;
+  reset: (key: string) => Promise<void>;
+}

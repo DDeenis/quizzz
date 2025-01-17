@@ -81,7 +81,7 @@ export default function SignInPage() {
             <>
               <h1 className="font-fancy text-3xl text-sky-950 text-center xl:text-5xl xl:leading-tight xl:text-left">
                 Welcome, <br />
-                quizzing champion
+                Quizzing Champion
               </h1>
               <form
                 className="px-6 py-5 xl:px-8 xl:py-7 flex flex-col justify-center gap-4 bg-sky-200 rounded-lg"

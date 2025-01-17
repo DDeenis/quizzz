@@ -1,6 +1,6 @@
-import type { RateLimiterStorage } from "./types";
+import type { RateLimiterImpl, RateLimiterStorage } from "./types";
 
-export class TokenBucket {
+export class TokenBucket implements RateLimiterImpl<number> {
   private max: number;
   private refillIntervalSeconds: number;
 
@@ -42,33 +42,5 @@ export class TokenBucket {
 
   async reset(key: string) {
     await this.storage.delete(key);
-  }
-}
-
-export class TokenBucketRateLimiter {
-  impl: TokenBucket;
-  getKey: (req: Request) => string;
-
-  constructor({
-    storage,
-    max,
-    refillIntervalSeconds,
-    getKey,
-  }: {
-    storage: RateLimiterStorage;
-    max: number;
-    refillIntervalSeconds: number;
-    getKey: (req: Request) => string;
-  }) {
-    this.impl = new TokenBucket(storage, { max, refillIntervalSeconds });
-    this.getKey = getKey;
-  }
-
-  async rateLimitRequest(req: Request, cost: number) {
-    return await this.impl.consume(this.getKey(req), cost);
-  }
-
-  async resetRequest(req: Request) {
-    return await this.impl.reset(this.getKey(req));
   }
 }

@@ -35,18 +35,18 @@ export function QuizCardShort({
   );
 
   return (
-    <div className="w-80 rounded-lg drop-shadow-sm">
+    <div className="w-full lg:w-80 rounded-lg drop-shadow-sm">
       <div
         role="presentation"
         aria-label="quiz cover image"
         className="h-16 bg-center rounded-t-[inherit]"
         style={{
           backgroundImage: `url(${image})`,
-          backgroundSize: "320px",
+          backgroundSize: "cover",
         }}
       />
-      <div className="px-6 py-4 bg-gray-100 h-36">
-        <div className="flex gap-2 items-baseline">
+      <div className="px-6 py-4 bg-gray-100 h-36 border-x border-x-gray-200">
+        <div className="flex gap-2">
           {status === "none" ? (
             <BookText className="stroke-gray-900 w-6 h-6 shrink-0" />
           ) : status === "started" ? (
@@ -57,7 +57,7 @@ export function QuizCardShort({
             <BookX className="stroke-gray-900 w-6 h-6 shrink-0" />
           )}
           <p
-            className="text-lg text-gray-900 line-clamp-2 hyphens-auto"
+            className="md:text-lg font-semibold md:font-medium text-gray-900 line-clamp-2 hyphens-auto"
             ref={(elem) => {
               if (!elem) return;
               setIsTwoLines(elem.clientHeight > APPROX_ONE_LINE_HEIGHT);
@@ -108,8 +108,8 @@ export function QuizCardShort({
           {status === "none" || status === "passed"
             ? "Start"
             : status === "failed"
-              ? "Try again"
-              : "Continue"}
+            ? "Try again"
+            : "Continue"}
         </Link>
       </div>
     </div>

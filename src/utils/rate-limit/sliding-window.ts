@@ -1,6 +1,6 @@
-import type { RateLimiterStorage } from "./types";
+import type { RateLimiterImpl, RateLimiterStorage } from "./types";
 
-export class SlidingWindow {
+export class SlidingWindow implements RateLimiterImpl {
   private window: number;
   private max: number;
 
@@ -46,33 +46,5 @@ export class SlidingWindow {
 
   async reset(key: string) {
     await this.storage.delete(key);
-  }
-}
-
-export class SlidingWindowRateLimiter {
-  private impl: SlidingWindow;
-  private getKey: (req: Request) => string;
-
-  constructor({
-    storage,
-    window,
-    max,
-    getKey,
-  }: {
-    storage: RateLimiterStorage;
-    window: number;
-    max: number;
-    getKey: (req: Request) => string;
-  }) {
-    this.impl = new SlidingWindow(storage, { window, max });
-    this.getKey = getKey;
-  }
-
-  async rateLimitRequest(req: Request) {
-    return await this.impl.consume(this.getKey(req));
-  }
-
-  async resetRequest(req: Request) {
-    return await this.impl.reset(this.getKey(req));
   }
 }
