@@ -1,27 +1,11 @@
-function stringToColor(string: string) {
-  let hash = 0;
-  let i;
-
-  for (i = 0; i < string.length; i += 1) {
-    hash = string.charCodeAt(i) + ((hash << 5) - hash);
-  }
-
-  let color = "#";
-
-  for (i = 0; i < 3; i += 1) {
-    const value = (hash >> (i * 8)) & 0xff;
-    color += `00${value.toString(16)}`.slice(-2);
-  }
-
-  return color;
-}
+import { stringToHslHue, toHslString } from "./color";
 
 export function stringAvatar(name: string) {
-  const { text, bg } = textAvatarWithBg(name);
+  const { text, gradient } = textAvatarWithBg(name);
 
   return {
     sx: {
-      bgcolor: bg,
+      bgimage: gradient,
     },
     children: text,
   };
@@ -35,8 +19,18 @@ export function textAvatarWithBg(name: string) {
     letters += word[0];
   }
 
+  const baseHue = stringToHslHue(name);
+  const prevHue = baseHue - 60;
+  const nextHue = baseHue + 90;
+  const saturation = 100;
+  const lightness = 70;
+
+  const firstColor = toHslString(prevHue, saturation, lightness - 10);
+  const secondColor = toHslString(baseHue, saturation, lightness);
+  const thirdColor = toHslString(nextHue, saturation, lightness + 10);
+
   return {
     text: letters,
-    bg: stringToColor(name),
+    gradient: `linear-gradient(43deg, ${firstColor} 0%, ${secondColor} 46%, ${thirdColor} 100%)`,
   };
 }

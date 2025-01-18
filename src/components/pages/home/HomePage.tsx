@@ -104,7 +104,7 @@ export default function HomePage() {
                 {Array.from({ length: 8 }).map((_, i) => (
                   <CarouselItem
                     key={i}
-                    className="basis-full md:basis-1/2 lg:basis-1/3 xl:basis-auto flex justify-center"
+                    className="basis-full md:basis-1/2 lg:basis-1/3 xl:basis-auto flex justify-center pb-1"
                   >
                     <QuizCardShort
                       title={
@@ -216,13 +216,13 @@ function Header({ user }: HeaderProps) {
               </ul>
             </NavigationMenuContent>
           </NavigationMenuItem>
-          {/* <NavigationMenuItem>
+          <NavigationMenuItem>
             <Link href="/leaderboard" legacyBehavior passHref>
               <NavigationMenuLink className="text-gray-400 font-semibold text-sm">
                 Leaderboards
               </NavigationMenuLink>
             </Link>
-          </NavigationMenuItem> */}
+          </NavigationMenuItem>
           <NavigationMenuItem>
             <Link href="/results" legacyBehavior passHref>
               <NavigationMenuLink className="text-gray-400 font-semibold text-sm">
@@ -246,7 +246,10 @@ function Header({ user }: HeaderProps) {
             {user.isAdmin ? "Admin" : "Student"}
           </p>
         </div>
-        <Avatar className="w-12 h-12" style={{ backgroundColor: avatar.bg }}>
+        <Avatar
+          className="w-12 h-12 font-medium"
+          style={{ backgroundImage: avatar.gradient }}
+        >
           <AvatarImage src={user.image ?? undefined} />
           <AvatarFallback>{avatar.text}</AvatarFallback>
         </Avatar>

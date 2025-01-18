@@ -20,13 +20,11 @@ export function HomeSection({
     <section className="mt-10 xl:mt-14">
       <div className="flex flex-col xl:flex-row justify-between xl:items-end">
         <div>
-          <h2 className="font-fancy font-semibold text-lg md:text-xl xl:text-3xl text-gray-950">
+          <h2 className="font-fancy font-semibold text-xl xl:text-3xl text-gray-950">
             {title}
           </h2>
           {!!description && (
-            <p className="mt-1 text-gray-600 text-sm md:text-base">
-              {description}
-            </p>
+            <p className="mt-2 text-gray-600 text-sm">{description}</p>
           )}
         </div>
         <Link

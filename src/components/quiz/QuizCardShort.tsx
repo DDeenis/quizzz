@@ -35,7 +35,7 @@ export function QuizCardShort({
   );
 
   return (
-    <div className="w-full lg:w-80 rounded-lg drop-shadow-sm">
+    <div className="w-full lg:w-80 rounded-lg">
       <div
         role="presentation"
         aria-label="quiz cover image"
@@ -67,8 +67,8 @@ export function QuizCardShort({
           </p>
         </div>
         <div
-          className={clsx("mt-3 p-2 flex", {
-            "flex-row items-center gap-5": isTwoLines,
+          className={clsx("mt-3 p-2 flex text-gray-800", {
+            "flex-row items-center justify-between": isTwoLines,
             "flex-col gap-3": !isTwoLines,
           })}
         >
@@ -92,7 +92,7 @@ export function QuizCardShort({
           <>
             <Link
               href={`/quiz/${slug}/view`}
-              className="h-full text-sm bg-gray-200 hover:bg-gray-300 flex justify-center items-center"
+              className="h-full text-sm bg-gray-200 hover:bg-gray-300 flex justify-center items-center font-medium"
             >
               See more
             </Link>
@@ -103,7 +103,7 @@ export function QuizCardShort({
         )}
         <Link
           href={`/quiz/${slug}/start`}
-          className="h-full text-sm bg-gray-200 hover:bg-gray-300 flex justify-center items-center"
+          className="h-full text-sm bg-gray-200 hover:bg-gray-300 flex justify-center items-center font-medium"
         >
           {status === "none" || status === "passed"
             ? "Start"
