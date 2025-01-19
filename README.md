@@ -1,29 +1,26 @@
-# Create T3 App
+## ⚠ This project is currently being redesigned. The current version in the `master` branch was initially created as a part of my university practice, and than slightly updated. You can view the current progress in the `feat/redesign` branch.
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+# Quizzz
 
-## What's next? How do I make an app with this?
+This is a full-stack Next.js app that allows users to create, edit, view, and take quizzes.
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+[Demo](https://quizzz-demo.vercel.app/)
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+## Functionality
+
+- ✨ Sign Up and Sign In with magic link
+- 📝 Take quizzes as user
+- 🗃 Questions and answers are shuffled for each user who is taking a quiz
+- 🏆 View your results
+- 🛠 Create and edit quizzes as admin
+- 🔭 View and manage users and their results as admin
+
+## Tech
 
 - [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
+- [tRPC](https://trpc.io)
+- [better-auth](https://www.better-auth.com/)
 - [Drizzle](https://orm.drizzle.team)
 - [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
-
-## Learn More
-
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
-
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
-
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
-
-## How do I deploy this?
-
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+- [SQLite](https://www.sqlite.org/)
+- [Material UI](https://mui.com/material-ui/)
