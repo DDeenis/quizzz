@@ -4,11 +4,13 @@ import "@/styles/globals.css";
 import { TRPCReactProvider } from "@/utils/trpc/client";
 
 const NotoSansFont = Noto_Sans({
+  subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-body",
 });
 
 const SpectralFont = Spectral({
+  subsets: ["latin"],
   weight: ["400", "600", "700"],
   variable: "--font-fancy",
 });
