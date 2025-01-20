@@ -18,8 +18,12 @@ export const client =
 if (env.NODE_ENV !== "production") globalForDb.client = client;
 
 if (!globalForDb.client) {
-  // switch to WAL
-  await client.execute("PRAGMA journal_mode=WAL;");
+  try {
+    // switch to WAL
+    await client.execute("PRAGMA journal_mode=WAL;");
+  } catch (err) {
+    console.error(err);
+  }
 }
 
 export const db = drizzle(client, { schema });
