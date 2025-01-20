@@ -25,7 +25,7 @@ interface HeaderProps {
   user: User;
 }
 
-export function Header({ user }: HeaderProps) {
+export default function Header({ user }: HeaderProps) {
   const avatar = useMemo(() => textAvatarWithBg(user.name), [user.name]);
 
   return (

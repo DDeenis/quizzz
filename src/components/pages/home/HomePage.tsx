@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/carousel";
 import { QuizCardShort } from "@/components/quiz/QuizCardShort";
 import { CategoryCard } from "@/components/CategoryCard";
-import { Header } from "@/components/Header";
+import Header from "@/components/Header";
 import { HomeSection } from "@/components/HomeSection";
 
 const testUser = {
