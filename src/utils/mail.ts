@@ -53,7 +53,7 @@ export async function sendMagicLinkEmail({
         <mj-section background-color="#f0f0f0" padding="20px 0">
           <mj-column>
             <mj-text font-size="12px" color="#888888" font-family="Helvetica, Arial, sans-serif" align="center">
-              © 2024 Quiz App. All rights reserved.
+              © 2024 Quizzz. All rights reserved.
             </mj-text>
           </mj-column>
         </mj-section>

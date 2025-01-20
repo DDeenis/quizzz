@@ -1,17 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import {
-  BadgeCheck,
-  BookText,
-  ChartNoAxesCombined,
-  ChevronDown,
-  ChevronRight,
-  House,
-  LucideProps,
-  Menu,
-} from "lucide-react";
-import React, { useMemo } from "react";
+import { BadgeCheck, BookText, ChartNoAxesCombined, Quote } from "lucide-react";
+import React from "react";
 import {
   Carousel,
   CarouselContent,
@@ -21,26 +11,8 @@ import {
 } from "@/components/ui/carousel";
 import { QuizCardShort } from "@/components/quiz/QuizCardShort";
 import { CategoryCard } from "@/components/CategoryCard";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
+import { Header } from "@/components/Header";
 import { HomeSection } from "@/components/HomeSection";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { type User } from "@/types/user";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { textAvatarWithBg } from "@/utils/user";
 
 const testUser = {
   id: "1",
@@ -56,7 +28,7 @@ const testUser = {
 
 export default function HomePage() {
   return (
-    <div className="pb-24">
+    <div>
       <Header user={testUser} />
       <main className="w-full mt-8 px-2">
         <div className="container mx-auto">
@@ -152,8 +124,54 @@ export default function HomePage() {
               <CarouselNext />
             </Carousel>
           </HomeSection>
+          <section className="mt-10 xl:mt-14">
+            <div
+              className="w-full xl:h-64 rounded-xl relative bg-gray-200"
+              aria-label="quote of the day"
+            >
+              <div
+                role="presentation"
+                aria-label="background pattern"
+                className="absolute inset-0 bg-slate-100 opacity-80"
+                style={{ maskImage: "url(charlie-brown.svg)" }}
+              />
+              <div
+                role="presentation"
+                aria-label="background gradient"
+                className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-200 to-transparent"
+              />
+              <div className="xl:absolute inset-0 flex justify-center items-center p-4">
+                <figure className="relative w-full max-w-[600px]">
+                  <Quote
+                    role="presentation"
+                    aria-label="start quote"
+                    className="static xl:absolute -top-1/3 -left-24 w-16 h-16 stroke-gray-300/60"
+                  />
+                  <blockquote className="my-4">
+                    <p className="font-fancy font-semibold text-2xl xl:text-3xl text-gray-700 leading-snug text-balance xl:line-clamp-3">
+                      To know, is to know that you know nothing. That is the
+                      meaning of true knowledge.
+                    </p>
+                  </blockquote>
+                  <Quote
+                    role="presentation"
+                    aria-label="end quote"
+                    className="xl:absolute -bottom-1/3 -right-24 rotate-180 w-16 h-16 stroke-gray-300/60 ml-auto"
+                  />
+                  <figcaption className="xl:absolute -bottom-9 right-0 text-sm xl:text-base font-medium text-gray-400">
+                    Socrates
+                  </figcaption>
+                </figure>
+              </div>
+            </div>
+          </section>
         </div>
       </main>
+      <footer className="mt-16 bg-gray-100 h-10 flex justify-center items-center">
+        <p className="text-sm text-gray-400">
+          © 2024, Quizzz. All rights reserved.
+        </p>
+      </footer>
     </div>
   );
 }
@@ -177,99 +195,5 @@ function StatsElement({ name, value, icon }: StatsElementProps) {
         </p>
       </div>
     </div>
-  );
-}
-
-interface HeaderProps {
-  user: User;
-}
-
-function Header({ user }: HeaderProps) {
-  const avatar = useMemo(() => textAvatarWithBg(user.name), [user.name]);
-
-  return (
-    <header className="bg-gray-100 px-4 xl:px-6 xl:py-2 flex justify-between items-center w-full h-14 xl:h-20">
-      <Link href="/home" className="font-fancy font-bold text-xl xl:text-2xl">
-        Quizzz
-      </Link>
-      <NavigationMenu className="hidden xl:block">
-        <NavigationMenuList className="space-x-12">
-          <NavigationMenuItem>
-            <NavigationMenuTrigger className="text-gray-950 font-semibold text-sm">
-              Quizzes
-            </NavigationMenuTrigger>
-            <NavigationMenuContent>
-              <ul className="w-[500px] bg-white shadow-md p-6 flex flex-col">
-                <li>
-                  <Link href="/home" legacyBehavior passHref>
-                    <NavigationMenuLink className="px-5 py-4 flex gap-5 hover:bg-gray-50 rounded-sm group">
-                      <div className="p-3 bg-gray-200 rounded-md">
-                        <House className="w-6 h-6 stroke-gray-600 group-hover:stroke-blue-600" />
-                      </div>
-                      <div className="flex flex-col justify-between">
-                        <p className="font-semibold">Home</p>
-                        <p className="text-gray-600 text-sm">Home page</p>
-                      </div>
-                    </NavigationMenuLink>
-                  </Link>
-                </li>
-              </ul>
-            </NavigationMenuContent>
-          </NavigationMenuItem>
-          <NavigationMenuItem>
-            <Link href="/leaderboard" legacyBehavior passHref>
-              <NavigationMenuLink className="text-gray-400 font-semibold text-sm">
-                Leaderboards
-              </NavigationMenuLink>
-            </Link>
-          </NavigationMenuItem>
-          <NavigationMenuItem>
-            <Link href="/results" legacyBehavior passHref>
-              <NavigationMenuLink className="text-gray-400 font-semibold text-sm">
-                My Results
-              </NavigationMenuLink>
-            </Link>
-          </NavigationMenuItem>
-          <NavigationMenuItem>
-            <Link href="/profile" legacyBehavior passHref>
-              <NavigationMenuLink className="text-gray-400 font-semibold text-sm">
-                Profile
-              </NavigationMenuLink>
-            </Link>
-          </NavigationMenuItem>
-        </NavigationMenuList>
-      </NavigationMenu>
-      <div className="hidden xl:flex items-center gap-4">
-        <div className="flex flex-col justify-center items-end gap-1">
-          <p className="text-sm font-semibold text-gray-950">{user.name}</p>
-          <p className="text-xs text-gray-400">
-            {user.isAdmin ? "Admin" : "Student"}
-          </p>
-        </div>
-        <Avatar
-          className="w-12 h-12 font-medium"
-          style={{ backgroundImage: avatar.gradient }}
-        >
-          <AvatarImage src={user.image ?? undefined} />
-          <AvatarFallback>{avatar.text}</AvatarFallback>
-        </Avatar>
-      </div>
-      <Sheet>
-        <SheetTrigger className="block xl:hidden">
-          <Menu className="w-6 h-6" />
-        </SheetTrigger>
-        <SheetContent className="w-full bg-white">
-          <SheetHeader>
-            <SheetTitle className="sr-only">
-              User data and navigation
-            </SheetTitle>
-            <SheetDescription className="sr-only">
-              Log in, sign up, view user data and navigate the website
-            </SheetDescription>
-            <div className="w-full"></div>
-          </SheetHeader>
-        </SheetContent>
-      </Sheet>
-    </header>
   );
 }
