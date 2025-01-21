@@ -19,19 +19,27 @@ const getRetryTimeInSeconds = retryTimeGenerator();
 export default function SignInPage() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string>();
+  const [isLoading, setIsLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [currentRetryTime, setCurrentRetryTime] = useState(0);
 
   function sendEmail() {
+    setIsLoading(true);
     return signIn
       .magicLink({ email, callbackURL: "/home" })
+      .then((res) => {
+        if (res.error) {
+          throw new Error(res.error.message);
+        }
+      })
       .then(() => setEmailSent(true))
       .catch((err: Error) => {
         console.error(err);
         setError(
           err.message ?? "Something went wrong. Please, try again later."
         );
-      });
+      })
+      .finally(() => setIsLoading(false));
   }
 
   function handleEmailChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -96,6 +104,7 @@ export default function SignInPage() {
                     id="email"
                     type="email"
                     placeholder="johndoe@quiz.app"
+                    disabled={isLoading}
                     value={email}
                     onChange={handleEmailChange}
                     className={clsx(
@@ -111,6 +120,7 @@ export default function SignInPage() {
                       type="submit"
                       aria-label="Submit"
                       className="absolute right-[2px] top-[2px] bottom-[2px] px-2 rounded-r-md flex justify-center items-center text-sky-600 hover:bg-sky-100 transition-colors aspect-square"
+                      disabled={isLoading}
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -131,7 +141,7 @@ export default function SignInPage() {
                 </div>
                 {error && <span className="text-sm text-red-700">{error}</span>}
               </form>
-              <SocialSignIn />
+              <SocialSignIn disabled={isLoading} />
             </>
           ) : (
             <>
@@ -187,7 +197,7 @@ export default function SignInPage() {
   );
 }
 
-function SocialSignIn() {
+function SocialSignIn({ disabled }: { disabled?: boolean }) {
   return (
     <div className="bg-transparent rounded-lg p-4 flex flex-col gap-4">
       <h2 className="text-sm text-center text-sky-700">
@@ -197,6 +207,7 @@ function SocialSignIn() {
         <button
           aria-label="Sign In with Google"
           className="p-1 rounded-full bg-sky-100"
+          disabled={disabled}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -213,6 +224,7 @@ function SocialSignIn() {
         <button
           aria-label="Sign In with Facebook"
           className="p-1 rounded-full bg-sky-100"
+          disabled={disabled}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -229,6 +241,7 @@ function SocialSignIn() {
         <button
           aria-label="Sign In with Discord"
           className="p-1 rounded-full bg-sky-100"
+          disabled={disabled}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
