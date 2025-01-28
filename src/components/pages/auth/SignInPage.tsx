@@ -122,20 +122,28 @@ export default function SignInPage() {
                       className="absolute right-[2px] top-[2px] bottom-[2px] px-2 rounded-r-md flex justify-center items-center text-sky-600 hover:bg-sky-100 transition-colors aspect-square"
                       disabled={isLoading}
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <path d="M9 6l6 6l-6 6" />
-                      </svg>
+                      {isLoading ? (
+                        <span
+                          role="presentation"
+                          aria-label="loading"
+                          className="w-6 h-6 border-[3px] border-sky-600 border-b-transparent rounded-full animate-spin"
+                        />
+                      ) : (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                          <path d="M9 6l6 6l-6 6" />
+                        </svg>
+                      )}
                     </button>
                   )}
                 </div>
