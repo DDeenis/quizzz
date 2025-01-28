@@ -30,7 +30,7 @@ export default function HomePage() {
   return (
     <div>
       <Header user={testUser} />
-      <main className="w-full mt-8 px-2">
+      <main className="w-full mt-8 px-2" id="content">
         <div className="container mx-auto">
           <section>
             <p className="text-sm xl:text-base font-semibold text-gray-950">

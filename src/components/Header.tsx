@@ -20,23 +20,60 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { usePathname } from "next/navigation";
+import clsx from "clsx";
 
 interface HeaderProps {
   user: User;
 }
 
+const linkClass = (isActive: boolean) =>
+  clsx(
+    "font-semibold text-sm",
+    isActive
+      ? "text-gray-900"
+      : "text-gray-400 hover:text-gray-800 focus:text-gray-800"
+  );
+
 export default function Header({ user }: HeaderProps) {
   const avatar = useMemo(() => textAvatarWithBg(user.name), [user.name]);
+  const pathname = usePathname();
+
+  const activeLinks = {
+    home: !!pathname?.startsWith("/home"),
+    quizzes: !!pathname?.startsWith("/quiz"),
+    leaderboards: !!pathname?.startsWith("/leaderboards"),
+    results: !!pathname?.startsWith("/results"),
+    proflie: !!pathname?.startsWith("/proflie"),
+  };
 
   return (
     <header className="bg-gray-100 px-4 xl:px-6 xl:py-2 flex justify-between items-center w-full h-14 xl:h-20">
+      <Link
+        href="#content"
+        tabIndex={0}
+        className="bg-gray-50 sr-only focus-within:not-sr-only focus-within:p-2 focus-within:absolute"
+      >
+        Skip to content
+      </Link>
       <Link href="/home" className="font-fancy font-bold text-xl xl:text-2xl">
         Quizzz
       </Link>
       <NavigationMenu className="hidden xl:block">
         <NavigationMenuList className="space-x-12">
           <NavigationMenuItem>
-            <NavigationMenuTrigger className="text-gray-950 font-semibold text-sm">
+            <Link href="/home" legacyBehavior passHref>
+              <NavigationMenuLink className={linkClass(activeLinks.home)}>
+                Home
+              </NavigationMenuLink>
+            </Link>
+          </NavigationMenuItem>
+          <NavigationMenuItem>
+            <NavigationMenuTrigger
+              className={`${linkClass(
+                activeLinks.quizzes
+              )} hover:bg-gray-200 focus:bg-gray-200`}
+            >
               Quizzes
             </NavigationMenuTrigger>
             <NavigationMenuContent>
@@ -59,21 +96,23 @@ export default function Header({ user }: HeaderProps) {
           </NavigationMenuItem>
           <NavigationMenuItem>
             <Link href="/leaderboard" legacyBehavior passHref>
-              <NavigationMenuLink className="text-gray-400 font-semibold text-sm">
+              <NavigationMenuLink
+                className={linkClass(activeLinks.leaderboards)}
+              >
                 Leaderboards
               </NavigationMenuLink>
             </Link>
           </NavigationMenuItem>
           <NavigationMenuItem>
             <Link href="/results" legacyBehavior passHref>
-              <NavigationMenuLink className="text-gray-400 font-semibold text-sm">
+              <NavigationMenuLink className={linkClass(activeLinks.results)}>
                 My Results
               </NavigationMenuLink>
             </Link>
           </NavigationMenuItem>
           <NavigationMenuItem>
             <Link href="/profile" legacyBehavior passHref>
-              <NavigationMenuLink className="text-gray-400 font-semibold text-sm">
+              <NavigationMenuLink className={linkClass(activeLinks.proflie)}>
                 Profile
               </NavigationMenuLink>
             </Link>
