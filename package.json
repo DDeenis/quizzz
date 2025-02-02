@@ -51,6 +51,7 @@
     "zod": "^3.23.3"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.0.0",
     "@types/eslint": "^8.56.10",
     "@types/mjml": "^4.7.4",
     "@types/node": "^20.14.10",
@@ -60,14 +61,13 @@
     "@types/slug": "^5.0.9",
     "@typescript-eslint/eslint-plugin": "^8.1.0",
     "@typescript-eslint/parser": "^8.1.0",
-    "autoprefixer": "^10.4.20",
     "drizzle-kit": "^0.30.1",
     "eslint": "^8.57.0",
     "eslint-config-next": "^15.0.1",
     "eslint-plugin-drizzle": "^0.2.3",
     "nodemailer": "^6.9.16",
     "postcss": "^8.4.49",
-    "tailwindcss": "^3.4.17",
+    "tailwindcss": "^4.0.0",
     "typescript": "^5.5.3"
   },
   "ct3aMetadata": {

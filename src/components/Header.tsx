@@ -80,7 +80,7 @@ export default function Header({ user }: HeaderProps) {
               <ul className="w-[500px] bg-white shadow-md p-6 flex flex-col">
                 <li>
                   <Link href="/home" legacyBehavior passHref>
-                    <NavigationMenuLink className="px-5 py-4 flex gap-5 hover:bg-gray-50 rounded-sm group">
+                    <NavigationMenuLink className="px-5 py-4 flex gap-5 hover:bg-gray-50 rounded-xs group">
                       <div className="p-3 bg-gray-200 rounded-md">
                         <House className="w-6 h-6 stroke-gray-600 group-hover:stroke-blue-600" />
                       </div>

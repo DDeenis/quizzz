@@ -96,18 +96,18 @@ export function QuizCardShort({
           <>
             <Link
               href={`/quiz/${slug}/view`}
-              className="h-full text-sm bg-gray-200 hover:bg-gray-300 focus:bg-gray-300 focus:outline-none flex justify-center items-center font-medium"
+              className="h-full text-sm bg-gray-200 hover:bg-gray-300 focus:bg-gray-300 focus:outline-hidden flex justify-center items-center font-medium"
             >
               See more
             </Link>
-            <div className="bg-gray-200 flex items-center pointer-events-none group-hover:bg-gray-400 group-has-[:focus]:bg-gray-400 transition-colors">
+            <div className="bg-gray-200 flex items-center pointer-events-none group-hover:bg-gray-400 group-has-focus:bg-gray-400 transition-colors">
               <div className="w-[1px] h-6 bg-gray-400" />
             </div>
           </>
         )}
         <Link
           href={`/quiz/${slug}/start`}
-          className="h-full text-sm bg-gray-200 hover:bg-gray-300 focus:bg-gray-300 focus:outline-none flex justify-center items-center font-medium"
+          className="h-full text-sm bg-gray-200 hover:bg-gray-300 focus:bg-gray-300 focus:outline-hidden flex justify-center items-center font-medium"
         >
           {status === "none" || status === "passed"
             ? "Start"

@@ -138,7 +138,7 @@ export default function HomePage() {
               <div
                 role="presentation"
                 aria-label="background gradient"
-                className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-200 to-transparent"
+                className="absolute inset-0 bg-linear-to-b from-transparent via-gray-200 to-transparent"
               />
               <div className="xl:absolute inset-0 flex justify-center items-center p-4">
                 <figure className="relative w-full max-w-[600px]">
