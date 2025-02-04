@@ -2,6 +2,11 @@
 
 This is a full-stack Next.js app that allows users to create, edit, view, and take quizzes.
 
+## TODO
+
+- [ ] Update database schema to reflect the latest changes
+- [ ] Recommendations based on categories of quizzes that user took, cache the result (in db?)
+
 ## Roadmap
 
 - [x] Auth

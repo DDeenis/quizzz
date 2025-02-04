@@ -14,6 +14,7 @@ import {
   uniqueIndex,
 } from "drizzle-orm/sqlite-core";
 import { sqlNow } from "./utils";
+import type { ImageOrPattern } from "@/types/quiz";
 
 const timestamps = {
   createdAt: int("created_at", { mode: "timestamp" })
@@ -132,6 +133,9 @@ export const quizzes = createTable(
     slug: text("slug", { length: 255 }).notNull(),
     name: text("name", { length: 255 }).notNull(),
     description: text("name", { length: 4096 }),
+    imageOrPattern: text("image_or_pattern", { mode: "json" })
+      .notNull()
+      .$type<ImageOrPattern>(),
     authorId: text("author_id", { length: 255 })
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
@@ -197,6 +201,16 @@ export const quizResults = createTable("quiz_results", {
   quizSessionId: text("quiz_session_id", { length: 255 })
     .notNull()
     .references(() => quizSessions.id, { onDelete: "cascade" }),
+  resultType: text("result_type", {
+    length: 255,
+    enum: [
+      AnswerType.Correct,
+      AnswerType.PartiallyCorrect,
+      AnswerType.Incorrect,
+    ],
+  })
+    .notNull()
+    .$type<AnswerType>(),
   countCorrect: int("count_correct").notNull(),
   countPartiallyCorrect: int("count_partially_correct").notNull(),
   countIncorrect: int("count_incorrect").notNull(),

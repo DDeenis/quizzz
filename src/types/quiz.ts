@@ -4,6 +4,7 @@ import type {
   QuestionCreateObject,
   QuestionUpdateObject,
 } from "./question";
+import { type QuizSession } from "./quizSession";
 
 export interface Quiz {
   id: string;
@@ -23,12 +24,11 @@ export interface Quiz {
 export interface QuizPreview {
   id: string;
   name: string;
+  slug: string;
+  imageOrPattern: ImageOrPattern;
   time: number | null;
-  description: string | null;
   questionsCount: number;
-  minimumScore: number;
-  attempts: number | null;
-  deletedAt: Date | null;
+  sessions: QuizSession[];
 }
 
 export type QuizClient = Omit<Quiz, "questions"> & {
@@ -60,4 +60,9 @@ export interface QuizUpdateObject {
 export interface QuizOption {
   id: string;
   name: string;
+}
+
+export interface ImageOrPattern {
+  type: "image" | "pattern";
+  url: string;
 }

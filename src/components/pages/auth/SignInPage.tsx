@@ -198,7 +198,7 @@ export default function SignInPage() {
       >
         <div
           className="w-full h-full bg-sky-200"
-          style={{ maskImage: "url('/topography.svg')" }}
+          style={{ maskImage: "url('/patterns/topography.svg')" }}
         />
       </div>
     </main>
