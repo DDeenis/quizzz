@@ -1,3 +1,4 @@
+import "server-only";
 import { env } from "@/env";
 import { createTransport } from "nodemailer";
 import mjml2html from "mjml";

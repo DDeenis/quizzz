@@ -1,3 +1,4 @@
+"use client";
 import type { User } from "@/types/user";
 import Link from "next/link";
 import { useMemo } from "react";
@@ -11,7 +12,6 @@ import {
 } from "@/components/ui/navigation-menu";
 import {
   GalleryVerticalEnd,
-  House,
   Menu,
   Search,
   TableProperties,
@@ -31,7 +31,7 @@ import { usePathname } from "next/navigation";
 import clsx from "clsx";
 
 interface HeaderProps {
-  user: User;
+  user?: User;
 }
 
 const linkClass = (isActive: boolean) =>
@@ -45,7 +45,11 @@ const linkClass = (isActive: boolean) =>
 const iconClass = "w-6 h-6 stroke-gray-600 group-hover:stroke-blue-600";
 
 export default function Header({ user }: HeaderProps) {
-  const avatar = useMemo(() => textAvatarWithBg(user.name), [user.name]);
+  const avatar = useMemo(
+    () =>
+      user?.name ? textAvatarWithBg(user.name) : { text: "", gradient: "" },
+    [user?.name]
+  );
   const pathname = usePathname();
 
   const activeLinks = {
@@ -130,21 +134,23 @@ export default function Header({ user }: HeaderProps) {
             </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
-        <div className="hidden xl:flex items-center gap-4">
-          <div className="flex flex-col justify-center items-end gap-1">
-            <p className="text-sm font-semibold text-gray-950">{user.name}</p>
-            <p className="text-xs text-gray-400">
-              {user.isAdmin ? "Admin" : "Student"}
-            </p>
+        {user ? (
+          <div className="hidden xl:flex items-center gap-4">
+            <div className="flex flex-col justify-center items-end gap-1">
+              <p className="text-sm font-semibold text-gray-950">{user.name}</p>
+              <p className="text-xs text-gray-400">
+                {user.isAdmin ? "Admin" : "Student"}
+              </p>
+            </div>
+            <Avatar
+              className="w-12 h-12 font-medium"
+              style={{ backgroundImage: avatar.gradient }}
+            >
+              <AvatarImage src={user.image ?? undefined} />
+              <AvatarFallback>{avatar.text}</AvatarFallback>
+            </Avatar>
           </div>
-          <Avatar
-            className="w-12 h-12 font-medium"
-            style={{ backgroundImage: avatar.gradient }}
-          >
-            <AvatarImage src={user.image ?? undefined} />
-            <AvatarFallback>{avatar.text}</AvatarFallback>
-          </Avatar>
-        </div>
+        ) : null}
 
         <Sheet>
           <SheetTrigger className="block xl:hidden">

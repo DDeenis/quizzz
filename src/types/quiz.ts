@@ -8,14 +8,16 @@ import { type QuizSession } from "./quizSession";
 
 export interface Quiz {
   id: string;
+  authorId: string;
   name: string;
   description: string | null;
-  authorId: string;
+  imageOrPattern: ImageOrPattern;
   time: number | null;
   questionsCount: number;
   minimumScore: number;
   maximumScore: number;
   attempts: number | null;
+  rating: number | null;
   createdAt: Date | null;
   deletedAt: Date | null;
   questions: Question[];
@@ -66,3 +68,5 @@ export interface ImageOrPattern {
   type: "image" | "pattern";
   url: string;
 }
+
+export type QiuzStatus = "none" | "started" | "passed" | "failed";

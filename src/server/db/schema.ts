@@ -15,6 +15,7 @@ import {
 } from "drizzle-orm/sqlite-core";
 import { sqlNow } from "./utils";
 import type { ImageOrPattern } from "@/types/quiz";
+import { ResultType } from "@/types/quizResult";
 
 const timestamps = {
   createdAt: int("created_at", { mode: "timestamp" })
@@ -130,6 +131,10 @@ export const quizzes = createTable(
       .notNull()
       .primaryKey()
       .$defaultFn(() => crypto.randomUUID()),
+    categoryId: text("category_id", { length: 255 }).references(
+      () => categories.id,
+      { onDelete: "set null" }
+    ),
     slug: text("slug", { length: 255 }).notNull(),
     name: text("name", { length: 255 }).notNull(),
     description: text("name", { length: 4096 }),
@@ -144,6 +149,8 @@ export const quizzes = createTable(
     minimumScore: int("minimun_score").notNull(),
     maximumScore: int("maximum_score").notNull(),
     attempts: int("attempts"),
+    // cumulative field (update when someone rates the quiz)
+    rating: int("rating"),
     createdAt: timestamps.createdAt,
     deletedAt: timestamps.deletedAt,
   },
@@ -154,9 +161,46 @@ export const quizzesRelations = relations(quizzes, ({ one, many }) => ({
   sessions: many(quizSessions),
   results: many(quizResults),
   questions: many(questions),
+  ratings: many(quizRatings),
+  category: one(categories, {
+    fields: [quizzes.categoryId],
+    references: [categories.id],
+  }),
   author: one(users, {
     fields: [quizzes.authorId],
     references: [users.id],
+  }),
+}));
+
+export const categories = createTable("categories", {
+  id: text("id", { length: 255 })
+    .notNull()
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  name: text("name", { length: 255 }).notNull(),
+  slug: text("slug", { length: 255 }).notNull(),
+  image: text("image", { length: 2048 }).notNull(),
+});
+
+export const categoriesRelations = relations(categories, ({ many }) => ({
+  quizzes: many(quizzes),
+}));
+
+export const quizRatings = createTable("quiz_rating", {
+  id: text("id", { length: 255 })
+    .notNull()
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  quizId: text("quiz_id", { length: 255 })
+    .notNull()
+    .references(() => quizzes.id),
+  rating: int("rating").notNull(),
+});
+
+export const quizRatingsRelations = relations(quizRatings, ({ one }) => ({
+  quiz: one(quizzes, {
+    fields: [quizRatings.quizId],
+    references: [quizzes.id],
   }),
 }));
 
@@ -203,14 +247,10 @@ export const quizResults = createTable("quiz_results", {
     .references(() => quizSessions.id, { onDelete: "cascade" }),
   resultType: text("result_type", {
     length: 255,
-    enum: [
-      AnswerType.Correct,
-      AnswerType.PartiallyCorrect,
-      AnswerType.Incorrect,
-    ],
+    enum: [ResultType.Incorrect, ResultType.Correct],
   })
     .notNull()
-    .$type<AnswerType>(),
+    .$type<ResultType>(),
   countCorrect: int("count_correct").notNull(),
   countPartiallyCorrect: int("count_partially_correct").notNull(),
   countIncorrect: int("count_incorrect").notNull(),

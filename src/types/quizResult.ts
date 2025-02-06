@@ -15,6 +15,7 @@ interface QuizResultBase {
   maxScore?: number;
   countCorrect: number;
   countIncorrect: number;
+  resultType: ResultType;
   createdAt: Date;
 }
 
@@ -54,4 +55,9 @@ export interface QuizResultAdminData extends QuizResultBase {
     minimumScore: number;
   };
   user: User;
+}
+
+export enum ResultType {
+  Incorrect = "incorrect",
+  Correct = "correct",
 }

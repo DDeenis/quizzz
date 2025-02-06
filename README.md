@@ -23,6 +23,7 @@ This is a full-stack Next.js app that allows users to create, edit, view, and ta
   - [ ] View and manage users
   - [ ] View and change users' results
   - [ ] Manage categories
+- [ ] Allow anonymus user to pass the quiz if they were given a link
 
 ## Tech
 
