@@ -172,15 +172,21 @@ export const quizzesRelations = relations(quizzes, ({ one, many }) => ({
   }),
 }));
 
-export const categories = createTable("categories", {
-  id: text("id", { length: 255 })
-    .notNull()
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  name: text("name", { length: 255 }).notNull(),
-  slug: text("slug", { length: 255 }).notNull(),
-  image: text("image", { length: 2048 }).notNull(),
-});
+export const categories = createTable(
+  "categories",
+  {
+    id: text("id", { length: 255 })
+      .notNull()
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    name: text("name", { length: 255 }).notNull(),
+    slug: text("slug", { length: 255 }).notNull(),
+    image: text("image", { length: 2048 }).notNull(),
+  },
+  (categories) => [
+    uniqueIndex("categories_slug_unique_idx").on(categories.slug),
+  ]
+);
 
 export const categoriesRelations = relations(categories, ({ many }) => ({
   quizzes: many(quizzes),
