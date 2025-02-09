@@ -8,3 +8,4 @@ export interface Category {
 }
 
 export type CategoryCreate = Omit<InferInsert<"categories">, "slug">;
+export type CategoryUpdate = Omit<Partial<CategoryCreate>, "id">;

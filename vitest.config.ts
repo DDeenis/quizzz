@@ -6,8 +6,6 @@ import nextEnv from "@next/env";
 export default defineConfig({
   plugins: [tsconfigPaths(), react()],
   test: {
-    // include: ["src/**/*.{test,spec}.?(c|m)[jt]s?(x)"],
-    // fileParallelism: false,
     env: nextEnv.loadEnvConfig(process.cwd()).combinedEnv,
     isolate: false,
     workspace: [
