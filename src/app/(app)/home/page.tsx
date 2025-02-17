@@ -1,29 +1,29 @@
 "use server";
 import HomePage from "@/components/pages/home/HomePage";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import { getLatestQuizzes, getRecommendations } from "@/server/db/quiz";
-import type { QuizPreview } from "@/types/quiz";
+import { getLatestTests, getRecommendations } from "@/server/db/test";
+import type { TestPreview } from "@/types/test";
 import { getLoggedInUser } from "@/utils/session";
 
 export default async function Page() {
   const user = await getLoggedInUser();
   const [recommendations, latestQizzes] = (await Promise.allSettled([
     getRecommendations(user.id),
-    getLatestQuizzes(),
+    getLatestTests(),
   ]).then((res) =>
     res.map((val) => (val.status === "fulfilled" ? val.value : []))
-  )) as [QuizPreview[], QuizPreview[]];
+  )) as [TestPreview[], TestPreview[]];
 
   return (
     <ProtectedRoute>
       <HomePage
         userStats={{
-          quizzesStarted: 12,
-          quizzesPassedPercentage: 80,
+          testsStarted: 12,
+          testsPassedPercentage: 80,
           streak: 5,
         }}
         recommendations={recommendations}
-        latestQuizzes={latestQizzes}
+        latestTests={latestQizzes}
         categories={[]}
         quoteOfTheDay={{
           quote:

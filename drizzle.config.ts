@@ -9,5 +9,5 @@ export default {
     url: env.DATABASE_URL,
     token: env.DATABASE_AUTH_TOKEN,
   },
-  tablesFilter: ["step-quiz_*"],
+  tablesFilter: ["testthing_*"],
 } satisfies Config;

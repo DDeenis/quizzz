@@ -1,30 +1,39 @@
-# Quizzz
+# Test thing (name WIP)
 
-This is a full-stack Next.js app that allows users to create, edit, view, and take quizzes.
+This is a full-stack Next.js app that allows users to create, edit, view, and take tests.
 
 ## TODO
 
 - [ ] Update database schema to reflect the latest changes
-- [ ] Recommendations based on categories of quizzes that user took, cache the result (in db?)
-- [ ] [Onboarding](https://github.com/enszrlu/NextStep)
+- [ ] Redo the whole thing because why not
 
 ## Roadmap
 
-- [x] Auth
-  - [x] Sign up
-  - [x] Sign in
-- [ ] Home page
-- [ ] Search quizzes page
-- [ ] Categories page
-- [ ] User profile page
-- [ ] Results & Statistics page
-- [ ] Leaderboards
-- [ ] Admin
-  - [ ] Create and edit quiz
-  - [ ] View and manage users
-  - [ ] View and change users' results
-  - [ ] Manage categories
-- [ ] Allow anonymus user to pass the quiz if they were given a link
+- [ ] Auth
+  - [ ] Teacher sign up
+  - [ ] Student sign up
+  - [ ] Sign in
+- [ ] Teacher
+  - [ ] [Onboarding](https://github.com/enszrlu/NextStep)
+  - [ ] Home page (latest results, most recent tests, something else)
+  - [ ] Tests page
+  - [ ] Test page (basically results)
+  - [ ] Groups page
+  - [ ] Group page
+  - [ ] Student page
+  - [ ] Create group
+  - [ ] Create and edit tests
+  - [ ] Manage groups
+  - [ ] Manage students & their results
+  - [ ] Share test link
+  - [ ] Share group link
+  - [ ] Manually create student profile and send invite
+  - [ ] Assing tests to students
+- [ ] Student
+  - [ ] Home page (assigned tests and latest results)
+  - [ ] Take tests
+  - [ ] Results page
+  - [ ] Profile page
 
 ## Tech
 

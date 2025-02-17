@@ -14,7 +14,7 @@ export default async function DefaultLayout({
       {children}
       <footer className="mt-16 bg-gray-100 h-10 flex justify-center items-center">
         <p className="text-sm text-gray-400">
-          © 2024, Quizzz. All rights reserved.
+          © 2024, TestThing. All rights reserved.
         </p>
       </footer>
     </>

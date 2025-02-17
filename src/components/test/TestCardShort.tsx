@@ -10,7 +10,7 @@ import {
 import Link from "next/link";
 import { useCallback, useState } from "react";
 
-interface QuizCardShortProps {
+interface TestCardShortProps {
   title: string;
   image: string;
   time: number | null;
@@ -22,14 +22,14 @@ interface QuizCardShortProps {
 const APPROX_MAX_CHARACTERS_PER_LINE = 23;
 const APPROX_ONE_LINE_HEIGHT = 30;
 
-export function QuizCardShort({
+export function TestCardShort({
   title,
   image,
   time,
   questionsCount,
   slug,
   status,
-}: QuizCardShortProps) {
+}: TestCardShortProps) {
   const [isTwoLines, setIsTwoLines] = useState(
     title.length > APPROX_MAX_CHARACTERS_PER_LINE
   );
@@ -46,7 +46,7 @@ export function QuizCardShort({
     <div className="w-full lg:w-80 rounded-lg">
       <div
         role="presentation"
-        aria-label="quiz cover image"
+        aria-label="test cover image"
         className="h-16 bg-center bg-cover rounded-t-[inherit]"
         style={{
           backgroundImage: `url(${image})`,
@@ -95,7 +95,7 @@ export function QuizCardShort({
         {status !== "started" && (
           <>
             <Link
-              href={`/quiz/${slug}/view`}
+              href={`/test/${slug}/view`}
               className="h-full text-sm bg-gray-200 hover:bg-gray-300 focus:bg-gray-300 focus:outline-hidden flex justify-center items-center font-medium"
             >
               See more
@@ -106,7 +106,7 @@ export function QuizCardShort({
           </>
         )}
         <Link
-          href={`/quiz/${slug}/start`}
+          href={`/test/${slug}/start`}
           className="h-full text-sm bg-gray-200 hover:bg-gray-300 focus:bg-gray-300 focus:outline-hidden flex justify-center items-center font-medium"
         >
           {status === "none" || status === "passed"

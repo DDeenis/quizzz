@@ -2,7 +2,7 @@ export interface QuestionAnswer {
   id: string;
   questionId: string;
   userId: string;
-  quizResultId: string;
+  testResultId: string;
   score: number;
   answerType: AnswerType;
   answerData: DetailedAnswerData[];

@@ -4,9 +4,9 @@ import type {
   QuestionCreateObject,
   QuestionUpdateObject,
 } from "./question";
-import { type QuizSession } from "./quizSession";
+import { type TestSession } from "./testSession";
 
-export interface Quiz {
+export interface Test {
   id: string;
   authorId: string;
   name: string;
@@ -23,21 +23,21 @@ export interface Quiz {
   questions: Question[];
 }
 
-export interface QuizPreview {
+export interface TestPreview {
   id: string;
   name: string;
   slug: string;
   imageOrPattern: ImageOrPattern;
   time: number | null;
   questionsCount: number;
-  sessions: QuizSession[];
+  sessions: TestSession[];
 }
 
-export type QuizClient = Omit<Quiz, "questions"> & {
+export type TestClient = Omit<Test, "questions"> & {
   questions?: QuestionClient[];
 };
 
-export interface QuizCreateObject {
+export interface TestCreateObject {
   name: string;
   authorId: string;
   time: number | null;
@@ -48,7 +48,7 @@ export interface QuizCreateObject {
   questions: QuestionCreateObject[];
 }
 
-export interface QuizUpdateObject {
+export interface TestUpdateObject {
   name: string;
   authorId: string;
   time: number | null;
@@ -59,7 +59,7 @@ export interface QuizUpdateObject {
   questions: QuestionUpdateObject[];
 }
 
-export interface QuizOption {
+export interface TestOption {
   id: string;
   name: string;
 }

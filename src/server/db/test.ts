@@ -1,15 +1,15 @@
 import { cache } from "react";
 import { db } from ".";
-import { getQuizStatus } from "@/utils/quiz";
+import { getTestStatus } from "@/utils/test";
 import { eq, inArray } from "drizzle-orm";
-import { quizResults, quizzes } from "./schema";
+import { testResults, tests } from "./schema";
 
 export const getRecommendations = cache(async (userId: string) => {
-  const categoriesFromPrevQuizzes = await db.query.quizResults.findMany({
+  const categoriesFromPrevTests = await db.query.testResults.findMany({
     columns: {},
-    where: eq(quizResults.userId, userId),
+    where: eq(testResults.userId, userId),
     with: {
-      quiz: {
+      test: {
         columns: {},
         with: {
           category: {
@@ -22,11 +22,11 @@ export const getRecommendations = cache(async (userId: string) => {
     },
     limit: 4,
   });
-  const ids = categoriesFromPrevQuizzes
-    .map((v) => v.quiz.category?.id)
+  const ids = categoriesFromPrevTests
+    .map((v) => v.test.category?.id)
     .filter((id) => id !== undefined);
 
-  return await db.query.quizzes
+  return await db.query.tests
     .findMany({
       columns: {
         id: true,
@@ -36,7 +36,7 @@ export const getRecommendations = cache(async (userId: string) => {
         questionsCount: true,
         slug: true,
       },
-      where: inArray(quizzes.categoryId, ids),
+      where: inArray(tests.categoryId, ids),
       with: {
         sessions: {
           limit: 1,
@@ -50,17 +50,14 @@ export const getRecommendations = cache(async (userId: string) => {
           },
         },
       },
-      orderBy: (quizzes, { desc }) => [
-        desc(quizzes.createdAt),
-        desc(quizzes.rating),
-      ],
+      orderBy: (tests, { desc }) => [desc(tests.createdAt), desc(tests.rating)],
       limit: 8,
     })
-    .then((result) => result.map((q) => ({ ...q, status: getQuizStatus(q) })));
+    .then((result) => result.map((q) => ({ ...q, status: getTestStatus(q) })));
 });
 
-export const getLatestQuizzes = cache(async () => {
-  return await db.query.quizzes
+export const getLatestTests = cache(async () => {
+  return await db.query.tests
     .findMany({
       columns: {
         id: true,
@@ -83,11 +80,8 @@ export const getLatestQuizzes = cache(async () => {
           },
         },
       },
-      orderBy: (quizzes, { desc }) => [
-        desc(quizzes.rating),
-        desc(quizzes.createdAt),
-      ],
+      orderBy: (tests, { desc }) => [desc(tests.rating), desc(tests.createdAt)],
       limit: 8,
     })
-    .then((result) => result.map((q) => ({ ...q, status: getQuizStatus(q) })));
+    .then((result) => result.map((q) => ({ ...q, status: getTestStatus(q) })));
 });

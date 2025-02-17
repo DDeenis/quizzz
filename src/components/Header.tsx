@@ -54,7 +54,7 @@ export default function Header({ user }: HeaderProps) {
 
   const activeLinks = {
     home: !!pathname?.startsWith("/home"),
-    quizzes: !!pathname?.startsWith("/quizzes"),
+    tests: !!pathname?.startsWith("/tests"),
     results: !!pathname?.startsWith("/results"),
     proflie: !!pathname?.startsWith("/proflie"),
   };
@@ -70,7 +70,7 @@ export default function Header({ user }: HeaderProps) {
           Skip to content
         </Link>
         <Link href="/home" className="font-fancy font-bold text-xl xl:text-2xl">
-          Quizzz
+          TestThing
         </Link>
         <NavigationMenu className="hidden xl:block">
           <NavigationMenuList className="space-x-12">
@@ -84,33 +84,33 @@ export default function Header({ user }: HeaderProps) {
             <NavigationMenuItem>
               <NavigationMenuTrigger
                 className={`${linkClass(
-                  activeLinks.quizzes
+                  activeLinks.tests
                 )} hover:bg-gray-200 focus:bg-gray-200`}
               >
-                Quizzes
+                Tests
               </NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="w-[500px] bg-white shadow-md p-6 flex flex-col">
                   <HeaderElement
-                    href="/quizzes/search"
-                    title="Search Quizzes"
-                    description="View and filter all available quizzes"
+                    href="/tests/search"
+                    title="Search Tests"
+                    description="View and filter all available tests"
                     icon={<Search className={iconClass} />}
                   />
                   <HeaderElement
-                    href="/quizzes/search?orderBy=rating&order=desc"
+                    href="/tests/search?orderBy=rating&order=desc"
                     title="Popular"
-                    description="Latest and greatest quizzes"
+                    description="Latest and greatest tests"
                     icon={<TrendingUp className={iconClass} />}
                   />
                   <HeaderElement
-                    href="/quizzes/categories"
+                    href="/tests/categories"
                     title="Categories"
-                    description="Quizzes by categories"
+                    description="Tests by categories"
                     icon={<GalleryVerticalEnd className={iconClass} />}
                   />
                   <HeaderElement
-                    href="/quizzes/leaderboard"
+                    href="/tests/leaderboard"
                     title="Leaderboard"
                     description="Compare your results to others"
                     icon={<TableProperties className={iconClass} />}

@@ -17,20 +17,20 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { QuizCardShort } from "@/components/quiz/QuizCardShort";
+import { TestCardShort } from "@/components/test/TestCardShort";
 import { CategoryCard } from "@/components/CategoryCard";
 import { HomeSection } from "@/components/HomeSection";
-import type { QuizPreview } from "@/types/quiz";
+import type { TestPreview } from "@/types/test";
 import { type Category } from "@/types/categories";
 
 interface Props {
   userStats?: {
-    quizzesStarted?: number;
-    quizzesPassedPercentage?: number;
+    testsStarted?: number;
+    testsPassedPercentage?: number;
     streak?: number;
   };
-  recommendations: QuizPreview[];
-  latestQuizzes: QuizPreview[];
+  recommendations: TestPreview[];
+  latestTests: TestPreview[];
   categories: Category[];
   quoteOfTheDay: {
     quote: string;
@@ -41,7 +41,7 @@ interface Props {
 export default function HomePage({
   userStats,
   recommendations,
-  latestQuizzes,
+  latestTests,
   categories,
   quoteOfTheDay,
 }: Props) {
@@ -54,10 +54,10 @@ export default function HomePage({
           </p>
           <div className="mt-3 xl:mt-5 grid grid-rows-3 md:grid-rows-1 md:grid-cols-3 gap-3 xl:gap-5">
             <StatsElement
-              name="Quizzes Started"
+              name="Tests Started"
               value={
-                userStats?.quizzesStarted
-                  ? `${userStats?.quizzesStarted}`
+                userStats?.testsStarted
+                  ? `${userStats?.testsStarted}`
                   : undefined
               }
               icon={
@@ -67,8 +67,8 @@ export default function HomePage({
             <StatsElement
               name="Passed Successfully"
               value={
-                userStats?.quizzesPassedPercentage
-                  ? `${userStats.quizzesPassedPercentage}%`
+                userStats?.testsPassedPercentage
+                  ? `${userStats.testsPassedPercentage}%`
                   : undefined
               }
               icon={
@@ -86,9 +86,9 @@ export default function HomePage({
         </section>
         <HomeSection
           title="Recommended to you"
-          description="These recommendations are based on the quizzes you have previously taken"
+          description="These recommendations are based on the tests you have previously taken"
           linkText="More recommendations"
-          linkUrl="/quizzes/popular"
+          linkUrl="/tests/popular"
         >
           {recommendations.length > 0 ? (
             <Carousel
@@ -103,7 +103,7 @@ export default function HomePage({
                     key={i}
                     className="basis-full md:basis-1/2 lg:basis-1/3 xl:basis-auto flex justify-center pb-1"
                   >
-                    <QuizCardShort
+                    <TestCardShort
                       title={
                         i === 2
                           ? "Placeholder Placeholder Placeholder Placeholder"
@@ -130,7 +130,7 @@ export default function HomePage({
         </HomeSection>
         <HomeSection
           title="Popular categories"
-          description="Choose the most interesting and explore thematic quizzes"
+          description="Choose the most interesting and explore thematic tests"
           linkText="See all"
           linkUrl="/categories/all"
         >
@@ -163,12 +163,12 @@ export default function HomePage({
           )}
         </HomeSection>
         <HomeSection
-          title="Explore latest quizzes"
-          description="See the most recent and popular quizzes and choose the one you like the most"
+          title="Explore latest tests"
+          description="See the most recent and popular tests and choose the one you like the most"
           linkText="Browse more"
-          linkUrl="/quizzes/latest"
+          linkUrl="/tests/latest"
         >
-          {latestQuizzes.length > 0 ? (
+          {latestTests.length > 0 ? (
             <Carousel
               opts={{
                 align: "end",
@@ -176,12 +176,12 @@ export default function HomePage({
               }}
             >
               <CarouselContent>
-                {latestQuizzes.map((_, i) => (
+                {latestTests.map((_, i) => (
                   <CarouselItem
                     key={i}
                     className="basis-full md:basis-1/2 lg:basis-1/3 xl:basis-auto flex justify-center pb-1"
                   >
-                    <QuizCardShort
+                    <TestCardShort
                       title={
                         i === 2
                           ? "Placeholder Placeholder Placeholder Placeholder"
@@ -202,7 +202,7 @@ export default function HomePage({
           ) : (
             <EmptyState
               icon={<Sprout className={emptyStateIconClass} />}
-              description="Waiting for incoming quizzes"
+              description="Waiting for incoming tests"
             />
           )}
         </HomeSection>

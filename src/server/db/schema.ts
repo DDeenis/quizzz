@@ -14,8 +14,8 @@ import {
   uniqueIndex,
 } from "drizzle-orm/sqlite-core";
 import { sqlNow } from "./utils";
-import type { ImageOrPattern } from "@/types/quiz";
-import { ResultType } from "@/types/quizResult";
+import type { ImageOrPattern } from "@/types/test";
+import { ResultType } from "@/types/testResult";
 
 const timestamps = {
   createdAt: int("created_at", { mode: "timestamp" })
@@ -34,7 +34,7 @@ const timestamps = {
  *
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
-export const createTable = sqliteTableCreator((name) => `step-quiz_${name}`);
+export const createTable = sqliteTableCreator((name) => `step-test_${name}`);
 
 export const users = createTable(
   "user",
@@ -56,9 +56,9 @@ export const users = createTable(
 
 export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
-  quizzes: many(quizzes),
-  sessions: many(quizSessions),
-  results: many(quizResults),
+  tests: many(tests),
+  sessions: many(testSessions),
+  results: many(testResults),
 }));
 
 export const accounts = createTable("account", {
@@ -124,8 +124,8 @@ export const rateLimit = createTable("rate_limit", {
   lastRequest: int("last_request").notNull(),
 });
 
-export const quizzes = createTable(
-  "quizzes",
+export const tests = createTable(
+  "tests",
   {
     id: text("id", { length: 255 })
       .notNull()
@@ -149,25 +149,25 @@ export const quizzes = createTable(
     minimumScore: int("minimun_score").notNull(),
     maximumScore: int("maximum_score").notNull(),
     attempts: int("attempts"),
-    // cumulative field (update when someone rates the quiz)
+    // cumulative field (update when someone rates the test)
     rating: int("rating"),
     createdAt: timestamps.createdAt,
     deletedAt: timestamps.deletedAt,
   },
-  (quiz) => [uniqueIndex("quiz_slug_unique_idx").on(quiz.slug)]
+  (test) => [uniqueIndex("test_slug_unique_idx").on(test.slug)]
 );
 
-export const quizzesRelations = relations(quizzes, ({ one, many }) => ({
-  sessions: many(quizSessions),
-  results: many(quizResults),
+export const testsRelations = relations(tests, ({ one, many }) => ({
+  sessions: many(testSessions),
+  results: many(testResults),
   questions: many(questions),
-  ratings: many(quizRatings),
+  ratings: many(testRatings),
   category: one(categories, {
-    fields: [quizzes.categoryId],
+    fields: [tests.categoryId],
     references: [categories.id],
   }),
   author: one(users, {
-    fields: [quizzes.authorId],
+    fields: [tests.authorId],
     references: [users.id],
   }),
 }));
@@ -189,35 +189,35 @@ export const categories = createTable(
 );
 
 export const categoriesRelations = relations(categories, ({ many }) => ({
-  quizzes: many(quizzes),
+  tests: many(tests),
 }));
 
-export const quizRatings = createTable("quiz_rating", {
+export const testRatings = createTable("test_rating", {
   id: text("id", { length: 255 })
     .notNull()
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
-  quizId: text("quiz_id", { length: 255 })
+  testId: text("test_id", { length: 255 })
     .notNull()
-    .references(() => quizzes.id),
+    .references(() => tests.id),
   rating: int("rating").notNull(),
 });
 
-export const quizRatingsRelations = relations(quizRatings, ({ one }) => ({
-  quiz: one(quizzes, {
-    fields: [quizRatings.quizId],
-    references: [quizzes.id],
+export const testRatingsRelations = relations(testRatings, ({ one }) => ({
+  test: one(tests, {
+    fields: [testRatings.testId],
+    references: [tests.id],
   }),
 }));
 
-export const quizSessions = createTable("quiz_sessions", {
+export const testSessions = createTable("test_sessions", {
   id: text("id", { length: 255 })
     .notNull()
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
-  quizId: text("quiz_id", { length: 255 })
+  testId: text("test_id", { length: 255 })
     .notNull()
-    .references(() => quizzes.id, { onDelete: "cascade" }),
+    .references(() => tests.id, { onDelete: "cascade" }),
   userId: text("user_id", { length: 255 })
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
@@ -225,19 +225,19 @@ export const quizSessions = createTable("quiz_sessions", {
   createdAt: timestamps.createdAt,
 });
 
-export const quizSessionsRelations = relations(quizSessions, ({ one }) => ({
+export const testSessionsRelations = relations(testSessions, ({ one }) => ({
   user: one(users, {
-    fields: [quizSessions.userId],
+    fields: [testSessions.userId],
     references: [users.id],
   }),
-  quiz: one(quizzes, {
-    fields: [quizSessions.quizId],
-    references: [quizzes.id],
+  test: one(tests, {
+    fields: [testSessions.testId],
+    references: [tests.id],
   }),
-  result: one(quizResults),
+  result: one(testResults),
 }));
 
-export const quizResults = createTable("quiz_results", {
+export const testResults = createTable("test_results", {
   id: text("id", { length: 255 })
     .notNull()
     .primaryKey()
@@ -245,12 +245,12 @@ export const quizResults = createTable("quiz_results", {
   userId: text("user_id", { length: 255 })
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  quizId: text("quiz_id", { length: 255 })
+  testId: text("test_id", { length: 255 })
     .notNull()
-    .references(() => quizzes.id, { onDelete: "cascade" }),
-  quizSessionId: text("quiz_session_id", { length: 255 })
+    .references(() => tests.id, { onDelete: "cascade" }),
+  testSessionId: text("test_session_id", { length: 255 })
     .notNull()
-    .references(() => quizSessions.id, { onDelete: "cascade" }),
+    .references(() => testSessions.id, { onDelete: "cascade" }),
   resultType: text("result_type", {
     length: 255,
     enum: [ResultType.Incorrect, ResultType.Correct],
@@ -265,18 +265,18 @@ export const quizResults = createTable("quiz_results", {
   createdAt: timestamps.createdAt,
 });
 
-export const quizResultsRelations = relations(quizResults, ({ one, many }) => ({
+export const testResultsRelations = relations(testResults, ({ one, many }) => ({
   user: one(users, {
-    fields: [quizResults.userId],
+    fields: [testResults.userId],
     references: [users.id],
   }),
-  quiz: one(quizzes, {
-    fields: [quizResults.quizId],
-    references: [quizzes.id],
+  test: one(tests, {
+    fields: [testResults.testId],
+    references: [tests.id],
   }),
-  session: one(quizSessions, {
-    fields: [quizResults.quizSessionId],
-    references: [quizSessions.id],
+  session: one(testSessions, {
+    fields: [testResults.testSessionId],
+    references: [testSessions.id],
   }),
   answers: many(questionAnswers),
 }));
@@ -286,9 +286,9 @@ export const questions = createTable("questions", {
     .notNull()
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
-  quizId: text("quiz_id", { length: 255 })
+  testId: text("test_id", { length: 255 })
     .notNull()
-    .references(() => quizzes.id, { onDelete: "cascade" }),
+    .references(() => tests.id, { onDelete: "cascade" }),
   questionType: text("question_type", {
     length: 255,
     enum: [QuestionType.SingleVariant, QuestionType.MultipleVariants],
@@ -314,9 +314,9 @@ export const questions = createTable("questions", {
 });
 
 export const questionsRelations = relations(questions, ({ one, many }) => ({
-  quiz: one(quizzes, {
-    fields: [questions.quizId],
-    references: [quizzes.id],
+  test: one(tests, {
+    fields: [questions.testId],
+    references: [tests.id],
   }),
   answers: many(questionAnswers),
 }));
@@ -332,9 +332,9 @@ export const questionAnswers = createTable("question_answers", {
   questionId: text("question_id", { length: 255 })
     .notNull()
     .references(() => questions.id, { onDelete: "cascade" }),
-  quizResultId: text("quiz_result_id", { length: 255 })
+  testResultId: text("test_result_id", { length: 255 })
     .notNull()
-    .references(() => quizResults.id, { onDelete: "cascade" }),
+    .references(() => testResults.id, { onDelete: "cascade" }),
   answerType: text("answer_type", {
     length: 255,
     enum: [
@@ -362,9 +362,9 @@ export const questionAnswersRelations = relations(
       fields: [questionAnswers.questionId],
       references: [questions.id],
     }),
-    result: one(quizResults, {
-      fields: [questionAnswers.quizResultId],
-      references: [quizResults.id],
+    result: one(testResults, {
+      fields: [questionAnswers.testResultId],
+      references: [testResults.id],
     }),
   })
 );

@@ -3,7 +3,7 @@ import { type QuestionAnswer } from "./questionAnswer";
 export type Question =
   | {
       id: string;
-      quizId: string;
+      testId: string;
       questionType: (typeof QuestionType)["SingleVariant"];
       complexity: QuestionComplexity;
       questionData: QuestionData;
@@ -12,7 +12,7 @@ export type Question =
     }
   | {
       id: string;
-      quizId: string;
+      testId: string;
       questionType: (typeof QuestionType)["MultipleVariants"];
       complexity: QuestionComplexity;
       questionData: QuestionData;
@@ -23,7 +23,7 @@ export type Question =
 export type QuestionClient =
   | {
       id: string;
-      quizId: string;
+      testId: string;
       questionType: (typeof QuestionType)["SingleVariant"];
       complexity: QuestionComplexity;
       questionData: QuestionDataClient;
@@ -31,7 +31,7 @@ export type QuestionClient =
     }
   | {
       id: string;
-      quizId: string;
+      testId: string;
       questionType: (typeof QuestionType)["MultipleVariants"];
       complexity: QuestionComplexity;
       questionData: QuestionDataClient;
