@@ -5,7 +5,7 @@ export interface TestSession {
   testId: string;
   userId: string;
   createdAt: Date;
-  expires: Date | null;
+  expiresAt: Date | null;
 }
 
 export interface TestSessionWithTest extends TestSession {

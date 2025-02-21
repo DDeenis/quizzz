@@ -8,7 +8,7 @@ interface ButtonProps
       HTMLButtonElement
     >
   > {
-  variant?: "primary" | "secondary" | "outline" | "link";
+  variant?: "primary" | "secondary" | "outline" | "ghost" | "link";
   size?: "lg" | "md" | "icon";
 }
 
@@ -27,9 +27,10 @@ export function Button({
           "py-3 px-8 font-medium": size === "lg",
           "py-2 px-3 text-sm font-semibold": size === "md",
           "w-6 h-6 border": size === "icon",
-          "": variant === "primary",
-          "": variant === "secondary",
+          "text-gray-50 bg-gray-900": variant === "primary",
+          "text-gray-900 bg-gray-200": variant === "secondary",
           "": variant === "outline",
+          "text-gray-500 bg-transparent": variant === "ghost",
         },
         className
       )}

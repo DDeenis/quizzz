@@ -1,26 +1,5 @@
-import {
-  type Question,
-  QuestionComplexity,
-  type QuestionCreateObject,
-} from "@/types/question";
+import { type Question } from "@/types/question";
 import type { TestSession } from "@/types/testSession";
-
-export const complexityToScoreMap = {
-  [QuestionComplexity.Low]: 1,
-  [QuestionComplexity.Medium]: 2,
-  [QuestionComplexity.High]: 3,
-};
-
-export const getTotalScore = (
-  questions: (Question | QuestionCreateObject)[]
-) => {
-  let totalScore = 0;
-
-  for (const q of questions) {
-    totalScore += complexityToScoreMap[q.complexity];
-  }
-  return totalScore;
-};
 
 export const shuffleArray = <T>(array: T[], seed?: number) => {
   const random = seed ? mulberry32(seed) : Math.random;
@@ -35,9 +14,9 @@ export const shuffleArray = <T>(array: T[], seed?: number) => {
 };
 
 export const isTestSessionExpired = (testSession: TestSession) => {
-  if (!testSession.expires) return false;
+  if (!testSession.expiresAt) return false;
   const nowISO = getISOnow();
-  const expires = getISODate(testSession.expires);
+  const expires = getISODate(testSession.expiresAt);
   return nowISO >= expires;
 };
 
@@ -77,13 +56,11 @@ function mulberry32(seed: number) {
 
 export function shuffleQuestionsForTest({
   questions,
-  minimumScore,
   questionsCount,
   testSessionId,
 }: {
   questions: Question[];
   questionsCount: number;
-  minimumScore: number;
   testSessionId: string;
 }) {
   const randomSeed = hashFromString(testSessionId);
@@ -91,10 +68,7 @@ export function shuffleQuestionsForTest({
   let questionsForTest: Question[] = [];
 
   let i = 0;
-  while (
-    getTotalScore(questionsForTest) < minimumScore ||
-    questionsForTest.length < questionsCount
-  ) {
+  while (questionsForTest.length < questionsCount) {
     const question = questionsShuffled[i++];
     // this probably won't happen, but just in case return all questions
     if (!question) {
@@ -109,9 +83,8 @@ export function shuffleQuestionsForTest({
 
   return questionsForTest.map((q) => ({
     ...q,
-    questionData: {
-      ...q.questionData,
-      variants: shuffleArray(q.questionData.variants),
+    answerData: {
+      variants: shuffleArray(q.answerData.variants),
     },
   }));
 }

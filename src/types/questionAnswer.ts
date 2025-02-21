@@ -21,7 +21,7 @@ export interface QuestionAnswerUpdateObject extends Omit<QuestionAnswer, "id"> {
 export enum AnswerType {
   Correct = "correct",
   Incorrect = "incorrect",
-  PartiallyCorrect = "partiallyCorrect",
+  PartiallyCorrect = "partially_correct",
 }
 
 interface AnswerData {

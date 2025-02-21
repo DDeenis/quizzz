@@ -1,14 +1,14 @@
-import type { QiuzStatus } from "@/types/test";
+import { TestStatus } from "@/types/test";
 import { ResultType } from "@/types/testResult";
 import type { TestSession } from "@/types/testSession";
 
 export function getTestStatus(test: {
   sessions: (TestSession & { result: { resultType: ResultType } | null })[];
-}): QiuzStatus {
+}): TestStatus {
   const latestSession = test.sessions[0];
 
-  if (!latestSession) return "none";
-  if (!latestSession.result) return "started";
+  if (!latestSession) return TestStatus.None;
+  if (!latestSession.result) return TestStatus.Started;
 
-  return ResultType.Correct ? "passed" : "failed";
+  return ResultType.Passed ? TestStatus.Passed : TestStatus.Failed;
 }

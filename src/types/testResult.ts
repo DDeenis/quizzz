@@ -58,6 +58,7 @@ export interface TestResultAdminData extends TestResultBase {
 }
 
 export enum ResultType {
-  Incorrect = "incorrect",
-  Correct = "correct",
+  Passed = "passed",
+  Failed = "failed",
+  Pending = "pending",
 }

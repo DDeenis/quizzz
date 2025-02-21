@@ -10,54 +10,45 @@ export interface Test {
   id: string;
   authorId: string;
   name: string;
+  slug: string;
   description: string | null;
   imageOrPattern: ImageOrPattern;
-  time: number | null;
+  timeInMinutes: number | null;
   questionsCount: number;
-  minimumScore: number;
-  maximumScore: number;
+  minimumCorrectAnswers: number;
   attempts: number | null;
-  rating: number | null;
   createdAt: Date | null;
   deletedAt: Date | null;
   questions: Question[];
 }
 
-export interface TestPreview {
-  id: string;
-  name: string;
-  slug: string;
-  imageOrPattern: ImageOrPattern;
-  time: number | null;
-  questionsCount: number;
+export type TestPreview = Pick<
+  Test,
+  "id" | "name" | "slug" | "imageOrPattern" | "timeInMinutes" | "questionsCount"
+> & {
   sessions: TestSession[];
-}
+};
 
 export type TestClient = Omit<Test, "questions"> & {
-  questions?: QuestionClient[];
+  questions: QuestionClient[];
 };
 
 export interface TestCreateObject {
-  name: string;
   authorId: string;
-  time: number | null;
+  name: string;
+  description?: string;
+  image?: string;
+  timeInMinutes?: number;
   questionsCount: number;
-  minimumScore: number;
-  attempts: number | null;
-  description: string | null;
+  autoScore: boolean;
+  minimumCorrectAnswers: number;
+  attempts?: number;
   questions: QuestionCreateObject[];
 }
 
-export interface TestUpdateObject {
-  name: string;
-  authorId: string;
-  time: number | null;
-  questionsCount: number;
-  minimumScore: number;
-  attempts: number | null;
-  description: string | null;
+export type TestUpdateObject = Omit<TestCreateObject, "questions"> & {
   questions: QuestionUpdateObject[];
-}
+};
 
 export interface TestOption {
   id: string;
@@ -69,4 +60,9 @@ export interface ImageOrPattern {
   url: string;
 }
 
-export type QiuzStatus = "none" | "started" | "passed" | "failed";
+export enum TestStatus {
+  None = "none",
+  Started = "started",
+  Passed = "passed",
+  Failed = "failed",
+}

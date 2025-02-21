@@ -1,8 +1,4 @@
-import {
-  QuestionComplexity,
-  type QuestionData,
-  QuestionType,
-} from "@/types/question";
+import { type AnswerData, QuestionType } from "@/types/question";
 import { AnswerType, type DetailedAnswerData } from "@/types/questionAnswer";
 import { relations, sql } from "drizzle-orm";
 import {
@@ -34,7 +30,7 @@ const timestamps = {
  *
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
-export const createTable = sqliteTableCreator((name) => `step-test_${name}`);
+export const createTable = sqliteTableCreator((name) => `test-thing_${name}`);
 
 export const users = createTable(
   "user",
@@ -131,26 +127,22 @@ export const tests = createTable(
       .notNull()
       .primaryKey()
       .$defaultFn(() => crypto.randomUUID()),
-    categoryId: text("category_id", { length: 255 }).references(
-      () => categories.id,
-      { onDelete: "set null" }
-    ),
-    slug: text("slug", { length: 255 }).notNull(),
+    authorId: text("author_id", { length: 255 })
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
     name: text("name", { length: 255 }).notNull(),
+    slug: text("slug", { length: 255 }).notNull(),
     description: text("name", { length: 4096 }),
     imageOrPattern: text("image_or_pattern", { mode: "json" })
       .notNull()
       .$type<ImageOrPattern>(),
-    authorId: text("author_id", { length: 255 })
-      .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
-    time: int("time"),
     questionsCount: int("questions_count").notNull(),
-    minimumScore: int("minimun_score").notNull(),
-    maximumScore: int("maximum_score").notNull(),
+    autoScore: int("auto_score_enabled", { mode: "boolean" })
+      .notNull()
+      .default(false),
+    minimumCorrectAnswers: int("minimum_correct_answers").notNull(),
+    timeInMinutes: int("time_in_minutes"),
     attempts: int("attempts"),
-    // cumulative field (update when someone rates the test)
-    rating: int("rating"),
     createdAt: timestamps.createdAt,
     deletedAt: timestamps.deletedAt,
   },
@@ -161,52 +153,9 @@ export const testsRelations = relations(tests, ({ one, many }) => ({
   sessions: many(testSessions),
   results: many(testResults),
   questions: many(questions),
-  ratings: many(testRatings),
-  category: one(categories, {
-    fields: [tests.categoryId],
-    references: [categories.id],
-  }),
   author: one(users, {
     fields: [tests.authorId],
     references: [users.id],
-  }),
-}));
-
-export const categories = createTable(
-  "categories",
-  {
-    id: text("id", { length: 255 })
-      .notNull()
-      .primaryKey()
-      .$defaultFn(() => crypto.randomUUID()),
-    name: text("name", { length: 255 }).notNull(),
-    slug: text("slug", { length: 255 }).notNull(),
-    image: text("image", { length: 2048 }).notNull(),
-  },
-  (categories) => [
-    uniqueIndex("categories_slug_unique_idx").on(categories.slug),
-  ]
-);
-
-export const categoriesRelations = relations(categories, ({ many }) => ({
-  tests: many(tests),
-}));
-
-export const testRatings = createTable("test_rating", {
-  id: text("id", { length: 255 })
-    .notNull()
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  testId: text("test_id", { length: 255 })
-    .notNull()
-    .references(() => tests.id),
-  rating: int("rating").notNull(),
-});
-
-export const testRatingsRelations = relations(testRatings, ({ one }) => ({
-  test: one(tests, {
-    fields: [testRatings.testId],
-    references: [tests.id],
   }),
 }));
 
@@ -221,7 +170,7 @@ export const testSessions = createTable("test_sessions", {
   userId: text("user_id", { length: 255 })
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  expires: int("expires_at", { mode: "timestamp" }),
+  expiresAt: int("expires_at", { mode: "timestamp" }),
   createdAt: timestamps.createdAt,
 });
 
@@ -253,16 +202,21 @@ export const testResults = createTable("test_results", {
     .references(() => testSessions.id, { onDelete: "cascade" }),
   resultType: text("result_type", {
     length: 255,
-    enum: [ResultType.Incorrect, ResultType.Correct],
+    enum: [ResultType.Passed, ResultType.Failed, ResultType.Pending],
+  })
+    .notNull()
+    .default(ResultType.Pending)
+    .$type<ResultType>(),
+  suggestedResultType: text("result_type", {
+    length: 255,
+    enum: [ResultType.Passed, ResultType.Failed],
   })
     .notNull()
     .$type<ResultType>(),
   countCorrect: int("count_correct").notNull(),
-  countPartiallyCorrect: int("count_partially_correct").notNull(),
   countIncorrect: int("count_incorrect").notNull(),
-  score: real("score").notNull(),
-  maxScore: int("max_score").notNull(),
   createdAt: timestamps.createdAt,
+  updatedAt: timestamps.updatedAt,
 });
 
 export const testResultsRelations = relations(testResults, ({ one, many }) => ({
@@ -295,21 +249,14 @@ export const questions = createTable("questions", {
   })
     .notNull()
     .$type<QuestionType>(),
-  complexity: text("complexity", {
-    length: 255,
-    enum: [
-      QuestionComplexity.Low,
-      QuestionComplexity.Medium,
-      QuestionComplexity.High,
-    ],
-  })
-    .notNull()
-    .$type<QuestionComplexity>(),
-  questionData: text("question_data_json", {
+  question: text("question", { length: 255 }).notNull(),
+  description: text("description", { length: 4096 }),
+  image: text("image", { length: 255 }),
+  answerData: text("question_data_json", {
     mode: "json",
   })
     .notNull()
-    .$type<QuestionData>(),
+    .$type<AnswerData>(),
   createdAt: timestamps.createdAt,
 });
 
