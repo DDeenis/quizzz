@@ -12,3 +12,18 @@ export function getTestStatus(test: {
 
   return ResultType.Passed ? TestStatus.Passed : TestStatus.Failed;
 }
+
+export const ACCEPTED_IMAGE_MIME_TYPES = [
+  "image/webp",
+  "image/jpeg",
+  "image/png",
+];
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
+
+export function validateImageSize(image: File) {
+  return image.size <= MAX_IMAGE_SIZE;
+}
+
+export function validateImageType(file: File) {
+  return ACCEPTED_IMAGE_MIME_TYPES.includes(file.type);
+}

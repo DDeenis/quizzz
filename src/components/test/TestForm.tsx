@@ -37,47 +37,109 @@ import { Plus, Save, Trash, Trash2 } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Label } from "../ui/label";
 import { Checkbox } from "../ui/checkbox";
+import { validateImageSize, validateImageType } from "@/utils/test";
 
-const ACCEPTED_MIME_TYPES = ["image/webp", "image/jpeg", "image/png"];
+const imageSchema = z
+  .custom<File | undefined>()
+  .refine(
+    (f) => (f ? validateImageSize(f) : true),
+    "Maximum image size is 10MB"
+  )
+  .refine((f) => (f ? validateImageType(f) : true), "Only images are accepted")
+  .optional();
 
-const formSchema = z.object({
-  name: z.string().min(1).max(255).trim(),
-  description: z.string().max(4096).optional(),
-  image: z
-    .custom<File | undefined>()
-    .refine((f) => (f ? f.size <= 10 * 1024 * 1024 : true))
-    .refine((f) => (f ? ACCEPTED_MIME_TYPES.includes(f.type) : true))
-    .optional(),
-  timeInMinutes: z
-    .number()
-    .min(5)
-    .max(60 * 6)
-    .optional(),
-  autoScore: z.boolean().default(false),
-  minimumCorrectAnswers: z.number().min(1),
-  attempts: z.number().min(1).optional(),
-  questionsCount: z.number().min(1),
-  questions: z.array(
-    z.object({
-      name: z.string().min(1).max(255).trim(),
-      description: z.string().max(4096).optional(),
-      image: z
-        .custom<File | undefined>()
-        .refine((f) => (f ? f.size <= 10 * 1024 * 1024 : true))
-        .refine((f) => (f ? ACCEPTED_MIME_TYPES.includes(f.type) : true))
-        .optional(),
-      questionType: z
-        .nativeEnum(QuestionType)
-        .default(QuestionType.SingleVariant),
-      answers: z.array(
+const formSchema = z
+  .object({
+    name: z
+      .string()
+      .min(1, "Name should not be empty")
+      .max(255, "Name should not be longer than 255 characters")
+      .trim(),
+    description: z
+      .string()
+      .max(4096, "Description should not be longer than 4096 characters")
+      .optional(),
+    image: imageSchema,
+    timeInMinutes: z
+      .number()
+      .min(5, "Minimum value is 5 minutes")
+      .max(60 * 6, "Maximum value is 6 hours")
+      .optional(),
+    autoScore: z.boolean().default(false),
+    minimumCorrectAnswers: z.number().min(1, "Minimum one question"),
+    attempts: z.number().min(1, "Minimum one attempt").optional(),
+    questionsCount: z.number().min(1, "Minimum one question"),
+    questions: z
+      .array(
         z.object({
-          variant: z.string().min(1).max(255).trim(),
-          isCorrect: z.boolean().default(false),
+          name: z
+            .string()
+            .min(1, "Name should not be empty")
+            .max(1024, "Name should not be longer than 1024 characters")
+            .trim(),
+          description: z
+            .string()
+            .max(4096, "Description should not be longer than 4096 characters")
+            .optional(),
+          image: imageSchema,
+          questionType: z
+            .nativeEnum(QuestionType)
+            .default(QuestionType.SingleVariant),
+          answers: z
+            .array(
+              z.object({
+                variant: z
+                  .string()
+                  .min(1, "Answer should not be empty")
+                  .max(2048, "Answer should not be longer than 2048 characters")
+                  .trim(),
+                isCorrect: z.boolean().default(false),
+              })
+            )
+            .refine(
+              (a) => a.some((v) => v.isCorrect),
+              "Select at least one correct answer"
+            ),
         })
-      ),
-    })
-  ),
-});
+      )
+      .refine((q) => q.length > 0, "Add minimum one question"),
+  })
+  .superRefine((fields, ctx) => {
+    if (fields.questionsCount > fields.questions.length) {
+      ctx.addIssue({
+        path: ["questionsCount"],
+        code: z.ZodIssueCode.too_big,
+        type: "number",
+        inclusive: true,
+        maximum: fields.questions.length,
+        message: `Maximum questions count is ${fields.questions.length}`,
+      });
+    }
+
+    if (fields.minimumCorrectAnswers > fields.questions.length) {
+      ctx.addIssue({
+        path: ["minimumCorrectAnswers"],
+        code: z.ZodIssueCode.too_big,
+        type: "number",
+        inclusive: true,
+        maximum: fields.questions.length,
+        message: `Maximum correct questions count is ${fields.questions.length}`,
+      });
+    }
+
+    if (fields.minimumCorrectAnswers > fields.questionsCount) {
+      ctx.addIssue({
+        path: ["minimumCorrectAnswers"],
+        code: z.ZodIssueCode.too_big,
+        type: "number",
+        inclusive: true,
+        maximum: fields.questions.length,
+        message: `Minimum correct questions number should not be greater than questions count`,
+      });
+    }
+
+    return z.NEVER;
+  });
 
 type FormType = z.infer<typeof formSchema>;
 
@@ -104,14 +166,18 @@ export default function TestForm() {
     },
   });
 
+  const onSubmit = form.handleSubmit((values) => {
+    console.log(values);
+  });
+
   return (
-    <div className="flex flex-col gap-3">
-      <Form {...form}>
+    <Form {...form}>
+      <form className="flex flex-col gap-3" onSubmit={onSubmit}>
         <GeneralTestForm form={form} />
         <Separator orientation="horizontal" />
         <QuestionsForms form={form} />
-      </Form>
-    </div>
+      </form>
+    </Form>
   );
 }
 
@@ -567,7 +633,10 @@ const QuestionForm = memo(
                 <div className="flex items-center gap-2" key={answer.id}>
                   {!answersRemoveMode ? (
                     questionType === QuestionType.SingleVariant ? (
-                      <RadioGroupItem value={answer.id} />
+                      <RadioGroupItem
+                        aria-label={`Answer №${i + 1} isCorrect radio button`}
+                        value={answer.id}
+                      />
                     ) : (
                       <FormField
                         control={form.control}

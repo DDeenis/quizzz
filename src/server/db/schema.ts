@@ -249,7 +249,7 @@ export const questions = createTable("questions", {
   })
     .notNull()
     .$type<QuestionType>(),
-  question: text("question", { length: 255 }).notNull(),
+  name: text("name", { length: 1024 }).notNull(),
   description: text("description", { length: 4096 }),
   image: text("image", { length: 255 }),
   answerData: text("question_data_json", {

@@ -3,6 +3,8 @@ import { type QuestionAnswer } from "./questionAnswer";
 export interface Question {
   id: string;
   testId: string;
+  name: string;
+  description: string;
   questionType: QuestionType;
   answerData: AnswerData;
   createdAt: Date;

@@ -3,6 +3,7 @@ import * as React from "react";
 import { Input } from "./input";
 import clsx from "clsx";
 import { ImageUp, Replace, Trash2 } from "lucide-react";
+import { ACCEPTED_IMAGE_MIME_TYPES } from "@/utils/test";
 
 const ImageUpload = React.forwardRef<
   HTMLInputElement,
@@ -43,8 +44,9 @@ const ImageUpload = React.forwardRef<
         }}
       >
         <Input
-          type="file"
           {...props}
+          type="file"
+          accept={ACCEPTED_IMAGE_MIME_TYPES.join(",")}
           onChange={(e) => {
             const file = e.target.files?.[0];
             if (file) onChange(file);
