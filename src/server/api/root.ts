@@ -1,24 +1,11 @@
 import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
-import { authRouter } from "./routers/auth";
-import { quizesRouter } from "./routers/quiz";
-import { studentQuizesRouter } from "./routers/studentQuiz";
-import { quizResultRouter } from "./routers/quizResult";
-import { userRouter } from "./routers/user";
-import { adminRouter } from "./routers/admin";
 
 /**
  * This is the primary router for your server.
  *
  * All routers added in /api/routers should be manually added here.
  */
-export const appRouter = createTRPCRouter({
-  auth: authRouter,
-  quizes: quizesRouter,
-  studentQuizes: studentQuizesRouter,
-  quizResults: quizResultRouter,
-  users: userRouter,
-  admin: adminRouter,
-});
+export const appRouter = createTRPCRouter({});
 
 // export type definition of API
 export type AppRouter = typeof appRouter;

@@ -1,48 +1,26 @@
 import { type QuestionAnswer } from "./questionAnswer";
 
-export type Question =
-  | {
-      id: string;
-      quizId: string;
-      questionType: (typeof QuestionType)["SingleVariant"];
-      complexity: QuestionComplexity;
-      questionData: QuestionData;
-      createdAt: Date;
-      answers?: QuestionAnswer[];
-    }
-  | {
-      id: string;
-      quizId: string;
-      questionType: (typeof QuestionType)["MultipleVariants"];
-      complexity: QuestionComplexity;
-      questionData: QuestionData;
-      createdAt: Date;
-      answers?: QuestionAnswer[];
-    };
-
-export type QuestionClient =
-  | {
-      id: string;
-      quizId: string;
-      questionType: (typeof QuestionType)["SingleVariant"];
-      complexity: QuestionComplexity;
-      questionData: QuestionDataClient;
-      createdAt: Date;
-    }
-  | {
-      id: string;
-      quizId: string;
-      questionType: (typeof QuestionType)["MultipleVariants"];
-      complexity: QuestionComplexity;
-      questionData: QuestionDataClient;
-      createdAt: Date;
-    };
-
-export interface QuestionCreateObject {
+export interface Question {
+  id: string;
+  testId: string;
+  name: string;
+  description: string;
   questionType: QuestionType;
-  complexity: QuestionComplexity;
-  questionData: QuestionData;
+  answerData: AnswerData;
+  createdAt: Date;
+  answers?: QuestionAnswer[];
 }
+
+type StrictOmit<T, K extends keyof T> = Omit<T, K>;
+
+export type QuestionClient = StrictOmit<Question, "answerData" | "answers"> & {
+  answerData: AnswerDataClient;
+};
+
+export type QuestionCreateObject = Pick<
+  Question,
+  "testId" | "questionType" | "answers"
+>;
 
 export type QuestionUpdateObject = QuestionCreateObject & {
   id?: string;
@@ -53,12 +31,6 @@ export enum QuestionType {
   MultipleVariants = "multipleVariants",
 }
 
-export enum QuestionComplexity {
-  Low = "low",
-  Medium = "medium",
-  High = "high",
-}
-
 export interface QuestionVariant {
   variant: string;
   isCorrect: boolean;
@@ -66,14 +38,10 @@ export interface QuestionVariant {
 
 export type QuestionVariantClient = string;
 
-export interface QuestionData {
-  question: string;
-  description?: string;
+export interface AnswerData {
   variants: QuestionVariant[];
 }
 
-export interface QuestionDataClient {
-  question: string;
-  description?: string;
+export interface AnswerDataClient {
   variants: QuestionVariantClient[];
 }

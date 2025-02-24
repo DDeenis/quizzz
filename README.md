@@ -1,19 +1,39 @@
-## ⚠ This project is currently being redesigned. The current version in the `master` branch was initially created as a part of my university practice, and than slightly updated. You can view the current progress in the `feat/redesign` branch.
+# Test thing (name WIP)
 
-# Quizzz
+This is a full-stack Next.js app that allows users to create, edit, view, and take tests.
 
-This is a full-stack Next.js app that allows users to create, edit, view, and take quizzes.
+## TODO
 
-[Demo](https://quizzz-demo.vercel.app/)
+- [ ] Update database schema to reflect the latest changes
+- [ ] Redo the whole thing because why not
 
-## Functionality
+## Roadmap
 
-- ✨ Sign Up and Sign In with magic link
-- 📝 Take quizzes as user
-- 🗃 Questions and answers are shuffled for each user who is taking a quiz
-- 🏆 View your results
-- 🛠 Create and edit quizzes as admin
-- 🔭 View and manage users and their results as admin
+- [ ] Auth
+  - [ ] Teacher sign up
+  - [ ] Student sign up
+  - [ ] Sign in
+- [ ] Teacher
+  - [ ] [Onboarding](https://github.com/enszrlu/NextStep)
+  - [ ] Home page (latest results, most recent tests, something else)
+  - [ ] Tests page
+  - [ ] Test page (basically results)
+  - [ ] Groups page
+  - [ ] Group page
+  - [ ] Student page
+  - [ ] Create group
+  - [ ] Create and edit tests
+  - [ ] Manage groups
+  - [ ] Manage students & their results
+  - [ ] Share test link
+  - [ ] Share group link
+  - [ ] Manually create student profile and send invite
+  - [ ] Assing tests to students
+- [ ] Student
+  - [ ] Home page (assigned tests and latest results)
+  - [ ] Take tests
+  - [ ] Results page
+  - [ ] Profile page
 
 ## Tech
 
@@ -23,4 +43,4 @@ This is a full-stack Next.js app that allows users to create, edit, view, and ta
 - [Drizzle](https://orm.drizzle.team)
 - [Tailwind CSS](https://tailwindcss.com)
 - [SQLite](https://www.sqlite.org/)
-- [Material UI](https://mui.com/material-ui/)
+- [ShadcnUI](https://ui.shadcn.com/)

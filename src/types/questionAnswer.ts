@@ -2,7 +2,7 @@ export interface QuestionAnswer {
   id: string;
   questionId: string;
   userId: string;
-  quizResultId: string;
+  testResultId: string;
   score: number;
   answerType: AnswerType;
   answerData: DetailedAnswerData[];
@@ -21,7 +21,7 @@ export interface QuestionAnswerUpdateObject extends Omit<QuestionAnswer, "id"> {
 export enum AnswerType {
   Correct = "correct",
   Incorrect = "incorrect",
-  PartiallyCorrect = "partiallyCorrect",
+  PartiallyCorrect = "partially_correct",
 }
 
 interface AnswerData {

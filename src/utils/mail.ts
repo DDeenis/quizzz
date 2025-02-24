@@ -1,3 +1,4 @@
+import "server-only";
 import { env } from "@/env";
 import { createTransport } from "nodemailer";
 import mjml2html from "mjml";
@@ -29,7 +30,7 @@ export async function sendMagicLinkEmail({
       <mj-body background-color="#ffffff">
         <mj-section background-color="#f0f0f0" padding="20px 0">
           <mj-column>
-            <mj-image width="100px" src="${origin}/logo.png" alt="Quiz App Logo" />
+            <mj-image width="100px" src="${origin}/logo.png" alt="Test App Logo" />
           </mj-column>
         </mj-section>
 
@@ -39,9 +40,9 @@ export async function sendMagicLinkEmail({
               Hello,
             </mj-text>
             <mj-text font-size="16px" color="#555555" font-family="Helvetica, Arial, sans-serif" line-height="1.5">
-              Welcome to Quiz App! Click the button below to sign in to your account:
+              Welcome to Test App! Click the button below to sign in to your account:
             </mj-text>
-            <mj-button background-color="#007BFF" color="#ffffff" font-family="Helvetica, Arial, sans-serif" href="${url}">
+            <mj-button background-color="#007BFF" color="#ffffff" font-family="Helvetica, Arial, sans-serif" href="${origin}/sign-in/magic-link/${token}">
               Sign In
             </mj-button>
             <mj-text font-size="16px" color="#555555" font-family="Helvetica, Arial, sans-serif" line-height="1.5">
@@ -53,7 +54,7 @@ export async function sendMagicLinkEmail({
         <mj-section background-color="#f0f0f0" padding="20px 0">
           <mj-column>
             <mj-text font-size="12px" color="#888888" font-family="Helvetica, Arial, sans-serif" align="center">
-              © 2024 Quiz App. All rights reserved.
+              © 2024 TestThing. All rights reserved.
             </mj-text>
           </mj-column>
         </mj-section>
@@ -69,7 +70,7 @@ export async function sendMagicLinkEmail({
     );
 
   return await transporter.sendMail({
-    from: `"Quiz App 💡" <${env.SMTP_USER}>`,
+    from: env.EMAIL_FROM,
     to: email,
     subject: "Your Magic Link ✨",
     // html: `Click <a href="${url}" target="_blank">this link<a> to log in`, // html body

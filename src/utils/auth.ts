@@ -5,6 +5,7 @@ import { betterAuth } from "better-auth";
 import { magicLink } from "better-auth/plugins";
 import { sendMagicLinkEmail } from "./mail";
 import { nextCookies } from "better-auth/next-js";
+import { getBaseUrl } from "./trpc/utils";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -32,15 +33,12 @@ export const auth = betterAuth({
       },
     },
   },
-  // session: {
-  //   cookieCache: { enabled: true },
-  // },
   plugins: [
     magicLink({
-      sendMagicLink: async (params, req) => {
+      sendMagicLink: async (params) => {
         await sendMagicLinkEmail({
           ...params,
-          origin: new URL(req!.url).origin,
+          origin: new URL(getBaseUrl()).origin,
         });
       },
     }),

@@ -17,4 +17,16 @@ export const client =
   createClient({ url: env.DATABASE_URL, authToken: env.DATABASE_AUTH_TOKEN });
 if (env.NODE_ENV !== "production") globalForDb.client = client;
 
+let configExecuted = false;
+
+if (!configExecuted) {
+  configExecuted = true;
+  try {
+    // switch to WAL
+    await client.execute("PRAGMA journal_mode=WAL;");
+  } catch (err) {
+    console.error(err);
+  }
+}
+
 export const db = drizzle(client, { schema });

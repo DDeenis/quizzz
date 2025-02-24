@@ -1,26 +1,5 @@
-import {
-  type Question,
-  QuestionComplexity,
-  type QuestionCreateObject,
-} from "@/types/question";
-import type { QuizSession } from "@/types/quizSession";
-
-export const complexityToScoreMap = {
-  [QuestionComplexity.Low]: 1,
-  [QuestionComplexity.Medium]: 2,
-  [QuestionComplexity.High]: 3,
-};
-
-export const getTotalScore = (
-  questions: (Question | QuestionCreateObject)[]
-) => {
-  let totalScore = 0;
-
-  for (const q of questions) {
-    totalScore += complexityToScoreMap[q.complexity];
-  }
-  return totalScore;
-};
+import { type Question } from "@/types/question";
+import type { TestSession } from "@/types/testSession";
 
 export const shuffleArray = <T>(array: T[], seed?: number) => {
   const random = seed ? mulberry32(seed) : Math.random;
@@ -34,9 +13,10 @@ export const shuffleArray = <T>(array: T[], seed?: number) => {
   return copy;
 };
 
-export const isQuizSessionExpired = (quizSession: QuizSession) => {
+export const isTestSessionExpired = (testSession: TestSession) => {
+  if (!testSession.expiresAt) return false;
   const nowISO = getISOnow();
-  const expires = getISODate(quizSession.expires);
+  const expires = getISODate(testSession.expiresAt);
   return nowISO >= expires;
 };
 
@@ -74,43 +54,37 @@ function mulberry32(seed: number) {
   };
 }
 
-export function shuffleQuestionsForQuiz({
+export function shuffleQuestionsForTest({
   questions,
-  minimumScore,
   questionsCount,
-  quizSessionId,
+  testSessionId,
 }: {
   questions: Question[];
   questionsCount: number;
-  minimumScore: number;
-  quizSessionId: string;
+  testSessionId: string;
 }) {
-  const randomSeed = hashFromString(quizSessionId);
+  const randomSeed = hashFromString(testSessionId);
   const questionsShuffled = shuffleArray(questions, randomSeed);
-  let questionsForQuiz: Question[] = [];
+  let questionsForTest: Question[] = [];
 
   let i = 0;
-  while (
-    getTotalScore(questionsForQuiz) < minimumScore ||
-    questionsForQuiz.length < questionsCount
-  ) {
+  while (questionsForTest.length < questionsCount) {
     const question = questionsShuffled[i++];
     // this probably won't happen, but just in case return all questions
     if (!question) {
       console.error(
-        `Something went wrong while selecting questions for quiz session ${quizSessionId}`
+        `Something went wrong while selecting questions for test session ${testSessionId}`
       );
-      questionsForQuiz = questionsShuffled;
+      questionsForTest = questionsShuffled;
       break;
     }
-    questionsForQuiz.push(question);
+    questionsForTest.push(question);
   }
 
-  return questionsForQuiz.map((q) => ({
+  return questionsForTest.map((q) => ({
     ...q,
-    questionData: {
-      ...q.questionData,
-      variants: shuffleArray(q.questionData.variants),
+    answerData: {
+      variants: shuffleArray(q.answerData.variants),
     },
   }));
 }
