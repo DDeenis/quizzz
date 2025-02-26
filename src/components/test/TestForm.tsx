@@ -2,13 +2,13 @@
 import { QuestionType } from "@/types/question";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import {
+  type FieldPath,
   useFieldArray,
   useForm,
   useWatch,
   type UseFormReturn,
 } from "react-hook-form";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
-import { z } from "zod";
 import {
   Form,
   FormControl,
@@ -30,122 +30,18 @@ import {
 } from "../ui/accordion";
 import clsx from "clsx";
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
 import { Plus, Save, Trash, Trash2 } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Label } from "../ui/label";
 import { Checkbox } from "../ui/checkbox";
-import { validateImageSize, validateImageType } from "@/utils/test";
-
-const imageSchema = z
-  .custom<File | undefined>()
-  .refine(
-    (f) => (f ? validateImageSize(f) : true),
-    "Maximum image size is 10MB"
-  )
-  .refine((f) => (f ? validateImageType(f) : true), "Only images are accepted")
-  .optional();
-
-const formSchema = z
-  .object({
-    name: z
-      .string()
-      .min(1, "Name should not be empty")
-      .max(255, "Name should not be longer than 255 characters")
-      .trim(),
-    description: z
-      .string()
-      .max(4096, "Description should not be longer than 4096 characters")
-      .optional(),
-    image: imageSchema,
-    timeInMinutes: z
-      .number()
-      .min(5, "Minimum value is 5 minutes")
-      .max(60 * 6, "Maximum value is 6 hours")
-      .optional(),
-    autoScore: z.boolean().default(false),
-    minimumCorrectAnswers: z.number().min(1, "Minimum one question"),
-    attempts: z.number().min(1, "Minimum one attempt").optional(),
-    questionsCount: z.number().min(1, "Minimum one question"),
-    questions: z
-      .array(
-        z.object({
-          name: z
-            .string()
-            .min(1, "Name should not be empty")
-            .max(1024, "Name should not be longer than 1024 characters")
-            .trim(),
-          description: z
-            .string()
-            .max(4096, "Description should not be longer than 4096 characters")
-            .optional(),
-          image: imageSchema,
-          questionType: z
-            .nativeEnum(QuestionType)
-            .default(QuestionType.SingleVariant),
-          answers: z
-            .array(
-              z.object({
-                variant: z
-                  .string()
-                  .min(1, "Answer should not be empty")
-                  .max(2048, "Answer should not be longer than 2048 characters")
-                  .trim(),
-                isCorrect: z.boolean().default(false),
-              })
-            )
-            .refine(
-              (a) => a.some((v) => v.isCorrect),
-              "Select at least one correct answer"
-            ),
-        })
-      )
-      .refine((q) => q.length > 0, "Add minimum one question"),
-  })
-  .superRefine((fields, ctx) => {
-    if (fields.questionsCount > fields.questions.length) {
-      ctx.addIssue({
-        path: ["questionsCount"],
-        code: z.ZodIssueCode.too_big,
-        type: "number",
-        inclusive: true,
-        maximum: fields.questions.length,
-        message: `Maximum questions count is ${fields.questions.length}`,
-      });
-    }
-
-    if (fields.minimumCorrectAnswers > fields.questions.length) {
-      ctx.addIssue({
-        path: ["minimumCorrectAnswers"],
-        code: z.ZodIssueCode.too_big,
-        type: "number",
-        inclusive: true,
-        maximum: fields.questions.length,
-        message: `Maximum correct questions count is ${fields.questions.length}`,
-      });
-    }
-
-    if (fields.minimumCorrectAnswers > fields.questionsCount) {
-      ctx.addIssue({
-        path: ["minimumCorrectAnswers"],
-        code: z.ZodIssueCode.too_big,
-        type: "number",
-        inclusive: true,
-        maximum: fields.questions.length,
-        message: `Minimum correct questions number should not be greater than questions count`,
-      });
-    }
-
-    return z.NEVER;
-  });
-
-type FormType = z.infer<typeof formSchema>;
+import { testFormSchema, type TestFormType } from "@/utils/forms/test-form";
 
 export default function TestForm() {
-  const form = useForm<FormType>({
-    resolver: standardSchemaResolver(formSchema),
+  const form = useForm<TestFormType>({
+    resolver: standardSchemaResolver(testFormSchema),
     defaultValues: {
       name: "",
       description: "",
@@ -158,8 +54,8 @@ export default function TestForm() {
           description: "",
           questionType: QuestionType.SingleVariant,
           answers: [
-            { variant: "", isCorrect: false },
-            { variant: "", isCorrect: false },
+            { id: crypto.randomUUID(), name: "", isCorrect: false },
+            { id: crypto.randomUUID(), name: "", isCorrect: false },
           ],
         },
       ],
@@ -182,7 +78,7 @@ export default function TestForm() {
 }
 
 interface FormProps {
-  form: UseFormReturn<FormType, unknown, undefined>;
+  form: UseFormReturn<TestFormType, unknown, undefined>;
 }
 
 function GeneralTestForm({ form }: FormProps) {
@@ -192,6 +88,41 @@ function GeneralTestForm({ form }: FormProps) {
     control: form.control,
     name: "autoScore",
   });
+
+  // function isInvalid(path: FieldPath<TestFormType>) {
+  //   return form.getFieldState(path).invalid;
+  // }
+
+  const { questions, questionsCount, minimumCorrectAnswers } = form.getValues();
+  useEffect(() => {
+    const questionsCountState = form.getFieldState("questionsCount");
+
+    if (
+      questionsCount !== questions.length &&
+      (questionsCountState.isDirty ? !questionsCountState.isTouched : true)
+    ) {
+      form.setValue("questionsCount", questions.length);
+    }
+
+    if (minimumCorrectAnswersOption) {
+      const newValue =
+        minimumCorrectAnswersOption === "all"
+          ? questions.length
+          : minimumCorrectAnswersOption === "50%"
+          ? Math.ceil((questions.length * 50) / 100)
+          : Math.ceil((questions.length * 70) / 100);
+
+      if (newValue !== minimumCorrectAnswers) {
+        form.setValue("minimumCorrectAnswers", newValue);
+      }
+    }
+  }, [
+    questionsCount,
+    questions.length,
+    minimumCorrectAnswers,
+    minimumCorrectAnswersOption,
+    form,
+  ]);
 
   return (
     <div className="p-3 space-y-5">
@@ -276,7 +207,7 @@ function GeneralTestForm({ form }: FormProps) {
               control={form.control}
               name="minimumCorrectAnswers"
               render={({ field }) => {
-                const { onChange, ...rest } = field;
+                const { onChange, value, ...rest } = field;
 
                 function handleChange(...event: unknown[]) {
                   onChange(...event);
@@ -317,7 +248,12 @@ function GeneralTestForm({ form }: FormProps) {
                       </ToggleGroupItem>
                     </ToggleGroup>
                     <FormControl>
-                      <Input type="number" onChange={handleChange} {...rest} />
+                      <Input
+                        type="number"
+                        onChange={handleChange}
+                        value={value ?? 0}
+                        {...rest}
+                      />
                     </FormControl>
                     <FormDescription>
                       Minimum amount of correct answers that student needs to
@@ -343,7 +279,12 @@ function GeneralTestForm({ form }: FormProps) {
                 <FormItem>
                   <FormLabel>Attempts</FormLabel>
                   <FormControl>
-                    <Input type="number" {...field} />
+                    <Input
+                      type="number"
+                      {...field}
+                      value={field.value ?? ""}
+                      onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                    />
                   </FormControl>
                   <FormDescription>
                     How many attempts to take the test student have.
@@ -361,7 +302,13 @@ function GeneralTestForm({ form }: FormProps) {
                 <FormItem>
                   <FormLabel>Time limit</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="No limit" {...field} />
+                    <Input
+                      type="number"
+                      placeholder="No limit"
+                      {...field}
+                      value={field.value ?? ""}
+                      onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                    />
                   </FormControl>
                   <FormDescription>
                     Test time limit in minutes. Leave blank to to remove time
@@ -374,6 +321,7 @@ function GeneralTestForm({ form }: FormProps) {
             <FormField
               control={form.control}
               name="questionsCount"
+              shouldUnregister
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Questions count</FormLabel>
@@ -382,6 +330,14 @@ function GeneralTestForm({ form }: FormProps) {
                       type="number"
                       placeholder="All questions"
                       {...field}
+                      value={field.value ?? ""}
+                      onChange={(e) =>
+                        field.onChange(
+                          isNaN(e.target.valueAsNumber)
+                            ? undefined
+                            : e.target.valueAsNumber
+                        )
+                      }
                     />
                   </FormControl>
                   <FormDescription>
@@ -420,8 +376,8 @@ const QuestionsForms = memo(({ form }: FormProps) => {
       description: "",
       questionType: QuestionType.SingleVariant,
       answers: [
-        { variant: "", isCorrect: false },
-        { variant: "", isCorrect: false },
+        { id: crypto.randomUUID(), name: "", isCorrect: false },
+        { id: crypto.randomUUID(), name: "", isCorrect: false },
       ],
     });
     setTimeout(() => {
@@ -493,7 +449,11 @@ const QuestionForm = memo(
         : undefined;
 
     const appendEmptyAnswer = () =>
-      answersArray.append({ variant: "", isCorrect: false });
+      answersArray.append({
+        id: crypto.randomUUID(),
+        name: "",
+        isCorrect: false,
+      });
     const removeAnswer = (i: number) => answersArray.remove(i);
 
     const handleSelectRadioItem = (value: string) => {
@@ -631,7 +591,7 @@ const QuestionForm = memo(
             {answersArray.fields.map((answer, i) => {
               return (
                 <div className="flex items-center gap-2" key={answer.id}>
-                  {!answersRemoveMode ? (
+                  {/* {!answersRemoveMode ? (
                     questionType === QuestionType.SingleVariant ? (
                       <RadioGroupItem
                         aria-label={`Answer №${i + 1} isCorrect radio button`}
@@ -669,19 +629,65 @@ const QuestionForm = memo(
                     >
                       <Trash className="w-4 h-4" />
                     </button>
-                  )}
+                  )} */}
                   <FormField
                     control={form.control}
-                    name={`questions.${questionIndex}.answers.${i}.variant`}
+                    name={`questions.${questionIndex}.answers.${i}.name`}
                     render={({ field }) => (
                       <FormItem className="grow">
                         <FormLabel className="sr-only">
                           Answer №{i + 1}
                         </FormLabel>
                         <FormControl>
-                          <Input placeholder={`Answer №${i + 1}`} {...field} />
+                          <div className="flex items-center gap-2">
+                            {!answersRemoveMode ? (
+                              questionType === QuestionType.SingleVariant ? (
+                                <RadioGroupItem
+                                  aria-label={`Answer №${
+                                    i + 1
+                                  } isCorrect radio button`}
+                                  value={answer.id}
+                                />
+                              ) : (
+                                <FormField
+                                  control={form.control}
+                                  name={`questions.${questionIndex}.answers.${i}.isCorrect`}
+                                  render={({ field }) => {
+                                    const { value, onChange, ...rest } = field;
+                                    return (
+                                      <FormItem>
+                                        <FormLabel className="sr-only">
+                                          Answer №{i + 1} isCorrect checkbox
+                                        </FormLabel>
+                                        <FormControl>
+                                          <Checkbox
+                                            checked={value}
+                                            onCheckedChange={onChange}
+                                            {...rest}
+                                          />
+                                        </FormControl>
+                                        <FormMessage />
+                                      </FormItem>
+                                    );
+                                  }}
+                                />
+                              )
+                            ) : (
+                              <button
+                                type="button"
+                                aria-label="remove answer"
+                                onClick={() => removeAnswer(i)}
+                              >
+                                <Trash className="w-4 h-4" />
+                              </button>
+                            )}
+                            <Input
+                              placeholder={`Answer №${i + 1}`}
+                              {...field}
+                            />
+                          </div>
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="ml-6" />
                       </FormItem>
                     )}
                   />
@@ -697,6 +703,12 @@ const QuestionForm = memo(
           >
             <Plus className="w-4 h-4" /> Add new answer
           </Button>
+          <FormMessage>
+            {
+              form.formState.errors.questions?.[questionIndex]?.answers?.root
+                ?.message
+            }
+          </FormMessage>
 
           <Label className="flex items-center gap-2">
             <Switch
@@ -708,6 +720,7 @@ const QuestionForm = memo(
 
           <div className="flex justify-end">
             <Button
+              type="button"
               variant="ghost"
               className="flex items-center gap-2 font-medium"
               onClick={() => handleRemoveQuestion(questionIndex)}

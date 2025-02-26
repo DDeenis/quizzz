@@ -1,3 +1,4 @@
+import { TestStatus } from "@/types/test";
 import clsx from "clsx";
 import {
   BookCheck,
@@ -16,7 +17,7 @@ interface TestCardShortProps {
   time: number | null;
   questionsCount: number;
   slug: string;
-  status: "none" | "started" | "passed" | "failed";
+  status: TestStatus;
 }
 
 const APPROX_MAX_CHARACTERS_PER_LINE = 23;
@@ -54,11 +55,11 @@ export function TestCardShort({
       />
       <div className="px-6 py-4 bg-gray-100 h-36 border-x border-x-gray-200">
         <div className="flex gap-2">
-          {status === "none" ? (
+          {status === TestStatus.None ? (
             <BookText className="stroke-gray-900 w-6 h-6 shrink-0" />
-          ) : status === "started" ? (
+          ) : status === TestStatus.Started ? (
             <BookType className="stroke-gray-900 w-6 h-6 shrink-0" />
-          ) : status === "passed" ? (
+          ) : status === TestStatus.Passed ? (
             <BookCheck className="stroke-gray-900 w-6 h-6 shrink-0" />
           ) : (
             <BookX className="stroke-gray-900 w-6 h-6 shrink-0" />
@@ -88,11 +89,11 @@ export function TestCardShort({
       </div>
       <div
         className={clsx("h-12 grid rounded-b-[inherit] overflow-hidden group", {
-          "grid-cols-[1fr_auto_1fr]": status !== "started",
-          "grid-cols-1": status === "started",
+          "grid-cols-[1fr_auto_1fr]": status !== TestStatus.Started,
+          "grid-cols-1": status === TestStatus.Started,
         })}
       >
-        {status !== "started" && (
+        {status !== TestStatus.Started && (
           <>
             <Link
               href={`/test/${slug}/view`}
@@ -109,9 +110,9 @@ export function TestCardShort({
           href={`/test/${slug}/start`}
           className="h-full text-sm bg-gray-200 hover:bg-gray-300 focus:bg-gray-300 focus:outline-hidden flex justify-center items-center font-medium"
         >
-          {status === "none" || status === "passed"
+          {status === TestStatus.None || status === TestStatus.Passed
             ? "Start"
-            : status === "failed"
+            : status === TestStatus.Failed
             ? "Try again"
             : "Continue"}
         </Link>

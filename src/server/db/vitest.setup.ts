@@ -1,4 +1,4 @@
-import { beforeEach, afterAll, beforeAll } from "vitest";
+import { beforeEach, afterAll, beforeAll, vi } from "vitest";
 import * as schema from "@/server/db/schema";
 import { db } from "@/server/db";
 import { createRequire as topLevelCreateRequire } from "module";
@@ -40,3 +40,5 @@ beforeEach(async () => {
 afterAll(async () => {
   await clearDb();
 });
+
+vi.mock("server-only", () => ({}));

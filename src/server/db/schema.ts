@@ -132,7 +132,7 @@ export const tests = createTable(
       .references(() => users.id, { onDelete: "cascade" }),
     name: text("name", { length: 255 }).notNull(),
     slug: text("slug", { length: 255 }).notNull(),
-    description: text("name", { length: 4096 }),
+    description: text("description", { length: 4096 }),
     imageOrPattern: text("image_or_pattern", { mode: "json" })
       .notNull()
       .$type<ImageOrPattern>(),
@@ -252,7 +252,7 @@ export const questions = createTable("questions", {
   name: text("name", { length: 1024 }).notNull(),
   description: text("description", { length: 4096 }),
   image: text("image", { length: 255 }),
-  answerData: text("question_data_json", {
+  answers: text("answers_json", {
     mode: "json",
   })
     .notNull()
@@ -260,12 +260,11 @@ export const questions = createTable("questions", {
   createdAt: timestamps.createdAt,
 });
 
-export const questionsRelations = relations(questions, ({ one, many }) => ({
+export const questionsRelations = relations(questions, ({ one }) => ({
   test: one(tests, {
     fields: [questions.testId],
     references: [tests.id],
   }),
-  answers: many(questionAnswers),
 }));
 
 export const questionAnswers = createTable("question_answers", {
@@ -276,12 +275,19 @@ export const questionAnswers = createTable("question_answers", {
   userId: text("user_id", { length: 255 })
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  questionId: text("question_id", { length: 255 })
-    .notNull()
-    .references(() => questions.id, { onDelete: "cascade" }),
+  questionId: text("user_id", { length: 255 }).notNull(),
   testResultId: text("test_result_id", { length: 255 })
     .notNull()
     .references(() => testResults.id, { onDelete: "cascade" }),
+  questionType: text("question_type", {
+    length: 255,
+    enum: [QuestionType.SingleVariant, QuestionType.MultipleVariants],
+  })
+    .notNull()
+    .$type<QuestionType>(),
+  name: text("name", { length: 1024 }).notNull(),
+  description: text("description", { length: 4096 }),
+  image: text("image", { length: 255 }),
   answerType: text("answer_type", {
     length: 255,
     enum: [
@@ -292,10 +298,9 @@ export const questionAnswers = createTable("question_answers", {
   })
     .notNull()
     .$type<AnswerType>(),
-  answerData: text("answer_data", { mode: "json" })
+  answers: text("answers_json", { mode: "json" })
     .notNull()
     .$type<DetailedAnswerData[]>(),
-  score: real("score").notNull(),
 });
 
 export const questionAnswersRelations = relations(
@@ -304,10 +309,6 @@ export const questionAnswersRelations = relations(
     user: one(users, {
       fields: [questionAnswers.userId],
       references: [users.id],
-    }),
-    question: one(questions, {
-      fields: [questionAnswers.questionId],
-      references: [questions.id],
     }),
     result: one(testResults, {
       fields: [questionAnswers.testResultId],

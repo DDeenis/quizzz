@@ -1,17 +1,22 @@
+import type { QuestionType } from "./question";
+
 export interface QuestionAnswer {
   id: string;
   questionId: string;
   userId: string;
   testResultId: string;
-  score: number;
+  name: string;
+  description: string | null;
+  image: string | null;
+  questionType: QuestionType;
   answerType: AnswerType;
-  answerData: DetailedAnswerData[];
+  answers: DetailedAnswerData[];
 }
 
 export interface QuestionAnswerCreateObject {
   questionId: string;
   userId: string;
-  answerData: AnswerData;
+  answerIds: string[];
 }
 
 export interface QuestionAnswerUpdateObject extends Omit<QuestionAnswer, "id"> {
@@ -22,13 +27,12 @@ export enum AnswerType {
   Correct = "correct",
   Incorrect = "incorrect",
   PartiallyCorrect = "partially_correct",
-}
-
-interface AnswerData {
-  variants: string[];
+  None = "none",
 }
 
 export interface DetailedAnswerData {
-  variant: string;
+  id: string;
+  name: string;
+  isCorrect: boolean;
   answerType: AnswerType;
 }
