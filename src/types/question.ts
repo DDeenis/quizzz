@@ -1,20 +1,18 @@
-import { type QuestionAnswer } from "./questionAnswer";
-
 export interface Question {
   id: string;
   testId: string;
   name: string;
-  description: string;
+  description: string | null;
+  image: string | null;
   questionType: QuestionType;
-  answerData: AnswerData;
+  answers: AnswerData;
   createdAt: Date;
-  answers?: QuestionAnswer[];
 }
 
 type StrictOmit<T, K extends keyof T> = Omit<T, K>;
 
-export type QuestionClient = StrictOmit<Question, "answerData" | "answers"> & {
-  answerData: AnswerDataClient;
+export type QuestionClient = StrictOmit<Question, "answers"> & {
+  answers: AnswerDataClient;
 };
 
 export type QuestionCreateObject = Pick<
@@ -32,16 +30,13 @@ export enum QuestionType {
 }
 
 export interface QuestionVariant {
-  variant: string;
+  id: string;
+  name: string;
   isCorrect: boolean;
 }
 
-export type QuestionVariantClient = string;
+export type QuestionVariantClient = Exclude<QuestionVariant, "isCorrect">;
 
-export interface AnswerData {
-  variants: QuestionVariant[];
-}
+export type AnswerData = QuestionVariant[];
 
-export interface AnswerDataClient {
-  variants: QuestionVariantClient[];
-}
+export type AnswerDataClient = QuestionVariantClient[];

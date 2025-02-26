@@ -84,7 +84,7 @@ export function shuffleQuestionsForTest({
   return questionsForTest.map((q) => ({
     ...q,
     answerData: {
-      variants: shuffleArray(q.answerData.variants),
+      variants: shuffleArray(q.answers),
     },
   }));
 }

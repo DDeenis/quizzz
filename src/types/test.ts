@@ -13,6 +13,7 @@ export interface Test {
   slug: string;
   description: string | null;
   imageOrPattern: ImageOrPattern;
+  autoScore: boolean;
   timeInMinutes: number | null;
   questionsCount: number;
   minimumCorrectAnswers: number;
@@ -57,7 +58,7 @@ export interface TestOption {
 
 export interface ImageOrPattern {
   type: "image" | "pattern";
-  url: string;
+  value: string;
 }
 
 export enum TestStatus {
