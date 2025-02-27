@@ -4,7 +4,7 @@ import { relations, sql } from "drizzle-orm";
 import {
   index,
   int,
-  real,
+  primaryKey,
   sqliteTableCreator,
   text,
   uniqueIndex,
@@ -12,6 +12,7 @@ import {
 import { sqlNow } from "./utils";
 import type { ImageOrPattern } from "@/types/test";
 import { ResultType } from "@/types/testResult";
+import { type TestSessionQuestionData } from "@/types/testSession";
 
 const timestamps = {
   createdAt: int("created_at", { mode: "timestamp" })
@@ -170,21 +171,58 @@ export const testSessions = createTable("test_sessions", {
   userId: text("user_id", { length: 255 })
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
+  questionsData: text("questions_data", { mode: "json" })
+    .notNull()
+    .default("[]")
+    .$type<TestSessionQuestionData>(),
+  latestQuestionId: text("latest_question_id"),
   expiresAt: int("expires_at", { mode: "timestamp" }),
   createdAt: timestamps.createdAt,
 });
 
-export const testSessionsRelations = relations(testSessions, ({ one }) => ({
-  user: one(users, {
-    fields: [testSessions.userId],
-    references: [users.id],
-  }),
-  test: one(tests, {
-    fields: [testSessions.testId],
-    references: [tests.id],
-  }),
-  result: one(testResults),
-}));
+export const testSessionsRelations = relations(
+  testSessions,
+  ({ one, many }) => ({
+    user: one(users, {
+      fields: [testSessions.userId],
+      references: [users.id],
+    }),
+    test: one(tests, {
+      fields: [testSessions.testId],
+      references: [tests.id],
+    }),
+    questions: many(testSessionsToQuestions),
+    result: one(testResults),
+  })
+);
+
+export const testSessionsToQuestions = createTable(
+  "test_sessions_to_questions",
+  {
+    testSessionId: text("test_session_id", { length: 255 })
+      .notNull()
+      .references(() => testSessions.id, { onDelete: "cascade" }),
+    questionId: text("question_id", { length: 255 })
+      .notNull()
+      .references(() => questions.id),
+    order: int("order").notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.testSessionId, table.questionId] })]
+);
+
+export const testSessionsToQuestionsRelations = relations(
+  testSessionsToQuestions,
+  ({ one }) => ({
+    testSession: one(testSessions, {
+      fields: [testSessionsToQuestions.testSessionId],
+      references: [testSessions.id],
+    }),
+    question: one(questions, {
+      fields: [testSessionsToQuestions.questionId],
+      references: [questions.id],
+    }),
+  })
+);
 
 export const testResults = createTable("test_results", {
   id: text("id", { length: 255 })
@@ -260,11 +298,12 @@ export const questions = createTable("questions", {
   createdAt: timestamps.createdAt,
 });
 
-export const questionsRelations = relations(questions, ({ one }) => ({
+export const questionsRelations = relations(questions, ({ one, many }) => ({
   test: one(tests, {
     fields: [questions.testId],
     references: [tests.id],
   }),
+  testSessions: many(testSessionsToQuestions),
 }));
 
 export const questionAnswers = createTable("question_answers", {

@@ -15,12 +15,12 @@ export const shuffleArray = <T>(array: T[], seed?: number) => {
 
 export const isTestSessionExpired = (testSession: TestSession) => {
   if (!testSession.expiresAt) return false;
-  const nowISO = getISOnow();
+  const nowISO = getISONow();
   const expires = getISODate(testSession.expiresAt);
   return nowISO >= expires;
 };
 
-function getISOnow() {
+export function getISONow() {
   const date = new Date();
   const str = date.toISOString().slice(0, -5);
   return Date.parse(str);
@@ -33,7 +33,7 @@ export function getISODate(dateISOStr: Date) {
 
 export function getISODistanceToInSeconds(date: Date) {
   const dateMs = getISODate(date);
-  const now = getISOnow();
+  const now = getISONow();
   return (dateMs - now) / 1000;
 }
 

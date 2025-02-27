@@ -1,21 +1,18 @@
-import { type User } from "./user";
-
 export interface TestSession {
   id: string;
   testId: string;
   userId: string;
   createdAt: Date;
   expiresAt: Date | null;
+  questionsData: TestSessionQuestionData;
+  latestQuestionId?: string;
 }
 
-export interface TestSessionWithTest extends TestSession {
-  test: {
-    name: string;
-  };
-}
+export type TestSessionQuestionData = PendingQuestion[];
 
-export interface TestSessionFull extends TestSessionWithTest {
-  user: User;
+interface PendingQuestion {
+  questionId: string;
+  answersIds: string[];
 }
 
 export type TestSessionCreateObject = Exclude<TestSession, "id">;
