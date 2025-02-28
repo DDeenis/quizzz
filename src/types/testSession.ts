@@ -5,7 +5,7 @@ export interface TestSession {
   createdAt: Date;
   expiresAt: Date | null;
   questionsData: TestSessionQuestionData;
-  latestQuestionId?: string;
+  latestQuestionId: string | null;
 }
 
 export type TestSessionQuestionData = PendingQuestion[];
