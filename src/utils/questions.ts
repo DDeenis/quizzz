@@ -1,17 +1,6 @@
 import { type Question } from "@/types/question";
 import type { TestSession } from "@/types/testSession";
-
-export const shuffleArray = <T>(array: T[], seed?: number) => {
-  const random = seed ? mulberry32(seed) : Math.random;
-  const copy = [...array];
-  for (let i = copy.length - 1; i > 0; i--) {
-    const j = Math.floor(random() * (i + 1));
-    const temp = copy[i]!;
-    copy[i] = copy[j]!;
-    copy[j] = temp;
-  }
-  return copy;
-};
+import { shuffleArray } from "./general";
 
 export const isTestSessionExpired = (testSession: TestSession) => {
   if (!testSession.expiresAt) return false;
@@ -44,15 +33,6 @@ export const hashFromString = (source: string) => {
   }
   return Math.floor((sum * 23) / 16);
 };
-
-function mulberry32(seed: number) {
-  return function () {
-    let t = (seed += 0x6d2b79f5);
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
 
 export function shuffleQuestionsForTest({
   questions,

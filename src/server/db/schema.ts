@@ -245,7 +245,7 @@ export const testResults = createTable("test_results", {
     .notNull()
     .default(ResultType.Pending)
     .$type<ResultType>(),
-  suggestedResultType: text("result_type", {
+  suggestedResultType: text("suggested_result_type", {
     length: 255,
     enum: [ResultType.Passed, ResultType.Failed],
   })

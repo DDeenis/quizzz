@@ -6,7 +6,8 @@ import {
   testSessions,
   testSessionsToQuestions,
 } from "./schema";
-import { getISONow, shuffleArray } from "@/utils/questions";
+import { shuffleArray } from "@/utils/general";
+import { getISONow } from "@/utils/questions";
 
 export async function createTestSession(testId: string, userId: string) {
   const testPromise = db
@@ -38,8 +39,6 @@ export async function createTestSession(testId: string, userId: string) {
   ]);
 
   if (!test) throw new Error("Test not found");
-
-  console.log(test);
 
   if (test.attempts && existingSessions[0]!.count >= test.attempts)
     throw new Error("All attempts were used");

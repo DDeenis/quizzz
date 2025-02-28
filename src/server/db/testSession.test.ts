@@ -8,7 +8,7 @@ import { testSessionsToQuestions } from "./schema";
 describe("Test Sessions DAL", () => {
   it("createTestSession should create test session", async () => {
     const user = await fixtures.createUser();
-    const test = await fixtures.createTest(user.id);
+    const test = await fixtures.createTest(user.id, { timeInMinutes: 30 });
     const testSession = await createTestSession(test.id, user.id);
     const { questionCount } = (
       await db
@@ -28,8 +28,7 @@ describe("Test Sessions DAL", () => {
 
   it("createTestSession should not create test session if all attempts are exausted", async () => {
     const user = await fixtures.createUser();
-    // only one attempt
-    const test = await fixtures.createTest(user.id);
+    const test = await fixtures.createTest(user.id, { attempts: 1 });
 
     await createTestSession(test.id, user.id);
 
