@@ -11,16 +11,6 @@ export function conflictUpdateAllExcept<
     ([col]) => !except.includes(col as keyof typeof table.$inferInsert)
   );
 
-  console.log(
-    updateColumns.reduce(
-      (acc, [colName, table]) => ({
-        ...acc,
-        [colName]: `excluded.${table.name}`,
-      }),
-      {}
-    )
-  );
-
   return updateColumns.reduce(
     (acc, [colName, table]) => ({
       ...acc,

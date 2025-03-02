@@ -2,17 +2,18 @@ import "server-only";
 import { testFormSchema, type TestFormType } from "@/utils/forms/test-form";
 import { db } from ".";
 import { questions, tests } from "./schema";
-import { slugify } from "./utils";
+import { conflictUpdateAllExcept, slugify, sqlNow } from "./utils";
 import { getRandomPattern } from "@/utils/patterns";
-import { type Test } from "@/types/test";
+import { type TestUpdateObject, type Test } from "@/types/test";
+import { eq, inArray, sql } from "drizzle-orm";
 
-export async function createTest(
+export function createTest(
   values: TestFormType,
   userId: string
 ): Promise<Test> {
   const validatedValues = testFormSchema.parse(values);
 
-  const result = await db.transaction(async (tx) => {
+  return db.transaction(async (tx) => {
     const testSlug = slugify(validatedValues.name, { maxChars: 255 });
 
     const testResult = await tx
@@ -60,6 +61,114 @@ export async function createTest(
       questions: questionsResult,
     };
   });
-
-  return result;
 }
+
+export async function updateTest(testId: string, values: TestUpdateObject) {
+  const currentTestValues = await db
+    .select({
+      name: tests.name,
+      slug: tests.slug,
+      questionsIds: sql`json_group_array(${questions.id})`.mapWith<
+        (value: string) => string[]
+      >(JSON.parse),
+    })
+    .from(tests)
+    .leftJoin(questions, eq(tests.id, questions.testId))
+    .where(eq(tests.id, testId))
+    .limit(1)
+    .then((r) => r[0]);
+
+  if (!currentTestValues) throw new Error("Test now found");
+
+  const currentQuestionsIds = new Set(currentTestValues.questionsIds);
+  const updatedQuestionsIds = new Set(
+    values.questions.filter((q) => q.id !== undefined).map((q) => q.id)
+  );
+  const deletedQuestions = Array.from(
+    currentQuestionsIds.difference(updatedQuestionsIds)
+  );
+
+  return db.transaction(async (tx) => {
+    const testResult = await tx
+      .update(tests)
+      .set({
+        name: values.name,
+        slug:
+          currentTestValues.name === values.name
+            ? currentTestValues.slug
+            : slugify(values.name, { maxChars: 255 }),
+        description: values.description,
+        minimumCorrectAnswers: values.minimumCorrectAnswers,
+        questionsCount: values.questionsCount,
+        attempts: values.attempts,
+        autoScore: values.autoScore,
+        timeInMinutes: values.timeInMinutes,
+      })
+      .returning();
+    const updatedTest = testResult[0];
+
+    if (!updatedTest) {
+      return tx.rollback();
+    }
+
+    const questionsToUpsert = values.questions.map((q) => ({
+      id: q.id,
+      testId: updatedTest.id,
+      name: q.name,
+      description: q.description,
+      questionType: q.questionType,
+      answers: q.answers,
+      //   TODO: implement image upload
+      image: undefined,
+    }));
+    const questionsResult = await tx
+      .insert(questions)
+      .values(questionsToUpsert)
+      .onConflictDoUpdate({
+        target: questions.id,
+        set: conflictUpdateAllExcept(questions, ["id"]),
+      })
+      .returning();
+
+    if (deletedQuestions.length) {
+      await tx.delete(questions).where(inArray(questions.id, deletedQuestions));
+    }
+
+    return {
+      ...updatedTest,
+      questions: questionsResult,
+    };
+  });
+}
+
+export const deleteTest = async (id: string): Promise<boolean> => {
+  try {
+    await db
+      .update(tests)
+      .set({
+        deletedAt: sqlNow(),
+      })
+      .where(eq(tests.id, id));
+  } catch (err) {
+    console.error(err);
+    return false;
+  }
+
+  return true;
+};
+
+export const restoreTest = async (id: string): Promise<boolean> => {
+  try {
+    await db
+      .update(tests)
+      .set({
+        deletedAt: null,
+      })
+      .where(eq(tests.id, id));
+  } catch (err) {
+    console.error(err);
+    return false;
+  }
+
+  return true;
+};

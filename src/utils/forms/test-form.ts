@@ -90,7 +90,7 @@ export const testFormSchema = z
             "Single answer questions can have only one answer"
           )
       )
-      .refine((q) => q.length > 0, "Add minimum one question"),
+      .min(2, "Add minimum two questions"),
   })
   .superRefine((fields, ctx) => {
     if (fields.questionsCount > fields.questions.length) {
