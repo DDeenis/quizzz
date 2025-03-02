@@ -142,11 +142,11 @@ async function createUser() {
   return res[0]!;
 }
 
-async function createTest(userId: string, overrides?: Partial<TestFormType>) {
-  return await createTestBase(testFormValues(overrides), userId);
+function createTest(userId: string, overrides?: Partial<TestFormType>) {
+  return createTestBase(testFormValues(overrides), userId);
 }
 
-async function createTestSession(testId: string, userId: string) {
+function createTestSession(testId: string, userId: string) {
   return createTestSessionBase(testId, userId);
 }
 
@@ -159,7 +159,7 @@ async function createTestWithSession(
   return { test, session };
 }
 
-async function createTestResult(values: TestResultCreateObject) {
+function createTestResult(values: TestResultCreateObject) {
   return createTestResultBase(values);
 }
 

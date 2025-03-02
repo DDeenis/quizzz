@@ -1,7 +1,7 @@
+import type { TestFormType } from "@/utils/forms/test-form";
 import type {
   Question,
   QuestionClient,
-  QuestionCreateObject,
   QuestionUpdateObject,
 } from "./question";
 import { type TestSession } from "./testSession";
@@ -34,18 +34,7 @@ export type TestClient = Omit<Test, "questions"> & {
   questions: QuestionClient[];
 };
 
-export interface TestCreateObject {
-  authorId: string;
-  name: string;
-  description?: string;
-  image?: string;
-  timeInMinutes?: number;
-  questionsCount: number;
-  autoScore: boolean;
-  minimumCorrectAnswers: number;
-  attempts?: number;
-  questions: QuestionCreateObject[];
-}
+export type TestCreateObject = TestFormType;
 
 export type TestUpdateObject = Omit<TestCreateObject, "questions"> & {
   questions: QuestionUpdateObject[];

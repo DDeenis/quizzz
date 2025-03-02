@@ -1,15 +1,15 @@
+import { type StrictOmit } from "./utility-types";
+
 export interface Question {
   id: string;
   testId: string;
   name: string;
-  description: string | null;
-  image: string | null;
+  description?: string | null;
+  image?: string | null;
   questionType: QuestionType;
   answers: AnswerData;
   createdAt: Date;
 }
-
-type StrictOmit<T, K extends keyof T> = Omit<T, K>;
 
 export type QuestionClient = StrictOmit<Question, "answers"> & {
   answers: AnswerDataClient;
@@ -17,7 +17,7 @@ export type QuestionClient = StrictOmit<Question, "answers"> & {
 
 export type QuestionCreateObject = Pick<
   Question,
-  "testId" | "questionType" | "answers"
+  "name" | "description" | "image" | "questionType" | "answers"
 >;
 
 export type QuestionUpdateObject = QuestionCreateObject & {
