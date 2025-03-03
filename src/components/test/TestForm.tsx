@@ -20,7 +20,7 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
-import { ImageUpload } from "../ui/image-upload";
+// import { ImageUpload } from "../ui/image-upload";
 import { Switch } from "../ui/switch";
 import {
   Accordion,
@@ -152,7 +152,7 @@ function GeneralTestForm({ form }: FormProps) {
           </FormItem>
         )}
       />
-      <FormField
+      {/* <FormField
         control={form.control}
         name="image"
         render={({ field }) => (
@@ -164,7 +164,7 @@ function GeneralTestForm({ form }: FormProps) {
             <FormMessage />
           </FormItem>
         )}
-      />
+      /> */}
       <FormField
         control={form.control}
         name="autoScore"
@@ -518,7 +518,7 @@ const QuestionForm = memo(
             </FormItem>
           )}
         />
-        <FormField
+        {/* <FormField
           control={form.control}
           name={`questions.${questionIndex}.image`}
           render={({ field }) => (
@@ -530,7 +530,7 @@ const QuestionForm = memo(
               <FormMessage />
             </FormItem>
           )}
-        />
+        /> */}
         <FormField
           control={form.control}
           name={`questions.${questionIndex}.questionType`}

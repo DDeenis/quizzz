@@ -8,8 +8,7 @@ const imageSchema = z
     (f) => (f ? validateImageSize(f) : true),
     "Maximum image size is 10MB"
   )
-  .refine((f) => (f ? validateImageType(f) : true), "Only images are accepted")
-  .optional();
+  .refine((f) => (f ? validateImageType(f) : true), "Only images are accepted");
 
 export const testFormSchema = z
   .object({
@@ -38,7 +37,6 @@ export const testFormSchema = z
     attempts: z
       .number()
       .min(1, "Minimum one attempt")
-      .optional()
       .optional()
       .transform((v) => (v && isNaN(v) ? undefined : v)),
     questionsCount: z.number().min(1, "Minimum one question"),
