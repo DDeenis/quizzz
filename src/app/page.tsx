@@ -1,7 +1,7 @@
 "use server";
 import SignInPage from "@/components/pages/auth/SignInPage";
 import CreateTestPage from "@/components/pages/create-test/create-test";
-import { getSession } from "@/utils/session";
+import { getSession } from "@/utils/user/session";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 

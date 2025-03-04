@@ -1,7 +1,7 @@
 "use server";
 import React from "react";
 import Header from "../Header";
-import { getUser } from "@/utils/session";
+import { getUser } from "@/utils/user/session";
 
 export default async function DefaultLayout({
   children,

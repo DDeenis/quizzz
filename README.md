@@ -4,8 +4,16 @@ This is a full-stack Next.js app that allows users to create, edit, view, and ta
 
 ## TODO
 
-- [ ] Update database schema to reflect the latest changes
-- [ ] Redo the whole thing because why not
+- [ ] Split test creation process in multiple phases
+  - When the user clicks 'Create Test' create empty test and redirect the user to the test's edit page
+  - After user modifies the test's field save changes using debounced function
+  - When the user clicks 'Add Question' create new empty question
+  - When question is edited save changes using debounced function
+  - Image uploads should be a separate endpoint that will upload image for existing test/question and return a url
+  - By default every test is a draft
+  - Validate test and questions separately when the test is a draft
+  - When the test is a draft show a warning and a 'Publish Test' button
+  - After the user clicks 'Publish Test' validate both test and questions (including vaidations that depend on both) and set `isDraft` to `false`
 
 ## Roadmap
 

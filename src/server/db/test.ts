@@ -4,8 +4,99 @@ import { db } from ".";
 import { questions, tests } from "./schema";
 import { conflictUpdateAllExcept, slugify, sqlNow } from "./utils";
 import { getRandomPattern } from "@/utils/patterns";
-import { type TestUpdateObject, type Test } from "@/types/test";
+import type { TestUpdateObject, Test, ImageOrPattern } from "@/types/test";
 import { eq, inArray, sql } from "drizzle-orm";
+import { emptyQuestionValues } from "./question";
+import { getUserFromDb } from "./user";
+import { TEACHER_MAX_TESTS } from "@/utils/constants";
+import { isAdmin, isStudent, isTeacher } from "@/utils/user/authorization";
+
+export function getTestById(id: string): Promise<Test | undefined> {
+  return db.query.tests
+    .findFirst({
+      where: eq(tests.id, id),
+      with: {
+        questions: true,
+      },
+    })
+    .execute();
+}
+
+export function userCanModifyTest(
+  userId: string,
+  testId: string
+): Promise<boolean> {
+  return Promise.all([
+    db.query.tests
+      .findFirst({
+        columns: {
+          authorId: true,
+        },
+        where: eq(tests.id, testId),
+      })
+      .execute(),
+    getUserFromDb(userId),
+  ]).then(([test, user]) => {
+    if (!test || !user || isStudent(user)) return false;
+
+    return test.authorId === user.id || isAdmin(user);
+  });
+}
+
+export function userCanCreateTest(userId: string) {
+  return Promise.all([
+    db.query.tests
+      .findMany({
+        where: eq(tests.authorId, userId),
+      })
+      .execute(),
+    getUserFromDb(userId),
+  ]).then(([userTests, user]) => {
+    if (userTests.length >= TEACHER_MAX_TESTS || !user) return false;
+
+    return isTeacher(user) || isAdmin(user);
+  });
+}
+
+export async function createEmptyTest(userId: string): Promise<Test> {
+  return await db.transaction(async (tx) => {
+    const test = await tx
+      .insert(tests)
+      .values(emptyTestValues(userId))
+      .returning()
+      .then((r) => r[0]);
+
+    if (!test) {
+      return tx.rollback();
+    }
+
+    const createdQuestion = await tx
+      .insert(questions)
+      .values(emptyQuestionValues(test.id))
+      .returning();
+
+    return { ...test, questions: createdQuestion };
+  });
+}
+
+export function emptyTestValues(userId: string) {
+  const testName = "Untitled Test";
+  return {
+    authorId: userId,
+    name: testName,
+    slug: slugify(`${testName}-${userId}`, { maxChars: 255 }),
+    description: "",
+    imageOrPattern: {
+      type: "pattern",
+      value: getRandomPattern(),
+    } as ImageOrPattern,
+    minimumCorrectAnswers: 0,
+    questionsCount: 0,
+    attempts: 1,
+    autoScore: false,
+    isDraft: false,
+  };
+}
 
 export function createTest(
   values: TestFormType,
