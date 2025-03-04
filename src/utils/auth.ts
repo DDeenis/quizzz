@@ -6,6 +6,7 @@ import { magicLink } from "better-auth/plugins";
 import { sendMagicLinkEmail } from "./mail";
 import { nextCookies } from "better-auth/next-js";
 import { getBaseUrl } from "./trpc/utils";
+import { UserRole } from "@/types/user";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -25,10 +26,10 @@ export const auth = betterAuth({
         defaultValue: null,
         input: false,
       },
-      isAdmin: {
-        type: "boolean",
+      role: {
+        type: "string",
         required: true,
-        defaultValue: false,
+        defaultValue: UserRole.Student,
         input: false,
       },
     },

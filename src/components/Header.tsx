@@ -1,5 +1,4 @@
 "use client";
-import type { User } from "@/types/user";
 import Link from "next/link";
 import { useMemo } from "react";
 import {
@@ -17,7 +16,7 @@ import {
   TableProperties,
   TrendingUp,
 } from "lucide-react";
-import { textAvatarWithBg } from "@/utils/user";
+import { textAvatarWithBg } from "@/utils/user/user";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Sheet,
@@ -29,6 +28,8 @@ import {
 } from "@/components/ui/sheet";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
+import type { User } from "@/types/user";
+import { isTeacher } from "@/utils/user/authorization";
 
 interface HeaderProps {
   user?: User;
@@ -139,7 +140,7 @@ export default function Header({ user }: HeaderProps) {
             <div className="flex flex-col justify-center items-end gap-1">
               <p className="text-sm font-semibold text-gray-950">{user.name}</p>
               <p className="text-xs text-gray-400">
-                {user.isAdmin ? "Admin" : "Student"}
+                {isTeacher(user) ? "Teacher" : "Student"}
               </p>
             </div>
             <Avatar

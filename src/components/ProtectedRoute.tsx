@@ -1,6 +1,8 @@
 "use server";
 
-import { getSession } from "@/utils/session";
+import { UserRole } from "@/types/user";
+import { getSession } from "@/utils/user/session";
+import { isAdmin, isTeacher } from "@/utils/user/authorization";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import type React from "react";
@@ -10,7 +12,7 @@ export default async function ProtectedRoute({
   roles,
 }: {
   children: React.ReactElement;
-  roles?: ("user" | "admin")[];
+  roles?: UserRole[];
 }) {
   const session = await getSession(await headers());
 
@@ -18,7 +20,11 @@ export default async function ProtectedRoute({
     redirect("/");
   }
 
-  if (roles?.includes("admin") && !session.user.isAdmin) {
+  if (roles?.includes(UserRole.Teacher) && !isTeacher(session.user)) {
+    redirect("/");
+  }
+
+  if (roles?.includes(UserRole.Admin) && !isAdmin(session.user)) {
     redirect("/");
   }
 

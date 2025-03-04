@@ -13,7 +13,8 @@ import { ZodError } from "zod";
 
 import { db } from "@/server/db";
 import { type Session } from "@/utils/auth";
-import { getSession } from "@/utils/session";
+import { getSession } from "@/utils/user/session";
+import { isAdmin, isTeacher } from "@/utils/user/authorization";
 
 /**
  * 1. CONTEXT
@@ -158,12 +159,31 @@ export const protectedProcedure = t.procedure
     });
   });
 
+const enforceUserIsTeacher = t.middleware(async ({ ctx, next }) => {
+  if (!ctx.session?.user) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+
+  if (!isTeacher(ctx.session.user) || !isAdmin(ctx.session.user)) {
+    throw new TRPCError({ code: "FORBIDDEN" });
+  }
+
+  return next({
+    ctx: {
+      // infers the `session` as non-nullable
+      session: { ...ctx.session, user: ctx.session.user },
+    },
+  });
+});
+
+export const teacherProcedure = t.procedure.use(enforceUserIsTeacher);
+
 const enforceUserIsAdmin = t.middleware(async ({ ctx, next }) => {
   if (!ctx.session?.user) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
 
-  if (!ctx.session.user.isAdmin) {
+  if (!isAdmin(ctx.session.user)) {
     throw new TRPCError({ code: "FORBIDDEN" });
   }
 

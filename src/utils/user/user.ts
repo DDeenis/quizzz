@@ -1,4 +1,4 @@
-import { stringToHslHue, toHslString } from "./color";
+import { stringToHslHue, toHslString } from "../color";
 
 export function stringAvatar(name: string) {
   const { text, gradient } = textAvatarWithBg(name);

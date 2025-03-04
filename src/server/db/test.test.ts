@@ -1,5 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { createTest, deleteTest, restoreTest, updateTest } from "./test";
+import {
+  createEmptyTest,
+  createTest,
+  deleteTest,
+  emptyTestValues,
+  getTestById,
+  restoreTest,
+  updateTest,
+  userCanCreateTest,
+  userCanModifyTest,
+} from "./test";
 import fixtures from "@/utils/test/fixtures";
 import type { TestFormType } from "@/utils/forms/test-form";
 import { type TestUpdateObject } from "@/types/test";
@@ -8,8 +18,95 @@ import { db } from ".";
 import { questions, tests } from "./schema";
 import { eq, inArray } from "drizzle-orm";
 import { QuestionType } from "@/types/question";
+import { UserRole } from "@/types/user";
 
 describe("Tests DAL", { retry: 2 }, () => {
+  it("getTestById should return test", async () => {
+    const userId = (await fixtures.createUser()).id;
+    const test = await fixtures.createTest(userId);
+
+    await expect(getTestById(test.id)).resolves.toStrictEqual(test);
+  });
+
+  it("userCanModifyTest should return true if user has permissions to modify a test", async () => {
+    const [teacher, admin] = await Promise.all([
+      fixtures.createUser({
+        email: "teacher1@example.com",
+        role: UserRole.Teacher,
+      }),
+      fixtures.createUser({
+        email: "admin@example.com",
+        role: UserRole.Admin,
+      }),
+    ]);
+    const test = await fixtures.createTest(teacher.id);
+
+    await expect(userCanModifyTest(teacher.id, test.id)).resolves.toBe(true);
+    await expect(userCanModifyTest(admin.id, test.id)).resolves.toBe(true);
+  });
+
+  it("userCanModifyTest should return false if user does not have permissions to modify a test", async () => {
+    const [teacher1, teacher2, student] = await Promise.all([
+      fixtures.createUser({
+        email: "teacher1@example.com",
+        role: UserRole.Teacher,
+      }),
+      fixtures.createUser({
+        email: "teacher2@example.com",
+        role: UserRole.Teacher,
+      }),
+      fixtures.createUser({
+        email: "student@example.com",
+        role: UserRole.Student,
+      }),
+    ]);
+    const test = await fixtures.createTest(teacher1.id);
+
+    await expect(userCanModifyTest(teacher2.id, test.id)).resolves.toBe(false);
+    await expect(userCanModifyTest(student.id, test.id)).resolves.toBe(false);
+  });
+
+  it("userCanCreateTest should return true if user has permissions to create a test", async () => {
+    const [teacher, admin] = await Promise.all([
+      fixtures.createUser({
+        email: "teacher1@example.com",
+        role: UserRole.Teacher,
+      }),
+      fixtures.createUser({
+        email: "admin@example.com",
+        role: UserRole.Admin,
+      }),
+    ]);
+
+    await expect(userCanCreateTest(teacher.id)).resolves.toBe(true);
+    await expect(userCanCreateTest(admin.id)).resolves.toBe(true);
+  });
+
+  it("userCanCreateTest should return false if user does not have permissions to create a test", async () => {
+    const student = await fixtures.createUser({
+      email: "student@example.com",
+      role: UserRole.Student,
+    });
+
+    await expect(userCanCreateTest(student.id)).resolves.toBe(false);
+  });
+
+  it("createEmptyTest should create and empty test", async () => {
+    const userId = (await fixtures.createTeacher()).id;
+    const emptyValues = emptyTestValues(userId);
+    const test = await createEmptyTest(userId);
+
+    expect(test.authorId).toBe(emptyValues.authorId);
+    expect(test.name).toBe(emptyValues.name);
+    expect(test.description).toBe(emptyValues.description);
+    expect(test.autoScore).toBe(emptyValues.autoScore);
+    expect(test.imageOrPattern.type).toBe(emptyValues.imageOrPattern.type);
+    expect(test.minimumCorrectAnswers).toBe(emptyValues.minimumCorrectAnswers);
+    expect(test.questionsCount).toBe(emptyValues.questionsCount);
+    expect(test.isDraft).toBe(emptyValues.isDraft);
+    expect(test.slug).toMatch(new RegExp(`untitled-test-${userId}-\\d{4}`));
+  });
+
   it("createTest should create test", async () => {
     const userId = (await fixtures.createUser()).id;
     const formValues = fixtures.testFormValues();

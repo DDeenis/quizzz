@@ -10,6 +10,7 @@ import { type TestSession } from "@/types/testSession";
 import { type QuestionAnswerCreateObject } from "@/types/questionAnswer";
 import { shuffleArray } from "../general";
 import { createTestResult as createTestResultBase } from "@/server/db/testResult";
+import { UserRole } from "@/types/user";
 
 function testFormValues(overrides?: Partial<TestFormType>): TestFormType {
   return Object.assign(
@@ -134,12 +135,39 @@ function testResultCreateObject(
   };
 }
 
-async function createUser() {
-  const res = await db
+async function createUser(overrides?: {
+  name?: string;
+  email?: string;
+  emailVerified?: boolean;
+  role?: UserRole;
+}) {
+  return await db
     .insert(users)
-    .values({ name: "test user", email: "test@test.com", emailVerified: true })
-    .returning();
-  return res[0]!;
+    .values(
+      Object.assign(
+        {
+          name: "test user",
+          email: "test@test.com",
+          emailVerified: true,
+          role: UserRole.Student,
+        },
+        overrides
+      )
+    )
+    .returning()
+    .then((r) => r[0]!);
+}
+
+function createTeacher(overrides?: {
+  name?: string;
+  email?: string;
+  emailVerified?: boolean;
+}) {
+  return createUser(
+    overrides
+      ? { ...overrides, role: UserRole.Teacher }
+      : { role: UserRole.Teacher }
+  );
 }
 
 function createTest(userId: string, overrides?: Partial<TestFormType>) {
@@ -167,6 +195,7 @@ const fixtures = {
   testFormValues,
   testResultCreateObject,
   createUser,
+  createTeacher,
   createTest,
   createTestSession,
   createTestWithSession,

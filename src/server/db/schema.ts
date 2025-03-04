@@ -13,6 +13,7 @@ import { sqlNow } from "./utils";
 import type { ImageOrPattern } from "@/types/test";
 import { ResultType } from "@/types/testResult";
 import { type TestSessionQuestionData } from "@/types/testSession";
+import { UserRole } from "@/types/user";
 
 const timestamps = {
   createdAt: int("created_at", { mode: "timestamp" })
@@ -43,10 +44,12 @@ export const users = createTable(
     email: text("email", { length: 255 }).notNull(),
     emailVerified: int("emailVerified", { mode: "boolean" }).notNull(),
     image: text("image"),
+    role: text("role", {
+      length: 255,
+    }).notNull(),
     createdAt: timestamps.createdAt,
     updatedAt: timestamps.updatedAt,
     deletedAt: timestamps.deletedAt,
-    isAdmin: int("is_admin", { mode: "boolean" }).notNull().default(false),
   },
   (user) => [uniqueIndex("user_unique_email_idx").on(sql`lower(${user.email})`)]
 );
@@ -144,6 +147,7 @@ export const tests = createTable(
     minimumCorrectAnswers: int("minimum_correct_answers").notNull(),
     timeInMinutes: int("time_in_minutes"),
     attempts: int("attempts"),
+    isDraft: int("is_draft", { mode: "boolean" }).notNull().default(true),
     createdAt: timestamps.createdAt,
     deletedAt: timestamps.deletedAt,
   },

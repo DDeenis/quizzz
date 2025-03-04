@@ -1,11 +1,11 @@
 import "server-only";
 import { cache } from "react";
-import { auth } from "./auth";
+import { auth } from "../auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-export const getSession = cache((headers: Headers) => {
-  return auth.api.getSession({ headers });
+export const getSession = cache(async (headers: Headers) => {
+  return await auth.api.getSession({ headers });
 });
 
 export const getUser = async () => {

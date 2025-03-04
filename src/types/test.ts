@@ -20,6 +20,7 @@ export interface Test {
   attempts: number | null;
   createdAt: Date | null;
   deletedAt: Date | null;
+  isDraft: boolean;
   questions: Question[];
 }
 
