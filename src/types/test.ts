@@ -37,7 +37,9 @@ export type TestClient = Omit<Test, "questions"> & {
 
 export type TestCreateObject = TestFormType;
 
-export type TestUpdateObject = Omit<TestCreateObject, "questions"> & {
+export type TestUpdateObject = Omit<TestCreateObject, "questions">;
+
+export type TestUpdateObjectFull = Omit<TestCreateObject, "questions"> & {
   questions: QuestionUpdateObject[];
 };
 

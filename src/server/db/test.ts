@@ -4,7 +4,12 @@ import { db } from ".";
 import { questions, tests } from "./schema";
 import { conflictUpdateAllExcept, slugify, sqlNow } from "./utils";
 import { getRandomPattern } from "@/utils/patterns";
-import type { TestUpdateObject, Test, ImageOrPattern } from "@/types/test";
+import type {
+  TestUpdateObjectFull,
+  Test,
+  ImageOrPattern,
+  TestUpdateObject,
+} from "@/types/test";
 import { eq, inArray, sql } from "drizzle-orm";
 import { emptyQuestionValues } from "./question";
 import { getUserFromDb } from "./user";
@@ -155,6 +160,43 @@ export function createTest(
 }
 
 export async function updateTest(testId: string, values: TestUpdateObject) {
+  const currentTestValues = await db
+    .select({
+      name: tests.name,
+      slug: tests.slug,
+    })
+    .from(tests)
+    .leftJoin(questions, eq(tests.id, questions.testId))
+    .where(eq(tests.id, testId))
+    .limit(1)
+    .then((r) => r[0]);
+
+  if (!currentTestValues) throw new Error("Test now found");
+
+  return db
+    .update(tests)
+    .set({
+      name: values.name,
+      slug:
+        currentTestValues.name === values.name
+          ? currentTestValues.slug
+          : slugify(values.name, { maxChars: 255 }),
+      description: values.description,
+      minimumCorrectAnswers: values.minimumCorrectAnswers,
+      questionsCount: values.questionsCount,
+      attempts: values.attempts,
+      autoScore: values.autoScore,
+      timeInMinutes: values.timeInMinutes,
+    })
+    .where(eq(tests.id, testId))
+    .returning()
+    .then((r) => r[0]!);
+}
+
+export async function updateTestFull(
+  testId: string,
+  values: TestUpdateObjectFull
+) {
   const currentTestValues = await db
     .select({
       name: tests.name,

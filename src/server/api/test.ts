@@ -4,7 +4,7 @@ import {
   createEmptyTest,
   createTest,
   getTestById,
-  updateTest,
+  updateTestFull,
   userCanCreateTest,
   userCanModifyTest,
 } from "../db/test";
@@ -47,7 +47,7 @@ const testsRouter = createTRPCRouter({
         throw new TRPCError({ code: "FORBIDDEN" });
       }
 
-      return updateTest(input.testId, input.values);
+      return updateTestFull(input.testId, input.values);
     }),
 });
 
