@@ -1,9 +1,5 @@
 import type { TestFormType } from "@/utils/forms/test-form";
-import type {
-  Question,
-  QuestionClient,
-  QuestionUpdateObject,
-} from "./question";
+import type { Question, QuestionClient } from "./question";
 import { type TestSession } from "./testSession";
 
 export interface Test {
@@ -38,10 +34,6 @@ export type TestClient = Omit<Test, "questions"> & {
 export type TestCreateObject = TestFormType;
 
 export type TestUpdateObject = Omit<TestCreateObject, "questions">;
-
-export type TestUpdateObjectFull = Omit<TestCreateObject, "questions"> & {
-  questions: QuestionUpdateObject[];
-};
 
 export interface TestOption {
   id: string;

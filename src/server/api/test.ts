@@ -2,9 +2,8 @@ import { testFormSchema } from "@/utils/forms/test-form";
 import { createTRPCRouter, protectedProcedure, teacherProcedure } from "./trpc";
 import {
   createEmptyTest,
-  createTest,
   getTestById,
-  updateTestFull,
+  updateTest,
   userCanCreateTest,
   userCanModifyTest,
 } from "../db/test";
@@ -32,10 +31,7 @@ const testsRouter = createTRPCRouter({
 
       return createEmptyQuestion(input);
     }),
-  create: teacherProcedure.input(testFormSchema).mutation(({ input, ctx }) => {
-    return createTest(input, ctx.session.user.id);
-  }),
-  update: teacherProcedure
+  updateTest: teacherProcedure
     .input(z.object({ testId: z.string(), values: testFormSchema }))
     .mutation(async ({ input, ctx }) => {
       const updateAllowed = await userCanModifyTest(
@@ -47,7 +43,7 @@ const testsRouter = createTRPCRouter({
         throw new TRPCError({ code: "FORBIDDEN" });
       }
 
-      return updateTestFull(input.testId, input.values);
+      return updateTest(input.testId, input.values);
     }),
 });
 
