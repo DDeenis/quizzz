@@ -16,10 +16,14 @@ export type QuestionClient = StrictOmit<Question, "answers"> & {
   answers: AnswerDataClient;
 };
 
-export type QuestionCreateObject = Pick<
-  Question,
-  "testId" | "name" | "description" | "image" | "questionType" | "answers"
->;
+export type QuestionCreateObject = {
+  testId: string;
+  name: string;
+  description?: string;
+  image?: string;
+  questionType: QuestionType;
+  answers: AnswerData;
+};
 
 export type QuestionUpdateObject = QuestionFormType;
 
