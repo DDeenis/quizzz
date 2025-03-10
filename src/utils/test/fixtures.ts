@@ -11,6 +11,7 @@ import { type QuestionAnswerCreateObject } from "@/types/questionAnswer";
 import { shuffleArray } from "../general";
 import { createTestResult as createTestResultBase } from "@/server/db/testResult";
 import { UserRole } from "@/types/user";
+import { createEmptyQuestion as createEmptyQuestionBase } from "@/server/db/question";
 
 function testFormValues(overrides?: Partial<TestFormType>): TestFormType {
   return Object.assign(
@@ -135,11 +136,11 @@ function testResultCreateObject(
   };
 }
 
-async function createUser(overrides?: {
+async function createUser(overrides: {
   name?: string;
   email?: string;
   emailVerified?: boolean;
-  role?: UserRole;
+  role: UserRole;
 }) {
   return await db
     .insert(users)
@@ -147,15 +148,26 @@ async function createUser(overrides?: {
       Object.assign(
         {
           name: "test user",
-          email: "test@test.com",
+          email: "user@test.com",
           emailVerified: true,
-          role: UserRole.Student,
         },
         overrides
       )
     )
     .returning()
     .then((r) => r[0]!);
+}
+
+function createStudent(overrides?: {
+  name?: string;
+  email?: string;
+  emailVerified?: boolean;
+}) {
+  return createUser(
+    overrides
+      ? { email: "student@test.com", ...overrides, role: UserRole.Student }
+      : { email: "student@test.com", role: UserRole.Student }
+  );
 }
 
 function createTeacher(overrides?: {
@@ -165,13 +177,29 @@ function createTeacher(overrides?: {
 }) {
   return createUser(
     overrides
-      ? { ...overrides, role: UserRole.Teacher }
-      : { role: UserRole.Teacher }
+      ? { email: "teacher@test.com", ...overrides, role: UserRole.Teacher }
+      : { email: "teacher@test.com", role: UserRole.Teacher }
+  );
+}
+
+function createAdmin(overrides?: {
+  name?: string;
+  email?: string;
+  emailVerified?: boolean;
+}) {
+  return createUser(
+    overrides
+      ? { email: "admin@test.com", ...overrides, role: UserRole.Admin }
+      : { email: "admin@test.com", role: UserRole.Admin }
   );
 }
 
 function createTest(userId: string, overrides?: Partial<TestFormType>) {
   return createTestBase(testFormValues(overrides), userId);
+}
+
+function createEmptyQuestion(testId: string) {
+  return createEmptyQuestionBase(testId);
 }
 
 function createTestSession(testId: string, userId: string) {
@@ -195,8 +223,11 @@ const fixtures = {
   testFormValues,
   testResultCreateObject,
   createUser,
+  createStudent,
   createTeacher,
+  createAdmin,
   createTest,
+  createEmptyQuestion,
   createTestSession,
   createTestWithSession,
   createTestResult,
