@@ -15,7 +15,7 @@ import fixtures from "@/utils/test/fixtures";
 
 describe("Questions DAL", () => {
   describe("createEmptyQuestion", () => {
-    it("should create an empty question an return it", async () => {
+    it("should create an empty question and return it", async () => {
       const teacher = await fixtures.createTeacher();
       const test = await fixtures.createTest(teacher.id);
       const values = emptyQuestionValues(test.id);
@@ -30,68 +30,46 @@ describe("Questions DAL", () => {
   });
 
   describe("updateQuestion", () => {
+    const updateValues = {
+      name: "Updated Question",
+      description: "Updated Description",
+      questionType: QuestionType.MultipleVariants,
+      answers: [
+        {
+          id: crypto.randomUUID(),
+          name: "Question 1",
+          isCorrect: true,
+        },
+        {
+          id: crypto.randomUUID(),
+          name: "Question 2",
+          isCorrect: false,
+        },
+        {
+          id: crypto.randomUUID(),
+          name: "Question 3",
+          isCorrect: true,
+        },
+      ],
+    };
+
     it("should update a question and return it", async () => {
       const teacher = await fixtures.createTeacher();
       const test = await fixtures.createTest(teacher.id);
       const question = await createEmptyQuestion(test.id);
 
-      const values = {
-        name: "Updated Question",
-        description: "Updated Description",
-        questionType: QuestionType.MultipleVariants,
-        answers: [
-          {
-            id: crypto.randomUUID(),
-            name: "Question 1",
-            isCorrect: true,
-          },
-          {
-            id: crypto.randomUUID(),
-            name: "Question 2",
-            isCorrect: false,
-          },
-          {
-            id: crypto.randomUUID(),
-            name: "Question 3",
-            isCorrect: true,
-          },
-        ],
-      };
-      const updatedQuestion = await updateQuestion(question.id, values);
+      const updatedQuestion = await updateQuestion(question.id, updateValues);
 
-      expect(updatedQuestion.name).toBe(values.name);
-      expect(updatedQuestion.description).toBe(values.description);
-      expect(updatedQuestion.questionType).toBe(values.questionType);
-      expect(updatedQuestion.answers).toStrictEqual(values.answers);
+      expect(updatedQuestion.name).toBe(updateValues.name);
+      expect(updatedQuestion.description).toBe(updateValues.description);
+      expect(updatedQuestion.questionType).toBe(updateValues.questionType);
+      expect(updatedQuestion.answers).toStrictEqual(updateValues.answers);
     });
 
     it("should throw error if question is not found", async () => {
-      const values = {
-        name: "Updated Question",
-        description: "Updated Description",
-        questionType: QuestionType.MultipleVariants,
-        answers: [
-          {
-            id: crypto.randomUUID(),
-            name: "Question 1",
-            isCorrect: true,
-          },
-          {
-            id: crypto.randomUUID(),
-            name: "Question 2",
-            isCorrect: false,
-          },
-          {
-            id: crypto.randomUUID(),
-            name: "Question 3",
-            isCorrect: true,
-          },
-        ],
-      };
-
-      await expect(updateQuestion("none-existent", values)).rejects.toThrow(
-        "Question not found"
-      );
+      await expect(
+        updateQuestion("non-existent", updateValues)
+      ).rejects.toMatchObject({ message: "Question not found" });
     });
   });
 
@@ -139,7 +117,7 @@ describe("Questions DAL", () => {
   });
 
   describe("userCanModifyTestQuestion", () => {
-    it("userCanModifyTestQuestion should return true if the user can update a test question", async () => {
+    it("should return true if the user can update a test question", async () => {
       const teacher = await fixtures.createTeacher();
       const admin = await fixtures.createAdmin();
       const test = await fixtures.createTest(teacher.id);
@@ -153,7 +131,7 @@ describe("Questions DAL", () => {
       ).resolves.toBe(true);
     });
 
-    it("userCanModifyTestQuestion should return false if the user can't update a test question", async () => {
+    it("should return false if the user can't update a test question", async () => {
       const teacher = await fixtures.createTeacher();
       const teacher2 = await fixtures.createTeacher({
         email: "teacher2@test.com",
