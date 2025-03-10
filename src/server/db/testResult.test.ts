@@ -27,26 +27,27 @@ describe("Test Results DAL", () => {
   ];
 
   it(`createTestResult should create a test result with the '${ResultType.Passed}' status`, async () => {
-    const user = await fixtures.createUser();
+    const teacher = await fixtures.createTeacher();
+    const student = await fixtures.createStudent();
 
-    const test1 = await fixtures.createTestWithSession(user.id, {
+    const test1 = await fixtures.createTestWithSession(teacher.id, {
       questionsCount: mockQuestions.length,
       minimumCorrectAnswers: 2,
       questions: mockQuestions,
     });
     const testResultCreateObject1: TestResultCreateObject = {
       testId: test1.test.id,
-      userId: user.id,
+      userId: student.id,
       testSessionId: test1.session.id,
       answers: [
         {
           questionId: test1.test.questions[0]!.id,
-          userId: user.id,
+          userId: student.id,
           answerIds: ["A1"],
         },
         {
           questionId: test1.test.questions[1]!.id,
-          userId: user.id,
+          userId: student.id,
           answerIds: ["B1", "B2"],
         },
       ],
@@ -60,24 +61,24 @@ describe("Test Results DAL", () => {
       testResultCreateObject1.answers.length
     );
 
-    const test2 = await fixtures.createTestWithSession(user.id, {
+    const test2 = await fixtures.createTestWithSession(teacher.id, {
       questionsCount: mockQuestions.length,
       minimumCorrectAnswers: 1,
       questions: mockQuestions,
     });
     const testResultCreateObject2: TestResultCreateObject = {
       testId: test2.test.id,
-      userId: user.id,
+      userId: student.id,
       testSessionId: test2.session.id,
       answers: [
         {
           questionId: test2.test.questions[0]!.id,
-          userId: user.id,
+          userId: student.id,
           answerIds: ["A1"],
         },
         {
           questionId: test2.test.questions[1]!.id,
-          userId: user.id,
+          userId: student.id,
           answerIds: ["B1", "B3"],
         },
       ],
@@ -93,26 +94,27 @@ describe("Test Results DAL", () => {
   });
 
   it(`createTestResult should create a test result with the '${ResultType.Failed}' status`, async () => {
-    const user = await fixtures.createUser();
+    const teacher = await fixtures.createTeacher();
+    const student = await fixtures.createStudent();
 
-    const test1 = await fixtures.createTestWithSession(user.id, {
+    const test1 = await fixtures.createTestWithSession(teacher.id, {
       questionsCount: mockQuestions.length,
       minimumCorrectAnswers: 2,
       questions: mockQuestions,
     });
     const testResultCreateObject1: TestResultCreateObject = {
       testId: test1.test.id,
-      userId: user.id,
+      userId: student.id,
       testSessionId: test1.session.id,
       answers: [
         {
           questionId: test1.test.questions[0]!.id,
-          userId: user.id,
+          userId: student.id,
           answerIds: ["A2"],
         },
         {
           questionId: test1.test.questions[1]!.id,
-          userId: user.id,
+          userId: student.id,
           answerIds: ["B3", "B4"],
         },
       ],
@@ -126,24 +128,24 @@ describe("Test Results DAL", () => {
       testResultCreateObject1.answers.length
     );
 
-    const test2 = await fixtures.createTestWithSession(user.id, {
+    const test2 = await fixtures.createTestWithSession(teacher.id, {
       questionsCount: mockQuestions.length,
       minimumCorrectAnswers: 2,
       questions: mockQuestions,
     });
     const testResultCreateObject2: TestResultCreateObject = {
       testId: test2.test.id,
-      userId: user.id,
+      userId: student.id,
       testSessionId: test2.session.id,
       answers: [
         {
           questionId: test2.test.questions[0]!.id,
-          userId: user.id,
+          userId: student.id,
           answerIds: ["A1"],
         },
         {
           questionId: test2.test.questions[1]!.id,
-          userId: user.id,
+          userId: student.id,
           answerIds: ["B2", "B3"],
         },
       ],
@@ -159,7 +161,7 @@ describe("Test Results DAL", () => {
   });
 
   it(`createTestResult should account for autoScore option`, async () => {
-    const user = await fixtures.createUser();
+    const user = await fixtures.createTeacher();
 
     const test1 = await fixtures.createTestWithSession(user.id, {
       questionsCount: mockQuestions.length,

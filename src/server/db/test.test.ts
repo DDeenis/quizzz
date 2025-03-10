@@ -20,7 +20,7 @@ import { UserRole } from "@/types/user";
 
 describe("Tests DAL", { retry: 2 }, () => {
   it("getTestById should return test", async () => {
-    const userId = (await fixtures.createUser()).id;
+    const userId = (await fixtures.createTeacher()).id;
     const test = await fixtures.createTest(userId);
 
     await expect(getTestById(test.id)).resolves.toStrictEqual(test);
@@ -106,7 +106,7 @@ describe("Tests DAL", { retry: 2 }, () => {
   });
 
   it("createTest should create test", async () => {
-    const userId = (await fixtures.createUser()).id;
+    const userId = (await fixtures.createTeacher()).id;
     const formValues = fixtures.testFormValues();
     const test = await createTest(formValues, userId);
 
@@ -138,7 +138,7 @@ describe("Tests DAL", { retry: 2 }, () => {
   });
 
   it("createTest should create two tests with the same name but different slugs", async () => {
-    const userId = (await fixtures.createUser()).id;
+    const userId = (await fixtures.createTeacher()).id;
     const formValues = fixtures.testFormValues();
 
     const test1 = await createTest(formValues, userId);
@@ -149,7 +149,7 @@ describe("Tests DAL", { retry: 2 }, () => {
   });
 
   it("updateTest should update test", async () => {
-    const userId = (await fixtures.createUser()).id;
+    const userId = (await fixtures.createTeacher()).id;
     const test = await fixtures.createTest(userId);
 
     const values = {
@@ -177,7 +177,7 @@ describe("Tests DAL", { retry: 2 }, () => {
   });
 
   it("deleteTest should soft delete test", async () => {
-    const userId = (await fixtures.createUser()).id;
+    const userId = (await fixtures.createTeacher()).id;
     const test = await fixtures.createTest(userId);
 
     const result = await deleteTest(test.id);
@@ -194,7 +194,7 @@ describe("Tests DAL", { retry: 2 }, () => {
   });
 
   it("restoreTest should restore soft deleted test", async () => {
-    const userId = (await fixtures.createUser()).id;
+    const userId = (await fixtures.createTeacher()).id;
     const test = await fixtures.createTest(userId);
 
     await deleteTest(test.id);

@@ -1,20 +1,29 @@
-import { QuestionType, type QuestionUpdateObject } from "@/types/question";
+import {
+  type QuestionCreateObject,
+  QuestionType,
+  type QuestionUpdateObject,
+} from "@/types/question";
 import { db } from ".";
 import { questions, tests } from "./schema";
 import { and, count, eq } from "drizzle-orm";
 import { getUserFromDb } from "./user";
 import { isAdmin, isStudent } from "@/utils/user/authorization";
 import { TEST_MAX_QUESTIONS } from "@/utils/constants";
+import { questionUpdateSchema } from "@/utils/forms/question-form";
 
 export function createEmptyQuestion(testId: string) {
   return db
     .insert(questions)
     .values(emptyQuestionValues(testId))
     .returning()
-    .then((r) => r[0]);
+    .then((r) => {
+      const res = r[0];
+      if (!res) throw new Error("Failed to create an empty question");
+      return res;
+    });
 }
 
-export function emptyQuestionValues(testId: string) {
+export function emptyQuestionValues(testId: string): QuestionCreateObject {
   return {
     testId,
     name: "",
@@ -34,9 +43,11 @@ export function updateQuestion(
   questionId: string,
   values: QuestionUpdateObject
 ) {
+  const validatedValues = questionUpdateSchema.parse(values);
+
   return db
     .update(questions)
-    .set(values)
+    .set(validatedValues)
     .where(eq(questions.id, questionId))
     .returning()
     .then((r) => {

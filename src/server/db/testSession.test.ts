@@ -7,9 +7,10 @@ import { testSessionsToQuestions } from "./schema";
 
 describe("Test Sessions DAL", () => {
   it("createTestSession should create test session", async () => {
-    const user = await fixtures.createUser();
-    const test = await fixtures.createTest(user.id, { timeInMinutes: 30 });
-    const testSession = await createTestSession(test.id, user.id);
+    const teacher = await fixtures.createTeacher();
+    const student = await fixtures.createStudent();
+    const test = await fixtures.createTest(teacher.id, { timeInMinutes: 30 });
+    const testSession = await createTestSession(test.id, student.id);
     const { questionCount } = (
       await db
         .select({ questionCount: count() })
@@ -21,17 +22,18 @@ describe("Test Sessions DAL", () => {
     expiresAt.setMinutes(expiresAt.getMinutes() + test.timeInMinutes!);
 
     expect(testSession.testId).toBe(test.id);
-    expect(testSession.userId).toBe(user.id);
+    expect(testSession.userId).toBe(student.id);
     expect(testSession.expiresAt).toStrictEqual(expiresAt);
     expect(questionCount).toBe(test.questionsCount);
   });
 
   it("createTestSession should not create test session if all attempts are exausted", async () => {
-    const user = await fixtures.createUser();
-    const test = await fixtures.createTest(user.id, { attempts: 1 });
+    const teacher = await fixtures.createTeacher();
+    const student = await fixtures.createStudent();
+    const test = await fixtures.createTest(teacher.id, { attempts: 1 });
 
-    await createTestSession(test.id, user.id);
+    await createTestSession(test.id, student.id);
 
-    await expect(createTestSession(test.id, user.id)).rejects.toThrowError();
+    await expect(createTestSession(test.id, student.id)).rejects.toThrowError();
   });
 });

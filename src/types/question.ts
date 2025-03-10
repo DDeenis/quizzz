@@ -1,3 +1,4 @@
+import { type QuestionFormType } from "@/utils/forms/question-form";
 import { type StrictOmit } from "./utility-types";
 
 export interface Question {
@@ -17,10 +18,10 @@ export type QuestionClient = StrictOmit<Question, "answers"> & {
 
 export type QuestionCreateObject = Pick<
   Question,
-  "name" | "description" | "image" | "questionType" | "answers"
+  "testId" | "name" | "description" | "image" | "questionType" | "answers"
 >;
 
-export type QuestionUpdateObject = QuestionCreateObject;
+export type QuestionUpdateObject = QuestionFormType;
 
 export enum QuestionType {
   SingleVariant = "singleVariant",
