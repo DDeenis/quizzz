@@ -10,6 +10,7 @@ import * as schema from "./schema";
  */
 const globalForDb = globalThis as unknown as {
   client: Client | undefined;
+  configExecuted: boolean | undefined;
 };
 
 export const client =
@@ -17,10 +18,8 @@ export const client =
   createClient({ url: env.DATABASE_URL, authToken: env.DATABASE_AUTH_TOKEN });
 if (env.NODE_ENV !== "production") globalForDb.client = client;
 
-let configExecuted = false;
-
-if (!configExecuted) {
-  configExecuted = true;
+if (!globalForDb.configExecuted) {
+  globalForDb.configExecuted = true;
   try {
     // switch to WAL
     await client.execute("PRAGMA journal_mode=WAL;");
