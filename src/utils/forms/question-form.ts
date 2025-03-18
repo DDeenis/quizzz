@@ -18,7 +18,7 @@ export const questionUpdateSchema = z
     answers: z
       .array(
         z.object({
-          id: z.string().uuid(),
+          id: z.string().min(1).max(36),
           name: z
             .string()
             .min(1, "Answer should not be empty")

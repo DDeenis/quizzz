@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { validateImageSize, validateImageType } from "../test";
-import { QuestionType } from "@/types/question";
+import { questionUpdateSchema } from "./question-form";
 
 export const imageSchema = z
   .custom<File | undefined>()
@@ -41,55 +41,12 @@ export const testGeneralFormSchema = z.object({
   questionsCount: z.number().min(1, "Minimum one question"),
 });
 
-export const testQuestionsFormSchema = z
-  .array(
-    z
-      .object({
-        id: z.string().optional(),
-        name: z
-          .string()
-          .min(1, "Name should not be empty")
-          .max(1024, "Name should not be longer than 1024 characters")
-          .trim(),
-        description: z
-          .string()
-          .max(4096, "Description should not be longer than 4096 characters")
-          .optional(),
-        image: z.string().optional(),
-        questionType: z
-          .nativeEnum(QuestionType)
-          .default(QuestionType.SingleVariant),
-        answers: z
-          .array(
-            z.object({
-              id: z.string(),
-              name: z
-                .string()
-                .min(1, "Answer should not be empty")
-                .max(2048, "Answer should not be longer than 2048 characters")
-                .trim(),
-              isCorrect: z.boolean().default(false),
-            })
-          )
-          .refine(
-            (a) => a.some((v) => v.isCorrect),
-            "Select at least one correct answer"
-          ),
-      })
-      .refine(
-        (q) =>
-          q.questionType === QuestionType.SingleVariant
-            ? q.answers.filter((a) => a.isCorrect).length === 1
-            : true,
-        "Single answer questions can have only one answer"
-      )
-  )
-  .min(2, "Add minimum two questions");
+export const testQuestionsFormSchema = z.object({
+  questions: z.array(questionUpdateSchema).min(2, "Add minimum two questions"),
+});
 
 export const testFormSchema = testGeneralFormSchema
-  .extend({
-    questions: testQuestionsFormSchema,
-  })
+  .merge(testQuestionsFormSchema)
   .superRefine((fields, ctx) => {
     if (fields.questionsCount > fields.questions.length) {
       ctx.addIssue({
@@ -128,3 +85,5 @@ export const testFormSchema = testGeneralFormSchema
   });
 
 export type TestFormType = z.infer<typeof testFormSchema>;
+export type GeneralTestFormType = z.infer<typeof testGeneralFormSchema>;
+export type QuestionsTestFormType = z.infer<typeof testQuestionsFormSchema>;
