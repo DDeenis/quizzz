@@ -10,7 +10,9 @@ export function getTestStatus(test: {
   if (!latestSession) return TestStatus.None;
   if (!latestSession.result) return TestStatus.Started;
 
-  return ResultType.Passed ? TestStatus.Passed : TestStatus.Failed;
+  return latestSession.result.resultType === ResultType.Passed
+    ? TestStatus.Passed
+    : TestStatus.Failed;
 }
 
 export const ACCEPTED_IMAGE_MIME_TYPES = [
